@@ -1,0 +1,478 @@
+<!DOCTYPE html><html dir="rtl" lang="ar"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PlayIn365 — حسابك الرياضي الموثّق</title>
+<link rel="icon" type="image/svg+xml" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="15" fill="%23151a2e"/><text x="32" y="44" text-anchor="middle" font-family="Arial" font-weight="700" font-size="30" fill="%23f5c518">In</text></svg>'>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;700;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* inlined: config.js */
+// PlayIn365 — ضع قيم مشروعك من Supabase → Settings → API
+window.PI_CONFIG = {
+  SUPABASE_URL: "https://qmpwekibhdzmpmdbuvxz.supabase.co",
+  SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFtcHdla2liaGR6bXBtZGJ1dnh6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2NTAwNjgsImV4cCI6MjEwMjIyNjA2OH0.ADvceljQzYvcy_9HxwVEjWRm0vhyjkj3CyU77EHupJE"
+};
+
+</script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#faf8f3;color:#151a2e;font-family:Cairo,sans-serif}
+.ltr{direction:ltr;unicode-bidi:isolate;font-family:'Space Grotesk',sans-serif}
+a{color:#4636e3;cursor:pointer}
+.shell{max-width:520px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
+.hd{position:sticky;top:0;z-index:50;background:rgba(250,248,243,.94);backdrop-filter:blur(14px);border-bottom:1px solid #e3ded2;padding:13px 18px;display:flex;justify-content:space-between;align-items:center}
+main{flex:1;padding:16px 18px 100px;display:flex;flex-direction:column;gap:12px}
+.card{background:#fff;border:1px solid #e9e4d8;border-radius:20px;padding:16px}
+.stage{background:#151a2e;border-radius:22px;padding:18px;color:#faf8f3;position:relative;overflow:hidden}
+.stage::before{content:"";position:absolute;inset-inline-start:62%;top:-70%;width:70%;height:230%;background:linear-gradient(200deg,#4636e3,#7b5cff);border-radius:50%;opacity:.5}
+.stage>*{position:relative}
+.btn{display:block;width:100%;background:#4636e3;color:#fff;border:0;border-radius:14px;padding:14px;font:900 12.5px Cairo;cursor:pointer;text-align:center}
+.btn.gold{background:#f5c518;color:#151a2e}.btn.dark{background:#151a2e;color:#f5c518}
+.btn.ghost{background:#fff;border:1px solid #e9e4d8;color:#565d78}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.chip{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:5px 12px;font-size:10px;font-weight:900}
+.chip.ok{background:#eaf5ee;color:#2c6e49}.chip.warn{background:#fff8df;border:1px solid #f0e2b4;color:#8a6912}
+.chip.live{background:#fdeee8;color:#e8531f}.chip.bad{background:#fdeee8;color:#a83b25}
+.fld{display:flex;flex-direction:column;gap:6px;margin-bottom:11px}
+.fld label{font-size:11.5px;font-weight:800}
+.fld input,.fld select{border:1px solid #e3ded2;border-radius:12px;padding:13px 14px;font:600 13px Cairo;outline:0;background:#fff;width:100%}
+.fld input:focus{border-color:#4636e3;box-shadow:0 0 0 4px rgba(70,54,227,.12)}
+.muted{font-size:10.5px;color:#8a8fa5;font-weight:700}
+.h2{font-size:13px;font-weight:900;margin:0}
+.lrow{display:flex;gap:11px;align-items:flex-start;padding:10px 0;border-top:1px solid #f0ece2}
+.lrow:first-of-type{border-top:0;padding-top:0}
+.ic{width:32px;height:32px;border-radius:50% 50% 50% 6px;background:#efedff;color:#4636e3;display:grid;place-items:center;font-size:13px;flex-shrink:0}
+.nav{position:fixed;bottom:0;inset-inline:0;max-width:520px;margin:0 auto;background:#fff;border-top:1px solid #e9e4d8;display:flex;justify-content:space-around;align-items:center;padding:10px 16px calc(10px + env(safe-area-inset-bottom));z-index:60}
+.nav button{background:none;border:0;cursor:pointer;font:800 10.5px Cairo;color:#8a8fa5;display:flex;flex-direction:column;align-items:center;gap:3px}
+.nav button.on{color:#4636e3;font-weight:900}
+.nav button i{font-style:normal;width:32px;height:32px;display:grid;place-items:center;font-size:15px;border-radius:12px}
+.nav button.on i{background:#efedff}
+.nav .fab{width:52px;height:52px;border-radius:50% 50% 50% 14px;background:#4636e3;color:#fff;font-size:22px;margin-top:-30px;box-shadow:0 10px 22px rgba(70,54,227,.35);display:grid;place-items:center}
+.note{background:#fff8df;border:1px solid #f0e2b4;border-radius:16px;padding:13px;font-size:11px;color:#8a6912;font-weight:700;line-height:1.85}
+.dnote{background:#151a2e;border-radius:16px;padding:13px;color:#c6cade;font-size:11px;font-weight:600;line-height:1.85}
+.stat3{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.stat{background:#fff;border:1px solid #e9e4d8;border-radius:16px;padding:13px 10px;text-align:center}
+.stat b{display:block;font:700 21px 'Space Grotesk';direction:ltr}
+.toast{position:fixed;bottom:96px;inset-inline:0;margin:0 auto;width:fit-content;max-width:90%;background:#2c6e49;color:#fff;border-radius:13px;padding:12px 20px;font-size:12px;font-weight:900;z-index:90;box-shadow:0 14px 30px rgba(21,26,46,.25)}
+.toast.err{background:#a83b25}
+.wm{direction:ltr;unicode-bidi:isolate;font-family:'Space Grotesk';font-weight:700;letter-spacing:-1.5px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.bar{display:flex;height:9px;border-radius:99px;overflow:hidden;background:#f0ece2}
+.skel{border-radius:14px;background:linear-gradient(90deg,#f2f0ea 25%,#fff 50%,#f2f0ea 75%);background-size:200% 100%;animation:sk 1.2s infinite}
+@keyframes sk{to{background-position:-200% 0}}
+</style></head><body>
+<div class="shell" id="app"></div>
+<script>
+/* inlined: app-core.js */
+const C=window.PI_CONFIG||{};
+const sb=(C.SUPABASE_URL&&!C.SUPABASE_URL.includes("YOUR-"))?supabase.createClient(C.SUPABASE_URL,C.SUPABASE_ANON_KEY):null;
+let ME=null, VIEW="auth", PARAM=null, CACHE={};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const N=n=>`<span class="ltr">${esc(n)}</span>`;
+const roleAr={player:"لاعب",coach:"مدرب",organizer:"منظم",academy:"أكاديمية",venue:"ملعب",guardian:"ولي أمر",scout:"كشاف",admin:"الإدارة",medical:"طبي",referee:"حكم",agent:"وكيل"};
+const WM=d=>`<span class="wm" style="font-size:18px"><span style="color:${d?"#faf8f3":"#151a2e"}">Play</span><span style="color:${d?"#f5c518":"#c78c00"}">In</span><span style="color:${d?"#7b5cff":"#4636e3"};font-size:.46em;vertical-align:super;letter-spacing:0">365</span></span>`;
+function toast(t,err){ const e=document.createElement("div"); e.className="toast"+(err?" err":""); e.textContent=t; document.body.append(e); setTimeout(()=>e.remove(),2800); }
+function go(v,p){ VIEW=v; PARAM=p??null; render(); }
+async function trans(action){ await sb.from("transparency").insert({actor:ME.name+" — "+roleAr[ME.role],action}); }
+async function notifyUser(uid,kind,title,body){ await sb.from("notifications").insert({user_id:uid,kind,title,body}); }
+
+/* ---------- AUTH ---------- */
+async function boot(){
+  if(!sb){ $("#app").innerHTML=`<main><div class="note" style="margin-top:40vh0">⚠️ لم تُضبط مفاتيح Supabase بعد — افتح <b>config.js</b> وضع Project URL وanon key ثم أعد التحميل. الخطوات كاملة في README-DEPLOY.md</div></main>`; return; }
+  const {data:{session}}=await sb.auth.getSession();
+  if(session){ await loadMe(session.user.id); VIEW=ME&&ME.roleSet?homeFor():"role"; } 
+  render();
+  sb.auth.onAuthStateChange(async(ev,s)=>{ if(ev==="SIGNED_IN"&&s){ await loadMe(s.user.id); VIEW=ME&&ME.roleSet?homeFor():"role"; render(); } if(ev==="SIGNED_OUT"){ ME=null; VIEW="auth"; render(); } });
+}
+async function loadMe(uid){
+  const {data}=await sb.from("profiles").select("*").eq("id",uid).single();
+  let picked=false; try{ picked=localStorage.getItem("pi_role_"+(data&&data.id))==="1"; }catch(e){}
+  ME=data?{...data,roleSet:picked||(data.role&&data.role!=="player")}:null;
+}
+function homeFor(){ return ({player:"home",coach:"orgMatch",organizer:"orgMatch",referee:"orgMatch",academy:"acad",venue:"venue",guardian:"guardian",scout:"scout",admin:"admin",medical:"medical",agent:"deals"})[ME.role]||"home"; }
+async function doSignup(){
+  const name=$("#su_name").value.trim(), em=$("#su_em").value.trim(), pw=$("#su_pw").value;
+  if(!name||!em||pw.length<8) return toast("أكمل الاسم والبريد وكلمة مرور ٨+ أحرف",1);
+  const {error}=await sb.auth.signUp({email:em,password:pw,options:{data:{name}}});
+  if(error) return toast(error.message.includes("registered")?"البريد مسجّل سابقًا — ادخل":"تعذّر: "+error.message,1);
+  toast("أنشئ الحساب — إن طُلب تأكيد البريد افتح رسالتنا");
+}
+async function doLogin(){
+  const em=$("#li_em").value.trim(), pw=$("#li_pw").value;
+  const {error}=await sb.auth.signInWithPassword({email:em,password:pw});
+  if(error) toast("بيانات غير صحيحة",1);
+}
+window.doGuest=async(btn)=>{
+  if(btn){ btn.disabled=true; btn.textContent="ثوانٍ — نجهّز جولتك…"; }
+  const r=Math.random().toString(36).slice(2,10);
+  const {error}=await sb.auth.signUp({email:`guest_${Date.now()}_${r}@demo.playin365.app`,password:"Gp!"+r+"9x2",options:{data:{name:"زائر تجريبي"}}});
+  if(error){ if(btn){ btn.disabled=false; btn.textContent="ادخل كتجربة — بلا بريد ولا كلمة مرور"; } return toast("تعذّر الدخول التجريبي — جرّب مرة أخرى",1); }
+  toast("دخلت كزائر — رحلة جديدة من البداية");
+};
+async function saveRole(){
+  const role=$("#rl").value, org=$("#rl_org")?$("#rl_org").value.trim():"";
+  const {error}=await sb.from("profiles").update({role,org}).eq("id",ME.id);
+  if(error) return toast("تعذّر الحفظ: "+error.message,1);
+  try{ localStorage.setItem("pi_role_"+ME.id,"1"); }catch(e){}
+  ME.role=role; ME.org=org; ME.roleSet=true; toast("أهلًا بك — "+roleAr[role]); go(homeFor());
+}
+
+/* ---------- DATA ---------- */
+async function q(name,builder){ const {data,error}=await builder; if(error){ console.error(name,error); toast("خطأ قراءة "+name,1); return []; } return data||[]; }
+const evLabel=e=>({goal:"هدف — "+e.who,assist:"صناعة — "+e.who,yellow:"بطاقة صفراء — "+e.who,red:"بطاقة حمراء — "+e.who,sub:"تبديل — "+e.who})[e.type]||e.type;
+
+/* ---------- VIEWS ---------- */
+const T={};
+T.auth=()=>`<main style="justify-content:center">
+  <div style="text-align:center;margin:26px 0 4px">
+    <span class="wm" style="font-size:34px"><span style="color:#151a2e">Play</span><span style="color:#c78c00">In</span><span style="color:#4636e3;font-size:.46em;vertical-align:super;letter-spacing:0">365</span></span>
+    <p style="margin:8px 0 0;font-size:13px;color:#565d78;font-weight:700">حسابك الرياضي الموثّق — كل رقم باسم من سجّله</p>
+  </div>
+  <div class="card">
+    <div style="display:flex;gap:6px;margin-bottom:13px">
+      <button class="btn" id="tabL" style="flex:1;padding:11px" onclick="swTab(0)">دخول</button>
+      <button class="btn ghost" id="tabS" style="flex:1;padding:11px" onclick="swTab(1)">حساب جديد</button>
+    </div>
+    <div id="pnL">
+      <div class="fld"><label>البريد الإلكتروني</label><input id="li_em" dir="ltr" placeholder="you@email.com"></div>
+      <div class="fld"><label>كلمة المرور</label><input id="li_pw" dir="ltr" type="password" placeholder="••••••••"></div>
+      <button class="btn" onclick="doLogin()">ادخل</button>
+    </div>
+    <div id="pnS" style="display:none">
+      <div class="fld"><label>الاسم</label><input id="su_name" placeholder="اسمك الظاهر في السجلات"></div>
+      <div class="fld"><label>البريد الإلكتروني</label><input id="su_em" dir="ltr" placeholder="you@email.com"></div>
+      <div class="fld"><label>كلمة المرور</label><input id="su_pw" dir="ltr" type="password" placeholder="٨ أحرف فأكثر"></div>
+      <button class="btn" onclick="doSignup()">أنشئ الحساب</button>
+      <p class="muted" style="text-align:center;margin:9px 0 0">التسجيل مفتوح للجميع — المصداقية تُكتسب من ملعبك لا عند الباب</p>
+    </div>
+    <button class="btn ghost" disabled style="margin-top:9px">نفاذ <span class="chip warn" style="margin-inline-start:6px">قريبًا</span></button>
+    <button class="btn dark" style="margin-top:9px" onclick="doGuest(this)">ادخل كتجربة — بلا بريد ولا كلمة مرور</button>
+    <p class="muted" style="text-align:center;margin:7px 0 0">كل دخول تجريبي يبدأ رحلة جديدة من الصفر</p>
+  </div></main>`;
+window.swTab=i=>{ $("#pnL").style.display=i?"none":"block"; $("#pnS").style.display=i?"block":"none"; $("#tabL").className=i?"btn ghost":"btn"; $("#tabS").className=i?"btn":"btn ghost"; $("#tabL").style.flex=$("#tabS").style.flex="1"; };
+
+T.role=()=>`<main>
+  <div class="stage"><b style="font-size:15px;color:#f5c518">هلا ${esc(ME.name)} 👋</b><p style="margin:7px 0 0;font-size:12px;color:#c6cade;font-weight:600;line-height:1.9">اختر دورك الأساسي — هوية واحدة وأدوار متعددة، وتضيف غيره لاحقًا.</p></div>
+  <div class="card">
+    <div class="fld"><label>الدور</label><select id="rl">${Object.entries(roleAr).map(([k,v])=>`<option value="${k}">${v}</option>`).join("")}</select></div>
+    <div class="fld"><label>جهتك (اختياري)</label><input id="rl_org" placeholder="مثال: أكاديمية النخبة / ملعب المروج"></div>
+    <button class="btn" onclick="saveRole()">ابدأ</button>
+  </div></main>`;
+
+T.home=async()=>{
+  const matches=CACHE.matches=await q("matches",sb.from("matches").select("*").order("created_at",{ascending:false}).limit(20));
+  const today=matches.find(m=>m.status==="today"||m.status==="live");
+  const open=matches.find(m=>m.status==="open");
+  const evs=CACHE.myEvents=await q("events",sb.from("match_events").select("*,matches(title)").eq("who",ME.name).order("created_at",{ascending:false}).limit(5));
+  return `<main>
+    <div><b style="font-size:18px">هلا ${esc(ME.name.split(" ")[0])}</b><span class="muted" style="display:block;margin-top:3px">${today?"عندك مباراة اليوم "+esc(today.match_time):"يومك هادئ"}</span></div>
+    ${today?`<div class="stage"><div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="font-size:10px;font-weight:900;color:#f5c518">مباراة اليوم</span><span style="font-size:10px;color:#c6cade;font-weight:800">${esc(today.comp)}</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:14px">${esc(today.title)}</b><b class="ltr" style="font-size:16px">${esc(today.match_time)}</b></div>
+      <button class="btn gold" style="margin-top:13px" onclick="joinMatch('${today.id}',1)">أكّد حضورك</button></div>`:""}
+    <div class="card"><div style="display:flex;justify-content:space-between;margin-bottom:10px"><b class="h2">آخر ما دخل سجلك</b><a onclick="go('records')" style="font-size:11px;font-weight:900">السجل ←</a></div>
+      ${evs.length?evs.slice(0,2).map(e=>`<div class="lrow"><span class="ic">${e.type==="goal"?"⚽":"◎"}</span><div style="flex:1;min-width:0"><b style="font-size:12px;display:block">${esc(evLabel(e))} · ${esc(e.matches?e.matches.title:"")}</b><span class="muted">سجّله ${esc(e.recorded_by)}</span></div></div>`).join(""):`<span class="muted">سجلك يبدأ من أول مباراة — انضم لمباراة قريبة.</span>`}</div>
+    ${open?`<div class="card"><div style="display:flex;justify-content:space-between;margin-bottom:9px"><b class="h2">قريب منك</b><a onclick="go('explore')" style="font-size:11px;font-weight:900">استكشف ←</a></div>
+      <div style="background:#faf8f3;border:1px solid #e9e4d8;border-radius:15px;padding:13px"><b style="font-size:12.5px;display:block">${esc(open.title)}</b>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px"><span class="muted">${esc(open.match_time)} · ${N(open.fee)} ر.س</span><button class="btn" style="width:auto;padding:8px 20px;border-radius:999px;font-size:11px" onclick="joinMatch('${open.id}')">انضم</button></div></div></div>`:""}
+  </main>`;
+};
+window.joinMatch=async(mid,att)=>{
+  const {error}=await sb.from("match_joins").upsert({match_id:mid,player_id:ME.id,player_name:ME.name,attended:!!att},{onConflict:"match_id,player_id"});
+  if(error) return toast("تعذّر: "+error.message,1);
+  toast(att?"حضورك مؤكد — أُخطر المنظم":"انضممت — تدخل تقويمك");
+};
+
+T.records=async()=>{
+  const evs=await q("events",sb.from("match_events").select("*,matches(title)").eq("who",ME.name).order("created_at",{ascending:false}));
+  const goals=evs.filter(e=>e.type==="goal").length, assists=evs.filter(e=>e.type==="assist").length;
+  const played=(await q("joins",sb.from("match_joins").select("id").eq("player_id",ME.id).eq("attended",true))).length;
+  CACHE.played=played;
+  return `<main>
+    <div class="stat3"><div class="stat"><b>${played}</b><span class="muted">مباراة</span></div><div class="stat"><b style="color:#4636e3">${goals}</b><span class="muted">هدف</span></div><div class="stat"><b style="color:#c78c00">${assists}</b><span class="muted">صناعة</span></div></div>
+    ${evs.length?evs.map(e=>`<div class="card" style="padding:13px 14px;display:flex;gap:11px;align-items:flex-start"><span class="ic" style="${e.type==="yellow"?"background:#151a2e;color:#f5c518":""}">${e.type==="goal"?"⚽":e.type==="yellow"?"▮":"◎"}</span><div style="flex:1;min-width:0"><b style="font-size:12px;display:block">${esc(evLabel(e))} · الدقيقة ${N(e.minute)}</b><span class="muted">${esc(e.matches?e.matches.title:"")} — سجّله ${esc(e.recorded_by)}</span></div></div>`).join(""):`<div class="card" style="text-align:center;padding:30px"><b style="font-size:13px">سجلك يبدأ من أول مباراة</b><p class="muted" style="margin:7px 0 0">كل حدث يدخل هنا لحظة تسجيله من المنظم أو حكمه.</p></div>`}
+    <div class="dnote">كل سطر باسم من كتبه. خطأ تقني؟ بلاغ عام لا يغيّر نتيجة ولا حدثًا — التصحيح حق المنظم وحده.</div>
+  </main>`;
+};
+
+T.rating=async()=>{
+  const played=CACHE.played??(await q("joins",sb.from("match_joins").select("id").eq("player_id",ME.id).eq("attended",true))).length;
+  const has=played>=5;
+  return `<main>
+    <div class="stage" style="text-align:center"><b class="ltr" style="font-size:44px;font-family:'Space Grotesk'">${has?"7.8":"—"}</b><span style="display:block;font-size:11px;color:#c6cade;font-weight:700;margin-top:6px">${has?"محدّث بعد كل مباراة موثّقة":`بعد ${N(5-played)} مباريات موثّقة يظهر رقمك`}</span></div>
+    ${has?`<div class="card"><div class="bar"><span style="width:50%;background:#151a2e"></span><span style="width:30%;background:#4636e3"></span><span style="width:15%;background:#c78c00"></span><span style="width:5%;background:#c9c2b2"></span></div>
+      <div style="display:flex;gap:10px;margin-top:9px;font-size:10px;font-weight:800;color:#565d78;flex-wrap:wrap"><span>مقيس ${N("50%")}</span><span>خبراء ${N("30%")}</span><span>داعمون ${N("15%")}</span><span>جمهور ${N("5%")}</span></div>
+      <p style="margin:10px 0 0;font-size:11px;color:#565d78;font-weight:600;line-height:1.9">سقف صلب: الداعمون + الجمهور ≤ ${N("20%")} مهما بلغ العدد.</p></div>`:""}
+    <div class="note">لا تقييم قبل ${N(5)} مباريات موثّقة — «—» لا صفر: الصفر يُقرأ حكمًا والشرطة انتظارًا.</div>
+  </main>`;
+};
+
+T.explore=async()=>{
+  const ms=await q("matches",sb.from("matches").select("*").in("status",["open","today"]).order("created_at",{ascending:false}));
+  return `<main>
+    <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="chip" style="background:#4636e3;color:#fff">مباريات مفتوحة</span><span class="chip" style="background:#fff;border:1px solid #e9e4d8;color:#565d78">ملاعب</span><span class="chip" style="background:#fff;border:1px solid #e9e4d8;color:#565d78">بطولات</span></div>
+    ${ms.length?ms.map(m=>`<div class="card"><div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:10px;font-weight:900;color:#c78c00">${m.status==="open"?"مفتوحة":"اليوم"}</span><span class="muted">${esc(m.venue)}</span></div><b style="font-size:12.5px;display:block">${esc(m.title)}</b>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px"><span class="muted">${esc(m.match_time)}${m.fee>0?" · "+N(m.fee)+" ر.س":""} · المنظم: ${esc(m.organizer_name)}</span><button class="btn" style="width:auto;padding:8px 18px;border-radius:999px;font-size:11px" onclick="joinMatch('${m.id}')">انضم</button></div></div>`).join(""):`<div class="card" style="text-align:center;padding:28px"><b>لا مباريات مفتوحة الآن</b><p class="muted" style="margin:6px 0 0">المنظمون ينشئونها من زر +</p></div>`}
+  </main>`;
+};
+
+T.newMatch=()=>`<main>
+  <div class="card"><b class="h2" style="display:block;margin-bottom:11px">إنشاء مباراة — أنت المنظم المسؤول</b>
+    <div class="fld"><label>العنوان</label><input id="nm_t" placeholder="سباعية ودية / الصقور × الشرق"></div>
+    <div class="grid2"><div class="fld"><label>الوقت</label><input id="nm_time" dir="ltr" value="20:00"></div><div class="fld"><label>الملعب</label><input id="nm_v" value="ملعب المروج"></div></div>
+    <div class="grid2"><div class="fld"><label>رسوم اللاعب (ر.س)</label><input id="nm_fee" dir="ltr" type="number" value="0"></div><div class="fld"><label>حكم معيّن (اختياري)</label><input id="nm_ref" placeholder="اسم الحكم"></div></div>
+    <button class="btn" onclick="createMatch()">أنشئ — تظهر فورًا في استكشف</button></div>
+  <div class="note">كل شيء تحت مسؤوليتك: التنظيم والتسجيل والنتيجة. إن عيّنت حكمًا فقراره ينعكس مباشرة.</div></main>`;
+window.createMatch=async()=>{
+  const t=$("#nm_t").value.trim(); if(!t) return toast("اكتب العنوان",1);
+  const {error}=await sb.from("matches").insert({title:t,match_time:$("#nm_time").value,venue:$("#nm_v").value,fee:+$("#nm_fee").value||0,referee_name:$("#nm_ref").value.trim(),organizer_id:ME.id,organizer_name:ME.name,status:"open",comp:"مفتوحة"});
+  if(error) return toast("تعذّر: "+error.message,1);
+  await trans("إنشاء مباراة: "+t); toast("أُنشئت"); go("orgMatch");
+};
+
+T.orgMatch=async()=>{
+  const ms=await q("matches",sb.from("matches").select("*").order("created_at",{ascending:false}).limit(15));
+  const mine=ME.role==="referee"?ms.filter(m=>m.referee_name===ME.name):ms.filter(m=>m.organizer_id===ME.id);
+  const list=mine.length?mine:ms;
+  return `<main>
+    ${list.map(m=>`<div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:13px">${esc(m.title)}</b>${m.status==="final"?`<b class="ltr" style="font-family:'Space Grotesk';font-size:16px">${m.score_a} - ${m.score_b}</b>`:`<span class="chip ${m.status==="live"?"live":"warn"}">${m.status==="live"?"● مباشر":m.status==="today"?"اليوم":"مفتوحة"}</span>`}</div>
+      <span class="muted" style="display:block;margin-top:4px">${esc(m.venue)} · ${esc(m.match_time)} · المنظم: ${esc(m.organizer_name)}${m.referee_name?" — الحكم "+esc(m.referee_name):""}</span>
+      <div style="display:flex;gap:8px;margin-top:11px">
+        ${(m.organizer_id===ME.id||m.referee_name===ME.name||["coach","organizer","referee"].includes(ME.role))&&m.status!=="final"?`<button class="btn" style="flex:1;padding:11px" onclick="go('live','${m.id}')">التسجيل المباشر</button>`:""}
+        ${(m.organizer_id===ME.id)&&m.status==="final"?`<button class="btn ghost" style="flex:1;padding:11px" onclick="go('correct','${m.id}')">تصحيح باسمك</button>`:""}
+        <button class="btn ghost" style="flex:1;padding:11px" onclick="go('matchView','${m.id}')">التفاصيل</button>
+      </div></div>`).join("")||`<div class="card" style="text-align:center;padding:28px"><b>لا مباريات بعد</b></div>`}
+    <div class="note">لا اعتماد ولا اعتراض: قرارك ينعكس فورًا. الخطأ يُصحَّح باسمك ووقتك وسببك في سجل الشفافية.</div>
+  </main>`;
+};
+
+T.live=async()=>{
+  const m=(await q("m",sb.from("matches").select("*").eq("id",PARAM)))[0]; if(!m) return "<main><div class='card'>غير موجودة</div></main>"; CACHE.live=m;
+  if(m.status!=="live"&&m.status!=="final"){ await sb.from("matches").update({status:"live"}).eq("id",m.id); m.status="live"; }
+  const evs=await q("evs",sb.from("match_events").select("*").eq("match_id",m.id).order("created_at",{ascending:false}));
+  const by=m.referee_name&&ME.name===m.referee_name?ME.name+" — الحكم":ME.name+" — المنظم";
+  return `<main>
+    <div class="stage"><div style="display:flex;justify-content:space-between;align-items:center"><span class="chip live" style="background:rgba(232,83,31,.2);border:1px solid #e8531f;color:#ff8a5f">● مباشر</span><b class="ltr" style="font-family:'Space Grotesk';font-size:30px">${m.score_a} - ${m.score_b}</b></div><b style="display:block;margin-top:6px;font-size:13px">${esc(m.title)}</b></div>
+    <div class="card"><b class="h2" style="display:block;margin-bottom:10px">سجّل — ينعكس فورًا باسم: ${esc(by)}</b>
+      <div class="fld"><label>اسم اللاعب</label><input id="ev_who" placeholder="من فعلها؟"></div>
+      <div class="grid2">
+        <button class="btn" onclick="recEv('${m.id}','goal',1,'${esc(by)}')">⚽ هدف (فريق ١)</button>
+        <button class="btn" onclick="recEv('${m.id}','goal',2,'${esc(by)}')">⚽ هدف (فريق ٢)</button>
+        <button class="btn dark" onclick="recEv('${m.id}','yellow',0,'${esc(by)}')">▮ بطاقة صفراء</button>
+        <button class="btn ghost" onclick="recEv('${m.id}','sub',0,'${esc(by)}')">⇄ تبديل</button>
+      </div></div>
+    <div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><b class="h2">الأحداث</b><button class="btn dark" style="width:auto;padding:9px 16px;border-radius:999px;font-size:10.5px" onclick="endMatch('${m.id}')">أنهِ — النتيجة نهائية لحظة الإعلان</button></div>
+      ${evs.map(e=>`<div class="lrow"><b class="ltr" style="font-family:'Space Grotesk';color:#8a8fa5;width:30px;flex:none">${e.minute}'</b><span style="flex:1;font-size:12px;font-weight:700">${esc(evLabel(e))}</span><span class="muted" style="flex-shrink:0">${esc(e.recorded_by)}</span></div>`).join("")||`<span class="muted">لم تُسجّل أحداث بعد.</span>`}</div>
+  </main>`;
+};
+window.recEv=async(mid,type,team,by)=>{
+  const who=$("#ev_who").value.trim()||"غير مسمّى";
+  const min=Math.floor(Math.random()*90)+1;
+  const {error}=await sb.from("match_events").insert({match_id:mid,minute:min,type,who,recorded_by:by});
+  if(error) return toast("تعذّر: "+error.message,1);
+  if(type==="goal"&&team){ const f=team===1?"score_a":"score_b"; const m=CACHE.live; m[f]++; await sb.from("matches").update({[f]:m[f]}).eq("id",mid); }
+  toast("سُجّل وانعكس فورًا"); render();
+};
+window.endMatch=async(mid)=>{
+  await sb.from("matches").update({status:"final"}).eq("id",mid);
+  const m=CACHE.live; await trans(`إعلان نتيجة ${m.title}: ${m.score_a}-${m.score_b} — نهائية لحظة الإعلان`);
+  toast("النتيجة نهائية ودخلت السجلات"); go("orgMatch");
+};
+
+T.correct=async()=>{
+  const m=(await q("m",sb.from("matches").select("*").eq("id",PARAM)))[0]; CACHE.corr=m;
+  return `<main>
+    <div class="card" style="border:2px solid #4636e3"><b class="h2" style="display:block;margin-bottom:10px">تصحيح المنظم — ${esc(m.title)}</b>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px"><span class="muted">النتيجة</span>
+        <input id="c1" dir="ltr" value="${m.score_a}" style="width:54px;text-align:center;border:1px solid #e3ded2;border-radius:10px;padding:10px;font:700 14px 'Space Grotesk'">
+        <span style="color:#c9c2b2;font-weight:900">-</span>
+        <input id="c2" dir="ltr" value="${m.score_b}" style="width:54px;text-align:center;border:1px solid #e3ded2;border-radius:10px;padding:10px;font:700 14px 'Space Grotesk'">
+      </div>
+      <div class="fld"><label>السبب — إلزامي</label><input id="cr" placeholder="مثال: خطأ إدخال في الدقيقة 67"></div>
+      <button class="btn dark" onclick="applyCorrect()">أكّد — يُخطر الطرفان ويدخل سجل الشفافية باسمك</button></div>
+    <div class="note">تصحيح لا اعتراض: أنت وحدك تصحّح ما نظّمت، ويبقى التصحيح باسمك ووقته وسببه للأبد.</div>
+  </main>`;
+};
+window.applyCorrect=async()=>{
+  const r=$("#cr").value.trim(); if(!r) return toast("السبب إلزامي",1);
+  const m=CACHE.corr, a=+$("#c1").value, b=+$("#c2").value;
+  await sb.from("matches").update({score_a:a,score_b:b}).eq("id",m.id);
+  await trans(`تصحيح نتيجة ${m.title}: من ${m.score_a}-${m.score_b} إلى ${a}-${b} · السبب: ${r}`);
+  toast("صُحّحت ودخل التصحيح سجل الشفافية"); go("orgMatch");
+};
+
+T.matchView=async()=>{
+  const m=(await q("m",sb.from("matches").select("*").eq("id",PARAM)))[0];
+  const evs=await q("evs",sb.from("match_events").select("*").eq("match_id",m.id).order("minute"));
+  return `<main>
+    <div class="card" style="text-align:center"><span class="muted">${esc(m.comp)} · ${esc(m.venue)}</span><b style="display:block;font-size:14px;margin-top:6px">${esc(m.title)}</b><b class="ltr" style="font-family:'Space Grotesk';font-size:30px;display:block;margin-top:5px">${m.score_a} - ${m.score_b}</b>
+      <span class="muted" style="display:block;margin-top:6px">المنظم: ${esc(m.organizer_name)}${m.referee_name?" — الحكم "+esc(m.referee_name)+" (قراره ينعكس فورًا)":""}</span></div>
+    <div class="stage"><b style="font-size:12.5px;color:#f5c518;display:block;margin-bottom:9px">الأحداث — دخلت السجلات لحظة تسجيلها</b>
+      ${evs.map(e=>`<div style="display:flex;gap:11px;align-items:center;padding:8px 0;border-top:1px solid #333a55;font-size:12px;font-weight:700"><b class="ltr" style="font-family:'Space Grotesk';color:#9aa0b8;width:30px;flex:none">${e.minute}'</b><span style="flex:1">${esc(evLabel(e))}</span><span style="font-size:9.5px;color:#9aa0b8">${esc(e.recorded_by)}</span></div>`).join("")||`<span style="font-size:11px;color:#9aa0b8;font-weight:700">لا أحداث بعد.</span>`}</div>
+    <button class="btn ghost" onclick="toast('وصل البلاغ التقني — لا يمسّ النتيجة ولا الأحداث')">بلاغ تقني عام — لا يغيّر نتيجة ولا حدثًا</button>
+  </main>`;
+};
+
+</script>
+<script>
+/* inlined: app-part2.js */
+/* PlayIn365 — part 2: أكاديمية · ملعب · ولي · كشاف · طبي · تعاقدات · سوق · أدمن · إشعارات · الهيكل */
+T.acad=async()=>{
+  const org=ME.org||"أكاديميتي";
+  const subs=await q("subs",sb.from("subscriptions").select("*").eq("org",org).order("paid"));
+  const att=await q("att",sb.from("attendance").select("*").eq("org",org).order("created_at",{ascending:false}).limit(8));
+  const due=subs.filter(s=>!s.paid);
+  return `<main>
+    <div class="dnote" style="background:#151a2e"><b style="color:#f5c518">الوضع الخفيف — ثلاث مهام تكفي اليوم:</b> حضور بنقرة · نتيجة المباراة · التحصيل تلقائي.</div>
+    <div class="card"><b class="h2" style="display:block;margin-bottom:10px">حضور اليوم</b>
+      <div class="grid2"><div class="fld" style="margin:0"><input id="at_p" placeholder="اسم اللاعب"></div><div class="fld" style="margin:0"><input id="at_g" value="U18" dir="ltr"></div></div>
+      <button class="btn" style="margin-top:9px" onclick="markAtt()">سجّل حضورًا بنقرة</button>
+      ${att.length?`<div style="margin-top:11px">${att.slice(0,5).map(a=>`<div class="lrow"><span class="ic">✓</span><div style="flex:1"><b style="font-size:12px">${esc(a.player_name)} · ${esc(a.group_name)}</b><span class="muted" style="display:block">سجّله ${esc(a.recorded_by)}</span></div></div>`).join("")}</div>`:""}</div>
+    <div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b class="h2">التحصيل</b><span class="chip ${due.length?"warn":"ok"}">${due.length?"متأخرات: "+due.length:"مكتمل ✓"}</span></div>
+      ${subs.map(s=>`<div class="lrow"><div style="flex:1"><b style="font-size:12px">${esc(s.player_name)} · ${esc(s.month)}</b><span class="muted" style="display:block">${esc(s.group_name)} · <span class="ltr">${s.amount}</span> ر.س</span></div>
+        ${s.paid?`<span class="chip ok">مدفوع ✓</span>`:`<button class="btn" style="width:auto;padding:8px 16px;border-radius:999px;font-size:10.5px" onclick="collect('${s.id}')">حصّل</button>`}</div>`).join("")||`<span class="muted">أضف اشتراكات لاعبيك.</span>`}
+      <div class="grid2" style="margin-top:10px"><input id="sb_p" placeholder="اسم اللاعب" style="border:1px solid #e3ded2;border-radius:11px;padding:11px;font:600 12px Cairo"><input id="sb_a" dir="ltr" type="number" placeholder="450" style="border:1px solid #e3ded2;border-radius:11px;padding:11px;font:600 12px Cairo"></div>
+      <button class="btn ghost" style="margin-top:8px" onclick="addSub()">أضف اشتراك سبتمبر</button></div>
+    <div class="note">نموذج الأكاديمية: اشتراك و${'\u200e'}0% أو بلا اشتراك و${'\u200e'}4% — تختار واحدًا، والتبديل مرة كل موسم.</div>
+  </main>`;
+};
+window.markAtt=async()=>{ const p=$("#at_p").value.trim(); if(!p) return toast("اكتب اسم اللاعب",1);
+  const {error}=await sb.from("attendance").insert({org:ME.org||"أكاديميتي",group_name:$("#at_g").value||"U18",player_name:p,recorded_by:ME.name});
+  if(error) return toast(error.message,1); toast("سُجّل الحضور"); render(); };
+window.collect=async(id)=>{ await sb.from("subscriptions").update({paid:true,paid_at:new Date().toISOString()}).eq("id",id); await trans("تحصيل اشتراك"); toast("حُصّل — وصل للمشترك إيصال"); render(); };
+window.addSub=async()=>{ const p=$("#sb_p").value.trim(), a=+$("#sb_a").value; if(!p||!a) return toast("الاسم والمبلغ",1);
+  await sb.from("subscriptions").insert({org:ME.org||"أكاديميتي",player_name:p,month:"سبتمبر",amount:a,group_name:$("#at_g")?$("#at_g").value:"U18"}); toast("أُضيف"); render(); };
+
+T.venue=async()=>{
+  const v=ME.org||"ملعبي";
+  const bs=await q("bk",sb.from("bookings").select("*").eq("venue",v).order("created_at",{ascending:false}));
+  const reqs=bs.filter(b=>b.status==="requested");
+  return `<main>
+    <div class="stat3"><div class="stat"><b>${bs.filter(b=>b.status==="paid"||b.status==="accepted").length}</b><span class="muted">حجوزات</span></div><div class="stat"><b style="color:#c78c00">${reqs.length}</b><span class="muted">بانتظار ردّك</span></div><div class="stat"><b style="color:#2c6e49" class="ltr">${bs.filter(b=>b.status==="paid").reduce((s,b)=>s+(+b.price||0),0)}</b><span class="muted">إيراد ر.س</span></div></div>
+    ${reqs.length?`<div class="card"><b class="h2" style="display:block;margin-bottom:9px">طلبات حجز — «بانتظار الاعتماد» مشروعة هنا (معاملة تجارية لا نتيجة)</b>
+      ${reqs.map(b=>`<div class="lrow"><div style="flex:1"><b style="font-size:12px">${esc(b.who)}</b><span class="muted" style="display:block">${esc(b.slot)} · <span class="ltr">${b.price||0}</span> ر.س</span></div>
+        <button class="btn" style="width:auto;padding:8px 14px;border-radius:999px;font-size:10.5px" onclick="bookAct('${b.id}','accepted')">اقبل</button>
+        <button class="btn ghost" style="width:auto;padding:8px 14px;border-radius:999px;font-size:10.5px" onclick="bookAct('${b.id}','rejected')">ارفض</button></div>`).join("")}</div>`:""}
+    <div class="card"><b class="h2" style="display:block;margin-bottom:9px">جدول اليوم</b>
+      ${bs.filter(b=>b.status!=="requested"&&b.status!=="rejected").map(b=>`<div class="lrow"><div style="flex:1"><b style="font-size:12px" class="ltr">${esc(b.slot)}</b><span class="muted" style="display:block">${esc(b.who)}</span></div><span class="chip ${b.status==="paid"?"ok":b.status==="accepted"?"warn":"ok"}">${b.status==="paid"?"مدفوع":b.status==="accepted"?"مقبول — بانتظار الدفع":esc(b.status)}</span></div>`).join("")||`<span class="muted">لا حجوزات بعد.</span>`}
+      <div class="grid2" style="margin-top:10px"><input id="bk_s" dir="ltr" placeholder="20–22" style="border:1px solid #e3ded2;border-radius:11px;padding:11px;font:600 12px Cairo"><input id="bk_p" dir="ltr" type="number" placeholder="120" style="border:1px solid #e3ded2;border-radius:11px;padding:11px;font:600 12px Cairo"></div>
+      <button class="btn ghost" style="margin-top:8px" onclick="addSlot()">أضف ساعة شاغرة معروضة في استكشف</button></div>
+  </main>`;
+};
+window.bookAct=async(id,st)=>{ await sb.from("bookings").update({status:st}).eq("id",id); await trans((st==="accepted"?"قبول":"رفض")+" طلب حجز"); toast(st==="accepted"?"قُبل — يدفع الطالب عبر المنصة":"رُفض"); render(); };
+window.addSlot=async()=>{ const s=$("#bk_s").value.trim(); if(!s) return toast("اكتب الفترة",1);
+  await sb.from("bookings").insert({venue:ME.org||"ملعبي",slot:s,who:"شاغر",status:"free",price:+$("#bk_p").value||0}); toast("أُضيفت"); render(); };
+
+T.guardian=async()=>`<main>
+  <div class="card"><b class="h2" style="display:block;margin-bottom:9px">إشراف ولي الأمر</b>
+    <div class="lrow"><span class="ic">👤</span><div style="flex:1"><b style="font-size:12px">طلب تواصل — وكيل مرخّص ✓</b><span class="muted" style="display:block">موافقة فردية لكل طلب — لا شيء يمرّ بدونك</span></div>
+      <button class="btn" style="width:auto;padding:8px 14px;border-radius:999px;font-size:10.5px" onclick="toast('وافقت — تُفتح محادثة بنسخة توثيقية لك')">وافق</button>
+      <button class="btn ghost" style="width:auto;padding:8px 14px;border-radius:999px;font-size:10.5px" onclick="toast('رفضت — بلا أي أثر على الابن')">ارفض</button></div>
+    <div class="lrow"><span class="ic">🔒</span><div style="flex:1"><b style="font-size:12px">إذن طبي مؤقت — طبيب خارجي</b><span class="muted" style="display:block"><span class="ltr">14</span> يومًا · تسحبه متى شئت</span></div><button class="btn ghost" style="width:auto;padding:8px 14px;border-radius:999px;font-size:10.5px" onclick="toast('سُحب الإذن فورًا وسُجّل في سجل الاطلاع')">اسحب</button></div></div>
+  <div class="dnote">القاصر لا يراسله غريب: كل محادثة كشاف/وكيل تُفتح بموافقتك وبنسخة لك، وكل اطّلاع طبي مسجّل باسم صاحبه.</div></main>`;
+
+T.scout=async()=>{
+  const ps=await q("pl",sb.from("profiles").select("*").eq("role","player").limit(20));
+  return `<main>
+    <div class="card"><b class="h2" style="display:block;margin-bottom:9px">بحث الكشافة — صلاحياتك أوسع من الجمهور، والطبي محجوب عنك دائمًا</b>
+      ${ps.map(p=>`<div class="lrow"><span class="ic" style="background:linear-gradient(160deg,#f5c518,#c78c00);color:#151a2e">${esc((p.name||"?")[0])}</span><div style="flex:1"><b style="font-size:12px">${esc(p.name)}</b><span class="muted" style="display:block">${esc(p.pos||"لاعب")}${p.age?" · "+p.age+" سنة":""}</span></div>
+        <button class="btn ghost" style="width:auto;padding:8px 14px;border-radius:999px;font-size:10.5px" onclick="toast('أُرسل طلب التواصل — يمرّ بولي الأمر إن كان قاصرًا')">اطلب تواصلًا</button></div>`).join("")||`<span class="muted">لا لاعبين مسجّلين بعد.</span>`}</div>
+  </main>`;
+};
+
+T.medical=async()=>`<main>
+  <div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b class="h2">حالة نشطة 🔒</b><span class="chip warn">تأهيل — أسبوع <span class="ltr">2</span>/<span class="ltr">3</span></span></div>
+    <b style="font-size:12.5px">التواء كاحل — درجة أولى</b><span class="muted" style="display:block;margin-top:3px">كتبها: ${esc(ME.name)} · العودة المتوقعة: الجمعة</span>
+    <div class="bar" style="margin-top:10px"><span style="width:70%;background:#2c6e49"></span></div>
+    <button class="btn" style="margin-top:11px" onclick="trans('جلسة تأهيل جديدة');toast('سُجّلت الجلسة باسمك في الملف وفي سجل الاطلاع')">سجّل جلسة اليوم</button></div>
+  <div class="card"><b class="h2" style="display:block;margin-bottom:8px">من يرى هذا الملف</b>
+    <div class="lrow"><div style="flex:1"><b style="font-size:12px">أنت — أخصائي الجهة</b></div><span class="chip ok">دائم</span></div>
+    <div class="lrow"><div style="flex:1"><b style="font-size:12px">المدرب</b><span class="muted" style="display:block">جاهزية فقط: جاهز/تدرّج/غير جاهز — بلا تشخيص</span></div><span class="chip warn">محدود</span></div>
+    <div class="lrow"><div style="flex:1"><b style="font-size:12px">الكشافون</b></div><span class="chip bad">ممنوع دائمًا</span></div></div>
+  <div class="dnote">كل اطّلاع يُسجّل: من فتح الملف ومتى — واللاعب أو وليّه يمنح الإذن المؤقت ويسحبه.</div></main>`;
+
+T.deals=async()=>{
+  const ds=await q("deals",sb.from("deals").select("*").order("created_at",{ascending:false}));
+  const stages=["فتح","مفاوضة","عقد بقوالب الاتحاد","توقيع رقمي","دفع 2.5% + إخطار الاتحاد"];
+  return `<main>
+    ${ds.map(d=>`<div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:13px">${esc(d.player)}</b><b class="ltr" style="font-family:'Space Grotesk';color:#c78c00">${(+d.value).toLocaleString("en")} ر.س</b></div>
+      <span class="muted" style="display:block;margin-top:4px">${esc(d.from_club)} ← ${esc(d.to_club)}</span>
+      <div style="display:flex;gap:4px;margin-top:11px">${stages.map((s,i)=>`<span style="flex:1;height:7px;border-radius:99px;background:${i<=d.stage?"#4636e3":"#f0ece2"}"></span>`).join("")}</div>
+      <span class="muted" style="display:block;margin-top:6px">المرحلة: ${stages[d.stage]}</span>
+      ${d.stage<4?`<button class="btn" style="margin-top:10px" onclick="advDeal('${d.id}',${d.stage+1})">قدّم للمرحلة التالية</button>`:`<span class="chip ok" style="margin-top:10px">اكتملت — حصة المنصة <span class="ltr">2.5%</span> اقتُطعت وأُخطر الاتحاد</span>`}</div>`).join("")||""}
+    <div class="card"><b class="h2" style="display:block;margin-bottom:9px">افتح صفقة (محترف بالغ فقط)</b>
+      <div class="fld"><label>اللاعب</label><input id="dl_p" placeholder="الاسم"></div>
+      <div class="grid2"><div class="fld"><label>من</label><input id="dl_f" placeholder="النادي البائع"></div><div class="fld"><label>إلى</label><input id="dl_t" placeholder="النادي المشتري"></div></div>
+      <div class="fld"><label>قيمة العقد (ر.س)</label><input id="dl_v" dir="ltr" type="number" placeholder="12000000"></div>
+      <button class="btn" onclick="newDeal()">افتح الغرفة</button></div>
+    <div class="note">النسبة ثابتة <span class="ltr">2.5%</span> مهما بلغ العقد — للمستوى الاحترافي فقط، وتعديلها قرار مجلس لا زر.</div>
+  </main>`;
+};
+window.advDeal=async(id,st)=>{ await sb.from("deals").update({stage:st}).eq("id",id); if(st===4) await trans("إتمام صفقة: دفع عبر المنصة 2.5% + إخطار الاتحاد"); toast("تقدّمت الصفقة"); render(); };
+window.newDeal=async()=>{ const p=$("#dl_p").value.trim(); if(!p) return toast("اسم اللاعب",1);
+  await sb.from("deals").insert({player:p,from_club:$("#dl_f").value,to_club:$("#dl_t").value,value:+$("#dl_v").value||0,stage:0}); toast("فُتحت الغرفة"); render(); };
+
+T.market=async()=>{
+  const ls=await q("list",sb.from("listings").select("*").order("created_at",{ascending:false}));
+  return `<main>
+    ${ls.map(l=>`<div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:12.5px">${esc(l.name)}</b><b class="ltr" style="font-family:'Space Grotesk'">${(+l.price).toLocaleString("en")} ر.س</b></div>
+      ${l.chain?`<span class="chip ok" style="margin-top:7px">سلسلة إثبات: ${esc(l.chain)}</span>`:""}
+      <button class="btn ${l.type==="auction"?"dark":""}" style="margin-top:10px" onclick="toast('${l.type==="auction"?"زايدت — أنت الأعلى الآن":"أُضيف للسلة — الدفع عبر المنصة"}')">${l.type==="auction"?"زايد":"اشترِ"}</button></div>`).join("")||`<div class="card" style="text-align:center;padding:26px"><b>السوق فارغ بعد</b></div>`}
+    <div class="card"><b class="h2" style="display:block;margin-bottom:9px">أدرج منتجًا</b>
+      <div class="grid2"><input id="ls_n" placeholder="الاسم" style="border:1px solid #e3ded2;border-radius:11px;padding:11px;font:600 12px Cairo"><input id="ls_p" dir="ltr" type="number" placeholder="180" style="border:1px solid #e3ded2;border-radius:11px;padding:11px;font:600 12px Cairo"></div>
+      <button class="btn ghost" style="margin-top:8px" onclick="addList()">أدرج — النسبة معلنة قبل النشر</button></div>
+  </main>`;
+};
+window.addList=async()=>{ const n=$("#ls_n").value.trim(); if(!n) return toast("الاسم",1);
+  await sb.from("listings").insert({name:n,price:+$("#ls_p").value||0,seller:ME.name}); toast("أُدرج"); render(); };
+
+T.admin=async()=>{
+  const [pr,mt,tr]=await Promise.all([q("p",sb.from("profiles").select("id",{count:"exact",head:false})),q("m",sb.from("matches").select("id")),q("t",sb.from("transparency").select("*").order("created_at",{ascending:false}).limit(10))]);
+  return `<main>
+    <div class="stat3"><div class="stat"><b>${pr.length}</b><span class="muted">حساب</span></div><div class="stat"><b style="color:#4636e3">${mt.length}</b><span class="muted">مباراة</span></div><div class="stat"><b style="color:#c78c00" class="ltr">2.5%</b><span class="muted">العقود — مقفلة</span></div></div>
+    <div class="card"><b class="h2" style="display:block;margin-bottom:9px">سجل الشفافية — قراءة فقط، حتى لك</b>
+      ${tr.map(t=>`<div class="lrow"><span class="ic">▤</span><div style="flex:1"><b style="font-size:12px">${esc(t.action)}</b><span class="muted" style="display:block">${esc(t.actor)} · <span class="ltr">${new Date(t.created_at).toLocaleString("en-GB")}</span></span></div></div>`).join("")||`<span class="muted">فارغ بعد.</span>`}</div>
+    <div class="note">الأدمن يدير المنصة والمال — ولا يملك أي زر لتعديل نتيجة أو حدث أو تقييم.</div>
+  </main>`;
+};
+T.adminTrans=T.admin;
+
+T.notifications=async()=>{
+  const ns=await q("nt",sb.from("notifications").select("*").eq("user_id",ME.id).order("created_at",{ascending:false}).limit(20));
+  return `<main>
+    ${ns.length?ns.map(n=>`<div class="card" style="padding:13px 14px;${n.kind==="decision"?"border-inline-start:3px solid #4636e3":""}"><div style="display:flex;justify-content:space-between"><b style="font-size:12px">${esc(n.title)}</b><span class="muted" class="ltr">${new Date(n.created_at).toLocaleDateString("en-GB")}</span></div><span class="muted" style="display:block;margin-top:3px">${esc(n.body)}</span></div>`).join(""):`<div class="card" style="text-align:center;padding:30px"><b style="font-size:13px">ما عندك شيء يحتاج انتباهك الآن</b></div>`}
+  </main>`;
+};
+
+/* ---------- SHELL & ROUTER ---------- */
+const NAV={
+  player:[["⌂","الرئيسية","home"],["◎","استكشف","explore"],["FAB","","newMatch"],["▤","سجلي","records"],["◉","تقييمي","rating"]],
+  coach:[["⌂","مبارياتي","orgMatch"],["◎","استكشف","explore"],["FAB","","newMatch"],["▤","أكاديمية","acad"],["◉","إشعارات","notifications"]],
+  organizer:[["⌂","مبارياتي","orgMatch"],["◎","استكشف","explore"],["FAB","","newMatch"],["▤","إشعارات","notifications"],["◉","الشفافية","admin"]],
+  referee:[["⌂","مبارياتي","orgMatch"],["◎","استكشف","explore"],["FAB","","newMatch"],["▤","إشعارات","notifications"],["◉","الشفافية","admin"]],
+  academy:[["⌂","الخفيف","acad"],["▶","مبارياتنا","orgMatch"],["FAB","","newMatch"],["◎","استكشف","explore"],["◉","إشعارات","notifications"]],
+  venue:[["⌂","اليوم","venue"],["◎","استكشف","explore"],["FAB","","venue"],["▤","إشعارات","notifications"],["◉","الشفافية","admin"]],
+  guardian:[["⌂","الإشراف","guardian"],["◎","استكشف","explore"],["FAB","","explore"],["▤","إشعارات","notifications"],["◉","الطبي","medical"]],
+  scout:[["⌂","الكشافة","scout"],["◎","استكشف","explore"],["FAB","","explore"],["▤","إشعارات","notifications"],["◉","السوق","market"]],
+  admin:[["⌂","النبض","admin"],["◎","السوق","market"],["FAB","","newMatch"],["▤","استكشف","explore"],["◉","إشعارات","notifications"]],
+  medical:[["⌂","الطبي","medical"],["◎","استكشف","explore"],["FAB","","explore"],["▤","إشعارات","notifications"],["◉","الشفافية","admin"]],
+  agent:[["⌂","التعاقدات","deals"],["◎","السوق","market"],["FAB","","deals"],["▤","إشعارات","notifications"],["◉","استكشف","explore"]]
+};
+const TITLES={home:"الرئيسية",records:"سجلي",rating:"تقييمي",explore:"استكشف",newMatch:"إنشاء مباراة",orgMatch:"مبارياتي",live:"تسجيل مباشر",correct:"تصحيح المنظم",matchView:"مباراة",acad:"الوضع الخفيف",venue:"جدول الملعب",guardian:"الإشراف",scout:"الكشافة",medical:"الطبي 🔒",deals:"غرفة التعاقدات",market:"السوق",admin:"النبض",notifications:"الإشعارات",role:"اختيار الدور",auth:""};
+async function render(){
+  const app=$("#app");
+  if(!ME||VIEW==="auth"){ app.innerHTML=T.auth(); return; }
+  if(VIEW==="role"){ app.innerHTML=`<header class="hd">${WM()}<span class="muted">${esc(ME.name)}</span></header>`+T.role(); return; }
+  app.innerHTML=`<header class="hd">${WM()}<div style="display:flex;align-items:center;gap:9px"><span class="muted">${TITLES[VIEW]||""}</span><button onclick="sb.auth.signOut()" style="background:#fff;border:1px solid #e9e4d8;border-radius:999px;padding:6px 12px;font:900 10.5px Cairo;color:#565d78;cursor:pointer">خروج</button></div></header><main><div class="skel" style="height:120px"></div><div class="skel" style="height:80px"></div></main>${navHtml()}`;
+  const fn=T[VIEW]||T.home;
+  const html=await fn();
+  app.innerHTML=`<header class="hd">${WM()}<div style="display:flex;align-items:center;gap:9px"><span class="muted">${TITLES[VIEW]||""}</span><button onclick="sb.auth.signOut()" style="background:#fff;border:1px solid #e9e4d8;border-radius:999px;padding:6px 12px;font:900 10.5px Cairo;color:#565d78;cursor:pointer">خروج</button></div></header>${html}${navHtml()}`;
+}
+function navHtml(){
+  const items=NAV[ME.role]||NAV.player;
+  return `<nav class="nav">${items.map(([ic,lb,v])=>ic==="FAB"?`<button class="fab" onclick="go('${v}')">+</button>`:`<button class="${VIEW===v?"on":""}" onclick="go('${v}')"><i>${ic}</i>${lb}</button>`).join("")}</nav>`;
+}
+window.go=go; window.render=render; window.toast=toast;
+boot();
+
+</script>
+</body></html>
