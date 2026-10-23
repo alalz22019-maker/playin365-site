@@ -21,13 +21,6 @@ RP.TEMPLATES={
     desc:"يغني عن مجموعة واتساب — الإداري يختار ما يُشارك، والباقي يبقى داخليًا.",
     blocks:["staff","evaluation","physical","tech","profiles","registration","nextweek","reminders"]
   },
-  player_self:{
-    ar:"تقريري الشخصي", en:"My Report",
-    who:"اللاعب ← نفسه أو جهة يختارها", audience:"self", roles:["player"],
-    accent:"#4636e3", period:"الموسم",
-    desc:"يطلبه اللاعب لنفسه — سجل موثّق قابل للمشاركة مع نادٍ أو كشاف بإذنه.",
-    blocks:["identity","record","rating","physical","readiness","evidence"]
-  },
   club_about_coach:{
     ar:"تقرير عن مدرب", en:"Coach Report",
     who:"النادي ← عن مدرب", audience:"org", roles:["admin","academy","scout"],
