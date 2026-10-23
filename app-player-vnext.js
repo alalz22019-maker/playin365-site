@@ -213,7 +213,12 @@
       if(VIEW!=='publicView'){
         document.body.insertAdjacentHTML('beforeend',`<button id="pv-fab" class="pv-fab" onclick="PV.toggleFab()" aria-label="إجراءات سريعة">＋</button>`);
       }
-      document.querySelectorAll('.nav').forEach(n=>{ if(!n.classList.contains('pv-nav')) n.style.display='none'; });
+      /* Player VNext owns navigation completely. Remove legacy player navigation nodes
+         instead of merely hiding them, while other roles keep their original navigation. */
+      document.querySelectorAll('.nav').forEach(n=>{ if(!n.classList.contains('pv-nav')) n.remove(); });
+      const routeMain=app&&app.querySelector('main:not(.pv-main)');
+      if(routeMain) routeMain.classList.add('pv-legacy-main');
+      if(app && !app.querySelector('.pv-page')) app.classList.add('pv-legacy-route');
     }catch(e){console.warn('PV decorate',e);}
   };
 })();
