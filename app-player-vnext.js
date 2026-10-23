@@ -215,7 +215,12 @@
       }
       /* Player VNext owns navigation completely. Remove legacy player navigation nodes
          instead of merely hiding them, while other roles keep their original navigation. */
-      document.querySelectorAll('.nav').forEach(n=>{ if(!n.classList.contains('pv-nav')) n.remove(); });
+      document.querySelectorAll('nav').forEach(n=>{
+        if(n.classList.contains('pv-nav')) return;
+        const txt=(n.textContent||'').replace(/\s+/g,' ');
+        const pos=(n.style&&n.style.position)||'';
+        if(pos==='fixed' || /بطاقتي|سجلي|تنقّل|حولك|مهامي/.test(txt)) n.remove();
+      });
       const routeMain=app&&app.querySelector('main:not(.pv-main)');
       if(routeMain) routeMain.classList.add('pv-legacy-main');
       if(app && !app.querySelector('.pv-page')) app.classList.add('pv-legacy-route');
