@@ -2,7 +2,7 @@
 (function(){
 'use strict';
 if(typeof window==='undefined')return;
-const PZ=window.PZ={version:'2026.10.23-zero-1'};
+const PZ=window.PZ={version:'2026.10.23-expert-final'};
 const ROUTES=['feed','home','profile','publicView','myCard','records','rating','ratingDetail','cabinet','opps','calendar','wallet','health','messages','viewLog','privacy','explore','find','pitch','news','market','memberships','settings','notifications','coachBrief','matchView'];
 const OLD={};ROUTES.forEach(function(n){OLD[n]=T[n]||null});
 PZ.e=function(v){return String(v==null?'':v).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})};
