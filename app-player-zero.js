@@ -11,50 +11,81 @@ PZ.go=function(v,p){PZ.close();go(v,p)};
 PZ.close=function(){document.querySelectorAll('.pz-sheet,.pz-sheet-bg').forEach(function(n){n.remove()})};
 PZ.brand=function(){return '<span class="pz-brand"><span class="play">Play</span><span class="in">In</span><sup>365</sup></span>'};
 PZ.photo=function(p,cls){return '<div class="'+cls+'">'+(p&&p.avatar_url?'<img src="'+PZ.e(p.avatar_url)+'" alt="">':'<span class="pz-photo-fallback"></span>')+'</div>'};
+PZ.icon=function(name,cls){
+ const icons={
+  home:'<path d="M4 11.5 12 5l8 6.5V20a1 1 0 0 1-1 1h-5v-6h-4v6H5a1 1 0 0 1-1-1Z"/>',
+  opps:'<circle cx="10" cy="12" r="5"/><path d="m14 8 5-5m0 0v4m0-4h-4M8 12h4m-2-2v4"/>',
+  services:'<path d="M8 3.5c2.2 2.6 3.5 4.4 3.5 6.2A3.5 3.5 0 1 1 4.5 9.7C4.5 7.9 5.8 6.1 8 3.5Z"/><path d="M16 10.5c2.2 2.6 3.5 4.4 3.5 6.2a3.5 3.5 0 1 1-7 0c0-1.8 1.3-3.6 3.5-6.2Z"/>',
+  records:'<path d="M4 19V5m0 14h16"/><path d="m7 15 3-4 3 2 5-6"/><circle cx="7" cy="15" r=".8"/><circle cx="10" cy="11" r=".8"/><circle cx="13" cy="13" r=".8"/><circle cx="18" cy="7" r=".8"/>',
+  profile:'<path d="M12 3.5c3.2 3.8 5 6.2 5 8.6a5 5 0 0 1-10 0c0-2.4 1.8-4.8 5-8.6Z"/><circle cx="12" cy="10.5" r="1.6"/><path d="M9.5 15c.8-1.3 1.7-2 2.5-2s1.7.7 2.5 2"/>',
+  rating:'<path d="M5 16a7 7 0 1 1 14 0"/><path d="m12 12 4-3"/><circle cx="12" cy="12" r="1"/><path d="M7 18h10"/>',
+  trophy:'<path d="M8 4h8v4a4 4 0 0 1-8 0Z"/><path d="M8 6H5v1a3 3 0 0 0 3 3m8-4h3v1a3 3 0 0 1-3 3M12 12v4m-3 4h6m-5-4h4"/>',
+  wallet:'<rect x="4" y="6" width="16" height="13" rx="3"/><path d="M7 6V4m10 2V4M4 10h16m-5 4h3"/>',
+  health:'<path d="M12 20S4.5 15.7 4.5 9.5A4 4 0 0 1 12 7.4a4 4 0 0 1 7.5 2.1C19.5 15.7 12 20 12 20Z"/><path d="m7.5 12 2.2 0 1.2-2.4 2.1 4.8 1.1-2.4h2.4"/>',
+  messages:'<path d="M5 5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-5 3v-3H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z"/><path d="M7 9h10M7 13h6"/>',
+  views:'<path d="M2.8 12s3.3-5 9.2-5 9.2 5 9.2 5-3.3 5-9.2 5-9.2-5-9.2-5Z"/><circle cx="12" cy="12" r="2.2"/>',
+  privacy:'<path d="M12 3 19 6v5c0 4.6-2.8 8-7 10-4.2-2-7-5.4-7-10V6Z"/><path d="M9.5 12.5 11 14l3.8-4"/>',
+  explore:'<circle cx="12" cy="12" r="8"/><path d="m15.5 8.5-2.2 4.8-4.8 2.2 2.2-4.8Z"/>',
+  search:'<circle cx="10.5" cy="10.5" r="5.5"/><path d="m15 15 5 5"/>',
+  community:'<circle cx="9" cy="9" r="3"/><circle cx="16.5" cy="10" r="2.5"/><path d="M3.5 19c.7-3 2.6-4.5 5.5-4.5s4.8 1.5 5.5 4.5m0-.5c.6-2.1 1.9-3.2 4-3.2 1.1 0 2 .3 2.8.9"/>',
+  news:'<path d="M5 4h13a2 2 0 0 1 2 2v13H6a2 2 0 0 1-2-2V5a1 1 0 0 1 1-1Z"/><path d="M8 8h8M8 12h8M8 16h5"/>',
+  market:'<path d="M6 8h12l1 12H5Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',
+  settings:'<path d="M5 7h14M8 12h8M5 17h14"/><circle cx="9" cy="7" r="1.7"/><circle cx="15" cy="12" r="1.7"/><circle cx="11" cy="17" r="1.7"/>',
+  memberships:'<path d="M4 7h16v12H4Z"/><path d="M8 7V5h8v2M8 12h8m-8 3h5"/>',
+  notifications:'<path d="M6 17h12l-1.5-2V10a4.5 4.5 0 0 0-9 0v5ZM10 20h4"/>',
+  coach:'<rect x="6" y="4" width="12" height="16" rx="2"/><path d="M9 4V3h6v1m-6 5h6m-6 4h4m-4 4h6"/>',
+  match:'<circle cx="12" cy="12" r="8"/><path d="m12 8 3 2-1 3h-4l-1-3Zm-3-3 1 3m5-3-1 3m-6 8 2-3m6 3-2-3"/>',
+  menu:'<path d="M5 7h14M5 12h14M5 17h14"/>',
+  back:'<path d="m15 5-7 7 7 7"/>',
+  plus:'<path d="M12 6v12M6 12h12"/>'
+ };
+ return '<svg class="pz-icon '+(cls||'')+'" viewBox="0 0 24 24" aria-hidden="true">'+(icons[name]||icons.services)+'</svg>';
+};
+
 PZ.services=[
-['◈','هويتي الرياضية','الواجهة العامة التي تسوّق لك','publicView','private'],
-['▤','السجل والأداء','مباريات وأحداث وتطور','records','private'],
-['◔','تفاصيل التقييم','كيف يتكوّن رقمك','ratingDetail','private'],
-['✦','خزانة الإنجازات','شارات وألقاب موثقة','cabinet','private'],
-['◎','الفرص والدعوات','تجارب وعروض واهتمامات','opps','private'],
-['▦','الجدول والمحفظة','مواعيد ومدفوعات','wallet','private'],
-['⌁','الصحة والجاهزية','الحالة وخطة العودة','health','private'],
-['✉','الرسائل','تواصل بإذن','messages','shared'],
-['◉','من رأى ملفك','سجل الزيارات','viewLog','private'],
-['⌾','الخصوصية','من يرى ماذا','privacy','private'],
-['⌖','اكتشف حولك','مباريات وملاعب وأكاديميات','explore','shared'],
-['⌕','البحث','لاعبون ومدربون وجهات','find','shared'],
-['♟','المجتمع الرياضي','محتوى وتفاعل','pitch','shared'],
-['▣','الأخبار','نبض رياضي وفعاليات','news','shared'],
-['◆','السوق والخدمات','منتجات وخدمات رياضية','market','shared'],
-['⚙','الإعدادات','الحساب والتفضيلات','settings','private']
+['profile','هويتي الرياضية','الواجهة العامة التي تسوّق لك','publicView','private'],
+['records','السجل والأداء','مباريات وأحداث وتطور','records','private'],
+['rating','تفاصيل التقييم','كيف يتكوّن رقمك','ratingDetail','private'],
+['trophy','خزانة الإنجازات','شارات وألقاب موثقة','cabinet','private'],
+['opps','الفرص والدعوات','تجارب وعروض واهتمامات','opps','private'],
+['wallet','الجدول والمحفظة','مواعيد ومدفوعات','wallet','private'],
+['health','الصحة والجاهزية','الحالة وخطة العودة','health','private'],
+['messages','الرسائل','تواصل بإذن','messages','shared'],
+['views','من رأى ملفك','سجل الزيارات','viewLog','private'],
+['privacy','الخصوصية','من يرى ماذا','privacy','private'],
+['explore','اكتشف حولك','مباريات وملاعب وأكاديميات','explore','shared'],
+['search','البحث','لاعبون ومدربون وجهات','find','shared'],
+['community','المجتمع الرياضي','محتوى وتفاعل','pitch','shared'],
+['news','الأخبار','نبض رياضي وفعاليات','news','shared'],
+['market','السوق والخدمات','منتجات وخدمات رياضية','market','shared'],
+['settings','الإعدادات','الحساب والتفضيلات','settings','private']
 ];
 PZ.meta={
-records:['▤','PERFORMANCE RECORD','السجل والأداء','مسيرتك الرياضية الموثقة'],
-ratingDetail:['◔','RATING MODEL','تفاصيل التقييم','رقم مفهوم وليس صندوقًا أسود'],
-cabinet:['✦','TROPHY ROOM','خزانة الإنجازات','كل لقب مرتبط بدليل'],
-opps:['◎','OPPORTUNITIES','الفرص والدعوات','قراراتك لا تظهر في ملفك العام'],
-wallet:['▦','PLAYER WALLET','الجدول والمحفظة','مواعيدك ومدفوعاتك في مكان واحد'],
-health:['⌁','READINESS','الصحة والجاهزية','الخصوصية الطبية أولًا'],
-messages:['✉','MESSAGES','الرسائل','تواصل رياضي موثق'],
-viewLog:['◉','VISIBILITY LOG','من رأى ملفك','كل اطلاع قابل للتتبع'],
-privacy:['⌾','PRIVACY','الخصوصية','أنت المتحكم'],
-explore:['⌖','DISCOVER','اكتشف حولك','ما يحدث رياضيًا حولك'],
-find:['⌕','UNIFIED SEARCH','البحث','ابحث عن أي كيان رياضي'],
-pitch:['♟','COMMUNITY','المجتمع الرياضي','التفاعل لا يساوي التقييم'],
-news:['▣','SPORTS PULSE','الأخبار','جهتك ودورياتك والعالم'],
-market:['◆','SPORTS MARKET','السوق والخدمات','احتياجاتك الرياضية'],
-memberships:['♛','MEMBERSHIPS','العضويات','مزايا رقمية واضحة'],
-settings:['⚙','SETTINGS','الإعدادات','حسابك وهويتك وتفضيلاتك'],
-notifications:['◉','NOTIFICATIONS','الإشعارات','كل ما يحتاج قرارك'],
-coachBrief:['◫','COACH BRIEF','خطة التدريب','ما تحتاجه قبل الحصة'],
-matchView:['⚽','MATCH','تفاصيل المباراة','المصدر الواحد لأحداث المباراة']
+records:['records','PERFORMANCE RECORD','السجل والأداء','مسيرتك الرياضية الموثقة'],
+ratingDetail:['rating','RATING MODEL','تفاصيل التقييم','رقم مفهوم وليس صندوقًا أسود'],
+cabinet:['trophy','TROPHY ROOM','خزانة الإنجازات','كل لقب مرتبط بدليل'],
+opps:['opps','OPPORTUNITIES','الفرص والدعوات','قراراتك لا تظهر في ملفك العام'],
+wallet:['wallet','PLAYER WALLET','الجدول والمحفظة','مواعيدك ومدفوعاتك في مكان واحد'],
+health:['health','READINESS','الصحة والجاهزية','الخصوصية الطبية أولًا'],
+messages:['messages','MESSAGES','الرسائل','تواصل رياضي موثق'],
+viewLog:['views','VISIBILITY LOG','من رأى ملفك','كل اطلاع قابل للتتبع'],
+privacy:['privacy','PRIVACY','الخصوصية','أنت المتحكم'],
+explore:['explore','DISCOVER','اكتشف حولك','ما يحدث رياضيًا حولك'],
+find:['search','UNIFIED SEARCH','البحث','ابحث عن أي كيان رياضي'],
+pitch:['community','COMMUNITY','المجتمع الرياضي','التفاعل لا يساوي التقييم'],
+news:['news','SPORTS PULSE','الأخبار','جهتك ودورياتك والعالم'],
+market:['market','SPORTS MARKET','السوق والخدمات','احتياجاتك الرياضية'],
+memberships:['memberships','MEMBERSHIPS','العضويات','مزايا رقمية واضحة'],
+settings:['settings','SETTINGS','الإعدادات','حسابك وهويتك وتفضيلاتك'],
+notifications:['notifications','NOTIFICATIONS','الإشعارات','كل ما يحتاج قرارك'],
+coachBrief:['coach','COACH BRIEF','خطة التدريب','ما تحتاجه قبل الحصة'],
+matchView:['match','MATCH','تفاصيل المباراة','المصدر الواحد لأحداث المباراة']
 };
 PZ.top=function(back){return '<header class="pz-top"><button class="pz-side" onclick="'+(back||"window.PZ.openServices()")+'">'+(back?'←':'◈')+'</button><button style="border:0;background:none" onclick="window.PZ.go(\'feed\')">'+PZ.brand()+'</button><button class="pz-side" onclick="window.PZ.openServices()">☰</button></header>'};
 PZ.nav=function(active){const a=[['⌂','مساحتي','feed'],['◎','فرصي','opps'],['◈','الخدمات','services'],['▤','أدائي','records'],['♡','هويتي','publicView']];return '<nav class="pz-nav">'+a.map(function(x){if(x[2]==='services')return '<button onclick="window.PZ.openServices()"><span>'+x[0]+'</span><b>'+x[1]+'</b></button>';return '<button class="'+(active===x[2]?'on':'')+'" onclick="window.PZ.go(\''+x[2]+'\')"><span>'+x[0]+'</span><b>'+x[1]+'</b></button>'}).join('')+'</nav>'};
 PZ.page=function(route,body){const m=PZ.meta[route]||['◈','PLAYER SPACE',route,'هويتك الرياضية'];return '<div class="pz-page">'+PZ.top("window.PZ.go('feed')")+'<section class="pz-route-head"><div class="pz-route-title"><span>'+m[0]+'</span><div><small>'+m[1]+'</small><h1>'+PZ.e(m[2])+'</h1><p>'+PZ.e(m[3])+'</p></div></div></section><main class="pz-route-main">'+body+'</main>'+PZ.nav(route)+'<button class="pz-fab" onclick="window.PZ.openServices()">＋</button></div>'};
 PZ.empty=function(t,s,a,r){return '<div class="pz-empty"><b>'+PZ.e(t)+'</b><small>'+PZ.e(s||'')+'</small>'+(a?'<div class="pz-actions" style="justify-content:center"><button class="pz-action primary" onclick="window.PZ.go(\''+r+'\')">'+PZ.e(a)+'</button></div>':'')+'</div>'};
-PZ.grid=function(f,q){f=f||'all';q=String(q||'').trim().toLowerCase();const rows=PZ.services.filter(function(s){return(f==='all'||s[4]===f)&&(!q||(s[1]+' '+s[2]).toLowerCase().includes(q))});return rows.map(function(s){return '<button class="pz-service-row" data-kind="'+s[4]+'" onclick="window.PZ.go(\''+s[3]+'\')"><i>'+s[0]+'</i><span><b>'+s[1]+'</b><small>'+s[2]+'</small></span><em class="pz-kind">'+(s[4]==='private'?'خاص':'مشترك')+'</em></button>'}).join('')||PZ.empty('لا توجد نتيجة','جرّب كلمة أخرى')};
+PZ.grid=function(f,q){f=f||'all';q=String(q||'').trim().toLowerCase();const rows=PZ.services.filter(function(s){return(f==='all'||s[4]===f)&&(!q||(s[1]+' '+s[2]).toLowerCase().includes(q))});return rows.map(function(s){return '<button class="pz-service-row" data-kind="'+s[4]+'" onclick="window.PZ.go(\''+s[3]+'\')"><i>'+PZ.icon(s[0])+'</i><span><b>'+s[1]+'</b><small>'+s[2]+'</small></span><em class="pz-kind">'+(s[4]==='private'?'خاص':'مشترك')+'</em></button>'}).join('')||PZ.empty('لا توجد نتيجة','جرّب كلمة أخرى')};
 PZ.openServices=function(){PZ.close();document.body.insertAdjacentHTML('beforeend','<div class="pz-sheet-bg" onclick="window.PZ.close()"></div><section class="pz-sheet"><div class="pz-sheet-grab"></div><div class="pz-sheet-head"><div><b>كل خدمات اللاعب</b><small>وصول واحد لكل شيء</small></div><button onclick="window.PZ.close()">×</button></div><label class="pz-search"><span>⌕</span><input id="pzServiceSearch" data-filter="all" placeholder="ابحث عن خدمة..." oninput="window.PZ.searchServices(this)"></label><div class="pz-filters"><button class="on" onclick="window.PZ.filterServices(\'all\',this)">الكل</button><button onclick="window.PZ.filterServices(\'private\',this)">خاص</button><button onclick="window.PZ.filterServices(\'shared\',this)">مشترك</button></div><div class="pz-all-services" id="pzServiceGrid">'+PZ.grid('all','')+'</div></section>')};
 PZ.searchServices=function(i){const g=document.getElementById('pzServiceGrid');if(g)g.innerHTML=PZ.grid(i.dataset.filter||'all',i.value)};
 PZ.filterServices=function(f,b){document.querySelectorAll('.pz-filters button').forEach(function(x){x.classList.remove('on')});if(b)b.classList.add('on');const i=document.getElementById('pzServiceSearch');if(i)i.dataset.filter=f;const g=document.getElementById('pzServiceGrid');if(g)g.innerHTML=PZ.grid(f,i?i.value:'')};
