@@ -5,7 +5,7 @@
   const PVC=window.PVC=window.PVC||{};
   PVC.version='2026.10.23-creative-v2';
 
-  PVC.isPlayer=()=>{try{return !!(window.ME&&ME.role==='player')}catch(e){return false}};
+  PVC.isPlayer=()=>{try{return !!(typeof ME!=='undefined'&&ME&&ME.role==='player')}catch(e){return false}};
   PVC.num=(s)=>{const m=String(s||'').match(/\d+(?:\.\d+)?/);return m?Number(m[0]):0};
   PVC.decorateServices=()=>{
     document.querySelectorAll('.pv-service').forEach((el,i)=>{
