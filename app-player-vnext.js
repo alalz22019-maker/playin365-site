@@ -200,12 +200,17 @@
 
   const prevRender=window.render;
   window.render=render=async function(){
+    /* Deterministic shell: never let a quick-action/menu from a previous route leak
+       into auth, public visitor mode, or another role. */
+    document.querySelectorAll('#pv-fab,#pv-fab-menu,.pv-sheet,.pv-scrim').forEach(n=>n.remove());
+    document.body.classList.remove('pvnext-active');
+    const before=document.getElementById('app'); if(before) before.classList.remove('pvnext-shell');
     await prevRender();
     try{
       if(!ME||ME.role!=='player'||VIEW==='auth'||VIEW==='role') return;
       document.body.classList.add('pvnext-active');
       const app=document.getElementById('app'); if(app) app.classList.add('pvnext-shell');
-      if(!document.getElementById('pv-fab') && VIEW!=='publicView'){
+      if(VIEW!=='publicView'){
         document.body.insertAdjacentHTML('beforeend',`<button id="pv-fab" class="pv-fab" onclick="PV.toggleFab()" aria-label="إجراءات سريعة">＋</button>`);
       }
       document.querySelectorAll('.nav').forEach(n=>{ if(!n.classList.contains('pv-nav')) n.style.display='none'; });
