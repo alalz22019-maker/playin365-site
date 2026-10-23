@@ -45,38 +45,4 @@ body.erp-skin a{color:#243244}
     try{ document.body.classList.toggle("erp-skin", ERP.test(typeof VIEW!=="undefined"?VIEW:"")); }catch(e){}
   };
 
-  /* ═══ من يملك الوصول — أذونات سارية وزر سحب (اللاعب) ═══ */
-  const RISK={record:["السجل الرياضي","#4636e3"],readiness:["حالة الجاهزية","#2c6e49"],contact:["التواصل عبرك","#c78c00"],medical:["الملف الطبي","#a83b25"]};
-  const _pv=T.privacy;
-  if(_pv) T.privacy=async()=>{
-    const body=await _pv();
-    let rows=[];
-    try{ rows=await q("cq", sb.from("pi_consent_req").select("*").eq("player",ME.name).order("created_at",{ascending:false}).limit(40)); }catch(e){}
-    const live=rows.filter(r=>r.status==="granted"||r.granted_at);
-    const panel=`<div class="card" style="border-radius:26px">
-      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px">
-        <b class="h2" style="color:#4636e3">من يملك الوصول</b>
-        <span style="font-size:10px;font-weight:900;color:#8a8fa5">${live.length?`<span class="ltr">${live.length}</span> إذنًا ساريًا`:"لا أذونات"}</span></div>
-      <span class="muted" style="display:block;line-height:1.9;margin-bottom:11px">الإذن ليس مربعًا واحدًا: نطاقٌ لجهةٍ بعينها لغرض مكتوب — ويُسحب متى شئت بلا سبب.</span>
-      ${live.length?live.map(r=>{const S=RISK[r.scope]||RISK.record;
-        return `<div style="background:#faf8f3;border:1px solid #e9e4d8;border-radius:16px;padding:12px 14px;margin-bottom:8px">
-        <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
-          <div style="min-width:0"><b style="font-size:12.5px">${esc(r.requester||"جهة")}</b>
-            <span style="display:block;font-size:10px;color:#8a8fa5;font-weight:800;margin-top:3px">${esc(r.req_role==="scout"?"كشاف":r.req_role||"")}${r.created_at?` · منذ <span class="ltr">${esc(String(r.created_at).slice(0,10))}</span>`:""}</span></div>
-          <span class="chip" style="background:${S[1]}18;color:${S[1]};flex:none">${S[0]}</span></div>
-        ${r.reason?`<span class="muted" style="display:block;margin-top:8px;line-height:1.8">الغرض: ${esc(r.reason)}</span>`:""}
-        <button class="btn ghost" style="margin-top:10px;padding:9px;font-size:10.5px" onclick="pvRevoke('${r.id}','${esc(r.requester||"")}')">اسحب الإذن</button>
-      </div>`}).join("")
-      :`<div style="border:1.5px dashed #d5d0c4;border-radius:16px;padding:18px;text-align:center"><span class="muted">لا جهة تملك إذنًا على سجلك الآن — وأي طلب يصلك قبل أن يُفتح شيء</span></div>`}
-      <span class="muted" style="display:block;margin-top:9px;line-height:1.85">الطبي لا يُمنح من هنا أبدًا — يمرّ بالمختص الطبي حصرًا وكل اطّلاع عليه مسجَّل.</span>
-    </div>`;
-    return body.replace("</main>", panel+"</main>");
-  };
-  window.pvRevoke=async(id,who)=>{
-    if(!confirm(`سحب إذن ${who}؟\nيتوقف اطّلاعه فورًا، ويُدوَّن السحب باسمك.`)) return;
-    const {error}=await sb.from("pi_consent_req").update({status:"revoked"}).eq("id",id);
-    if(error) return toast("تعذّر: "+error.message,1);
-    await trans(`سحب إذن اطلاع — ${who}`);
-    toast("سُحب الإذن — لا اطّلاع بعد الآن"); render();
-  };
-})();
+  })();
