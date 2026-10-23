@@ -85,8 +85,66 @@
   PVC.enhance=()=>{
     if(!PVC.isPlayer()) return;
     if(window.PV) PV.openServices=PVC.openServices;
-    PVC.decorateServices(); PVC.glance(); PVC.trust(); PVC.scroll(); PVC.press();
+    PVC.decorateServices(); PVC.glance(); PVC.trust(); PVC.scroll(); PVC.press(); PVC.deep();
   };
+
+  PVC.routeMeta={
+    records:{g:'performance',ic:'▤',en:'PERFORMANCE',t:'السجل والأداء',s:'كل مباراة موثقة تبني قصتك الرياضية',chips:['مباريات موثقة','أهداف وصناعة','منحنى الأداء']},
+    ratingDetail:{g:'performance',ic:'◔',en:'RATING MODEL',t:'تفاصيل التقييم',s:'افهم كيف يتكوّن رقمك الرياضي',chips:['منهجية واضحة','أوزان معلنة','لا حكم بلا بيانات']},
+    cabinet:{g:'performance',ic:'✦',en:'TROPHY ROOM',t:'خزانة الإنجازات',s:'إنجازاتك مع دليلها وسياقها',chips:['شارات','ألقاب','أدلة موثقة']},
+    opps:{g:'opportunity',ic:'◎',en:'OPPORTUNITIES',t:'الفرص والدعوات',s:'تجارب وعروض واهتمامات — في مكان واحد',chips:['دعوات','تجارب','قرارات']},
+    explore:{g:'opportunity',ic:'⌖',en:'DISCOVER',t:'اكتشف حولك',s:'مباريات وملاعب وأكاديميات قريبة',chips:['خريطة','مسافة','انضم سريعًا']},
+    find:{g:'opportunity',ic:'⌕',en:'UNIFIED SEARCH',t:'البحث',s:'اسم واحد يوصلك للكيان الصحيح',chips:['لاعبون','مدربون','أكاديميات']},
+    health:{g:'health',ic:'⌁',en:'READINESS',t:'الصحة والجاهزية',s:'خصوصيتك الطبية أولًا — وقرار العودة للعب موثق',chips:['جاهزية','تأهيل','سجل اطلاع']},
+    wallet:{g:'commerce',ic:'▦',en:'WALLET',t:'الجدول والمحفظة',s:'مواعيدك واشتراكاتك ومدفوعاتك',chips:['تقويم','اشتراكات','مدفوعات']},
+    market:{g:'commerce',ic:'◆',en:'SPORTS MARKET',t:'السوق والخدمات',s:'خدمات ومنتجات رياضية مرتبطة باحتياجك',chips:['متجر','خدمات','طلبات']},
+    memberships:{g:'commerce',ic:'♛',en:'MEMBERSHIPS',t:'العضويات',s:'عضويات رقمية بمزايا واضحة',chips:['خطط','مزايا','حالة العضوية']},
+    messages:{g:'privacy',ic:'✉',en:'MESSAGES',t:'الرسائل',s:'تواصل بإذن — بدون فتح باب عشوائي',chips:['إذن','محادثات','سجل واضح']},
+    viewLog:{g:'privacy',ic:'◉',en:'VISIBILITY LOG',t:'من رأى ملفك',s:'كل اطلاع باسم صاحبه ووقته',chips:['زيارات','صلاحيات','شفافية']},
+    privacy:{g:'privacy',ic:'⌾',en:'PRIVACY',t:'الخصوصية',s:'أنت تتحكم بمن يرى ماذا ومتى',chips:['أذونات','سحب فوري','تتبّع']},
+    settings:{g:'privacy',ic:'⚙',en:'PREFERENCES',t:'الإعدادات',s:'حسابك وهويتك وتفضيلاتك',chips:['الحساب','التنبيهات','ساعات الهدوء']},
+    pitch:{g:'content',ic:'♟',en:'COMMUNITY',t:'المجتمع الرياضي',s:'محتوى وتفاعل — بدون خلطه بالأداء',chips:['منشورات','تفاعل','بلاغات']},
+    news:{g:'content',ic:'▣',en:'SPORTS PULSE',t:'الأخبار',s:'نبض رياضي وفعاليات تهمك',chips:['أحداث','مستجدات','مباشر']}
+  };
+  PVC.relatedMap={
+    records:[['◔','التقييم','ratingDetail'],['✦','الإنجازات','cabinet'],['◈','هويتي','publicView']],
+    ratingDetail:[['▤','السجل','records'],['✦','الإنجازات','cabinet'],['◎','الفرص','opps']],
+    cabinet:[['▤','الأداء','records'],['◈','هويتي','publicView'],['⇪','مشاركة','publicView']],
+    opps:[['⌖','اكتشف','explore'],['⌕','ابحث','find'],['▦','تقويمي','wallet']],
+    explore:[['◎','فرصي','opps'],['⌕','بحث','find'],['◈','هويتي','publicView']],
+    find:[['⌖','اكتشف','explore'],['◎','فرصي','opps'],['♟','المجتمع','pitch']],
+    health:[['▦','تقويمي','wallet'],['✉','الرسائل','messages'],['⌾','الخصوصية','privacy']],
+    wallet:[['◆','السوق','market'],['♛','العضويات','memberships'],['◎','الفرص','opps']],
+    market:[['▦','محفظتي','wallet'],['♛','العضويات','memberships'],['⌖','حولك','explore']],
+    memberships:[['▦','محفظتي','wallet'],['◆','السوق','market'],['⚙','الإعدادات','settings']],
+    messages:[['◉','من رأى ملفك','viewLog'],['⌾','الخصوصية','privacy'],['◎','الفرص','opps']],
+    viewLog:[['⌾','الخصوصية','privacy'],['◈','هويتي','publicView'],['⚙','الإعدادات','settings']],
+    privacy:[['◉','سجل الاطلاع','viewLog'],['✉','الرسائل','messages'],['⚙','الإعدادات','settings']],
+    settings:[['⌾','الخصوصية','privacy'],['◈','هويتي','publicView'],['▦','المحفظة','wallet']],
+    pitch:[['▣','الأخبار','news'],['⌕','البحث','find'],['⌖','اكتشف','explore']],
+    news:[['♟','المجتمع','pitch'],['⌖','حولك','explore'],['◎','الفرص','opps']]
+  };
+  PVC.deep=()=>{
+    if(!PVC.isPlayer()) return;
+    const v=typeof VIEW!=='undefined'?VIEW:'';
+    document.body.dataset.pvView=v;
+    const meta=PVC.routeMeta[v];
+    if(!meta){delete document.body.dataset.pvGroup;return}
+    document.body.dataset.pvGroup=meta.g;
+    const main=document.querySelector('#app .pv-legacy-main');
+    if(!main)return;
+    if(!main.querySelector('.pvc-route-banner')){
+      main.insertAdjacentHTML('afterbegin',`<section class="pvc-route-banner">
+        <div class="pvc-route-row"><span class="pvc-route-icon">${meta.ic}</span><div class="pvc-route-copy"><small>${meta.en}</small><b>${meta.t}</b><span>${meta.s}</span></div><button class="pvc-route-action" onclick="PVC.openServices()">كل الخدمات</button></div>
+        <div class="pvc-route-strip">${meta.chips.map(x=>'<span>'+x+'</span>').join('')}</div>
+      </section><div class="pvc-route-context"><button onclick="PV.go('feed')">⌂ مساحتي</button><button onclick="PV.go('publicView')">◈ هويتي</button><button onclick="PVC.openServices()">☰ كل الخدمات</button></div>`);
+    }
+    if(!main.querySelector('.pvc-related')){
+      const rel=(PVC.relatedMap[v]||[]).filter(x=>{try{return typeof T[x[2]]==='function'}catch(e){return false}});
+      if(rel.length)main.insertAdjacentHTML('beforeend',`<section class="pvc-related"><div class="pvc-related-head"><div><small>NEXT MOVE</small><b>قد تحتاج أيضًا</b></div><span>اختصارات ذكية</span></div><div class="pvc-related-grid">${rel.map(x=>'<button onclick="PV.go(\''+x[2]+'\')"><span>'+x[0]+'</span>'+x[1]+'</button>').join('')}</div></section>`);
+    }
+  };
+
   addEventListener('scroll',PVC.scroll,{passive:true});
   const old=window.render;
   if(typeof old==='function'){
