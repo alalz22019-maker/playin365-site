@@ -16,14 +16,23 @@ async function notifyUser(uid,kind,title,body){ await sb.from("notifications").i
 async function boot(){
   if(!sb){ $("#app").innerHTML=`<main><div class="note" style="margin-top:40vh0">⚠️ لم تُضبط مفاتيح Supabase بعد — افتح <b>config.js</b> وضع Project URL وanon key ثم أعد التحميل. الخطوات كاملة في README-DEPLOY.md</div></main>`; return; }
   const {data:{session}}=await sb.auth.getSession();
-  if(session){ DEMO.begin(session.user.id,session.user.email); await loadMe(session.user.id); VIEW=ME&&ME.roleSet?homeFor():"role"; } 
+  if(session){ DEMO.begin(session.user.id,session.user.email); await loadMe(session.user.id,session.user.email); VIEW=ME&&ME.roleSet?homeFor():"role"; } 
   render();
-  sb.auth.onAuthStateChange(async(ev,s)=>{ if(ev==="SIGNED_IN"&&s){ CACHE={}; PARAM=null; DEMO.begin(s.user.id,s.user.email); await loadMe(s.user.id); VIEW=ME&&ME.roleSet?homeFor():"role"; render(); } if(ev==="SIGNED_OUT"){ ME=null; CACHE={}; PARAM=null; DEMO.on=false; VIEW="auth"; render(); } });
+  sb.auth.onAuthStateChange(async(ev,s)=>{ if(ev==="SIGNED_IN"&&s){ CACHE={}; PARAM=null; DEMO.begin(s.user.id,s.user.email); await loadMe(s.user.id,s.user.email); VIEW=ME&&ME.roleSet?homeFor():"role"; render(); } if(ev==="SIGNED_OUT"){ ME=null; CACHE={}; PARAM=null; DEMO.on=false; VIEW="auth"; render(); } });
 }
-async function loadMe(uid){
+async function loadMe(uid,email){
   const {data}=await sb.from("profiles").select("*").eq("id",uid).single();
   let picked=false; try{ picked=localStorage.getItem("pi_role_"+(data&&data.id))==="1"; }catch(e){}
-  ME=data?{...data,roleSet:picked||DEMO_HINT===data.id||(data.role&&data.role!=="player")||(data.org&&data.pos)}:null;
+  /* Demo accounts are synthetic personas. Their requested persona is encoded in the
+     @demo.playin365.app email and must never be overridden by stale profile seed data. */
+  let demoRole=null;
+  try{
+    if(data && DEMO && DEMO.isDemoEmail(email)){
+      const candidate=String(email||"").split("@")[0];
+      if(roleAr[candidate]) demoRole=candidate;
+    }
+  }catch(e){}
+  ME=data?{...data,role:demoRole||data.role,roleSet:!!demoRole||picked||DEMO_HINT===data.id||(data.role&&data.role!=="player")||(data.org&&data.pos)}:null;
 }
 function homeFor(){ return ({player:"feed",coach:"orgMatch",organizer:"orgMatch",referee:"refDuty",academy:"acad",venue:"venue",guardian:"guardian",scout:"scout",admin:"owner",medical:"medical",agent:"deals"})[ME.role]||"home"; }
 async function doSignup(){
