@@ -1,17 +1,5 @@
 /* PlayIn365 — part 3: طبقة برايم الكاملة — بروفايلات ورسوم بيانية وخدمات لكل دور (تُركّب فوق 1/2) */
 const P3={};
-/* معادلة الانطلاقة — معلنة في الواجهة، تتبدل بقرار معلن لا بزر */
-P3.score=evs=>{let s=6;for(const e of evs){if(e.type==="goal")s+=.5;if(e.type==="assist")s+=.3;if(e.type==="red")s-=.5}return Math.max(1,Math.min(10,Math.round(s*10)/10))};
-P3.byMatch=evs=>{const m={};evs.forEach(e=>{(m[e.match_id]=m[e.match_id]||[]).push(e)});return Object.values(m)};
-P3.curve=(vals,best)=>{if(vals.length<2)return null;const w=300,h=90,min=Math.min(...vals,5.5),max=Math.max(...vals,8);
-  const pts=vals.map((v,i)=>[i*(w/(vals.length-1)),h-10-((v-min)/((max-min)||1))*(h-26)]);
-  const d=pts.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+","+p[1].toFixed(1)).join(" ");
-  const bi=vals.indexOf(Math.max(...vals)),bp=pts[bi],lp=pts[pts.length-1];
-  return `<svg viewBox="0 0 300 90" style="width:100%;height:auto;display:block" preserveAspectRatio="none"><path d="${d} L300,90 L0,90 Z" fill="rgba(70,54,227,.12)"></path><path d="${d}" fill="none" stroke="#4636e3" stroke-width="3" stroke-linecap="round"></path><circle cx="${bp[0]}" cy="${bp[1]}" r="5" fill="#f5c518" stroke="#fff" stroke-width="2"></circle><circle cx="${lp[0]}" cy="${lp[1]}" r="5" fill="#e8531f" stroke="#fff" stroke-width="2"></circle></svg>`};
-P3.compBar=()=>`<div class="bar" style="height:10px"><span style="width:50%;background:#151a2e"></span><span style="width:30%;background:#4636e3"></span><span style="width:15%;background:#c78c00"></span><span style="width:5%;background:#c9c2b2"></span></div>
-  <div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:7px"><span class="muted" style="color:#151a2e">■ مسجَّل 50٪</span><span class="muted" style="color:#4636e3">■ خبراء 30٪</span><span class="muted" style="color:#c78c00">■ داعمون 15٪</span><span class="muted">■ جمهور 5٪</span></div>
-  <div class="wnote" style="margin-top:9px;border-top:1px solid #f0ece2;padding-top:9px"><span class="muted" style="line-height:1.8">المال لا يشتري وزنًا — سقف صلب للداعمين والجمهور.</span><span class="muted" style="line-height:1.8">الجمهور لا يُحتسب إلا بعتبة ظهور.</span><span class="muted" style="line-height:1.8">و«—» حيث لا تقييم بعد — لا صفر.</span></div>`;
-P3.hex=(fill,inner,label)=>`<span style="width:58px;height:66px;background:${fill};${inner?"":"border:2px dashed #d5d0c4;"}clip-path:polygon(50% 0,100% 16%,100% 66%,50% 100%,0 66%,0 16%);display:grid;place-items:center;font-size:${inner?"19px":"15px"};color:${inner?"#fff":"#b0aa9c"}" title="${label||""}">${inner||"؟"}</span>`;
 P3.headCard=(sub,av,ringHTML,extra)=>`<div class="stage" style="border-radius:26px;padding:22px 20px 24px">
   <span style="font-size:11.5px;color:#c6cade;font-weight:800;background:rgba(255,255,255,.08);border-radius:999px;padding:4px 13px;width:fit-content;display:inline-block">${sub}</span>
   <div style="display:flex;align-items:center;gap:15px;margin-top:16px">
