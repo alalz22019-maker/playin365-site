@@ -31,3 +31,7 @@ body.pvnext-active{background:#e9e5dd!important}.pvnext-shell{max-width:520px!im
 .pvnext-active .pv-legacy-main h2,
 .pvnext-active .pv-legacy-main h3,
 .pvnext-active .pv-legacy-main .h2{letter-spacing:-.2px}
+
+/* Safety net: the legacy player capsule was generated as a classless fixed <nav>.
+   VNext owns the player bottom navigation; hide only direct classless nav siblings. */
+body.pvnext-active .pvnext-shell>nav:not(.pv-nav){display:none!important}
