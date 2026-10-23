@@ -249,7 +249,7 @@ body.pz-player .hd,body.pz-player .nav{display:none!important}
 .pz-profile-photo.pz-drop-portrait{width:170px}
 .pz-drop-portrait svg{display:block;width:100%;height:auto;overflow:visible;filter:drop-shadow(0 22px 30px rgba(0,0,0,.42))}
 .pz-drop-portrait image{filter:saturate(.95) contrast(1.06)}
-.pz-drop-frame{fill:rgba(104,72,255,.13);stroke:var(--pz-g);stroke-width:2.3;vector-effect:non-scaling-stroke}
+.pz-drop-frame{fill:none;stroke:var(--pz-g);stroke-width:2.3;vector-effect:non-scaling-stroke}
 .pz-drop-portrait:after{
  content:"";position:absolute;width:42px;height:42px;left:-4px;bottom:15px;border-radius:58% 52% 58% 18%;
  background:linear-gradient(145deg,var(--pz-v),var(--pz-v2));transform:rotate(-28deg);
@@ -321,3 +321,5 @@ body.pz-player .hd,body.pz-player .nav{display:none!important}
  .pz-profile-photo.pz-drop-portrait{width:145px}
  .pz-profile-stage-v2 .pz-player-name{font-size:28px!important}
 }
+
+.pz-side .pz-icon{width:19px;height:19px;stroke-width:1.8}
