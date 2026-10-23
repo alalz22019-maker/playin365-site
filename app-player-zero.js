@@ -14,7 +14,7 @@ PZ.photo=function(p,cls){
  const demoId='89a89d4d-6792-48ff-9017-086532d128b0';
  const demoPhoto='https://images.unsplash.com/photo-1761225091881-0d3bda9f6d5a?auto=format&fit=crop&fm=jpg&ixlib=rb-4.1.0&q=82&w=1200';
  const src=(p&&String(p.id)===demoId)?demoPhoto:((p&&p.avatar_url)||demoPhoto);
- return '<div class="'+cls+' pz-drop-portrait"><svg viewBox="0 0 180 220" role="img" aria-label="صورة اللاعب"><defs><clipPath id="pzPlayerDrop"><path d="M31 18C73-1 133 5 159 43c27 40 15 99-24 137-25 25-53 38-78 35-33-4-53-31-48-65l9-75c4-31 2-45 13-57Z"/></clipPath></defs><path class="pz-drop-frame" d="M31 18C73-1 133 5 159 43c27 40 15 99-24 137-25 25-53 38-78 35-33-4-53-31-48-65l9-75c4-31 2-45 13-57Z"/><image href="'+PZ.e(src)+'" x="0" y="0" width="180" height="220" preserveAspectRatio="xMidYMid slice" clip-path="url(#pzPlayerDrop)"/></svg></div>'
+ return '<div class="'+cls+' pz-drop-portrait"><svg viewBox="0 0 180 220" role="img" aria-label="صورة اللاعب"><defs><clipPath id="pzPlayerDrop"><path d="M31 18C73-1 133 5 159 43c27 40 15 99-24 137-25 25-53 38-78 35-33-4-53-31-48-65l9-75c4-31 2-45 13-57Z"/></clipPath></defs><image href="'+PZ.e(src)+'" x="0" y="0" width="180" height="220" preserveAspectRatio="xMidYMid slice" clip-path="url(#pzPlayerDrop)"/><path class="pz-drop-frame" d="M31 18C73-1 133 5 159 43c27 40 15 99-24 137-25 25-53 38-78 35-33-4-53-31-48-65l9-75c4-31 2-45 13-57Z"/></svg></div>'
 };
 PZ.playerName=function(name){
  const parts=String(name||'').trim().split(/\s+/).filter(Boolean);
@@ -93,7 +93,7 @@ notifications:['notifications','NOTIFICATIONS','الإشعارات','كل ما �
 coachBrief:['coach','COACH BRIEF','خطة التدريب','ما تحتاجه قبل الحصة'],
 matchView:['match','MATCH','تفاصيل المباراة','المصدر الواحد لأحداث المباراة']
 };
-PZ.top=function(back){return '<header class="pz-top"><button class="pz-side" onclick="'+(back||"window.PZ.openServices()")+'">'+(back?'←':'◈')+'</button><button style="border:0;background:none" onclick="window.PZ.go(\'feed\')">'+PZ.brand()+'</button><button class="pz-side" onclick="window.PZ.openServices()">☰</button></header>'};
+PZ.top=function(back){return '<header class="pz-top"><button class="pz-side" onclick="'+(back||"window.PZ.openServices()")+'">'+PZ.icon(back?'back':'services')+'</button><button style="border:0;background:none" onclick="window.PZ.go(\'feed\')">'+PZ.brand()+'</button><button class="pz-side" onclick="window.PZ.openServices()">'+PZ.icon('menu')+'</button></header>'};
 PZ.nav=function(active){
  const a=[['home','مساحتي','feed'],['opps','فرصي','opps'],['services','الخدمات','services'],['records','أدائي','records'],['profile','هويتي','publicView']];
  return '<nav class="pz-nav">'+a.map(function(x){
