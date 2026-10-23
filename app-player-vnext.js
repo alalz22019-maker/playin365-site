@@ -11,6 +11,18 @@
   PV.safe = async(p,b)=>{ try{ const r=await q(p,b); return r||[]; }catch(e){ console.warn('PV',p,e); return []; } };
   PV.go = v => { PV.closeSheets(); go(v); };
   PV.closeSheets=()=>document.querySelectorAll('.pv-sheet,.pv-scrim').forEach(x=>x.remove());
+  PV.killLegacyNav=()=>{
+    if(!document.body.classList.contains('pvnext-active')) return;
+    document.querySelectorAll('nav:not(.pv-nav)').forEach(n=>{
+      const txt=(n.textContent||'').replace(/\s+/g,' ');
+      const fixed=((n.style&&n.style.position)==='fixed') || (getComputedStyle(n).position==='fixed');
+      if(fixed && /بطاقتي|سجلي|تنقّل|حولك|مهامي/.test(txt)) n.remove();
+    });
+  };
+  if(!window.__pvLegacyNavGuard){
+    window.__pvLegacyNavGuard=new MutationObserver(()=>requestAnimationFrame(PV.killLegacyNav));
+    window.__pvLegacyNavGuard.observe(document.documentElement,{childList:true,subtree:true});
+  }
 
   PV.services=[
     ['◈','هويتي الرياضية','بطاقتك العامة الموثقة','publicView','private'],
@@ -213,7 +225,12 @@
       if(VIEW!=='publicView'){
         document.body.insertAdjacentHTML('beforeend',`<button id="pv-fab" class="pv-fab" onclick="PV.toggleFab()" aria-label="إجراءات سريعة">＋</button>`);
       }
-      document.querySelectorAll('.nav').forEach(n=>{ if(!n.classList.contains('pv-nav')) n.style.display='none'; });
+      /* Player VNext owns navigation completely. Remove legacy player navigation nodes
+         instead of merely hiding them, while other roles keep their original navigation. */
+      PV.killLegacyNav();
+      const routeMain=app&&app.querySelector('main:not(.pv-main)');
+      if(routeMain) routeMain.classList.add('pv-legacy-main');
+      if(app && !app.querySelector('.pv-page')) app.classList.add('pv-legacy-route');
     }catch(e){console.warn('PV decorate',e);}
   };
 })();
