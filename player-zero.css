@@ -323,3 +323,88 @@ body.pz-player .hd,body.pz-player .nav{display:none!important}
 }
 
 .pz-side .pz-icon{width:19px;height:19px;stroke-width:1.8}
+
+
+/* Official PlayIn365 Basmat — source: V4 Prime identity */
+:root{
+  --pz-basmat-gradient:linear-gradient(160deg,#4636e3,#151a2e);
+  --pz-basmat-violet:#4636e3;
+  --pz-basmat-navy:#151a2e;
+}
+.pz-basmat{
+  display:inline-block;flex:none;
+  background:var(--pz-basmat-gradient);
+  border-radius:50% 50% 50% 14px;
+}
+.pz-basmat-mini{
+  width:14px;height:14px;
+  border-radius:50% 50% 50% 3px;
+  box-shadow:0 4px 12px rgba(70,54,227,.3);
+}
+.pz-chip:before{display:none!important}
+
+/* Player portrait uses the exact PlayIn basmat geometry, not a water-drop path */
+.pz-basmat-photo{
+  position:relative!important;
+  overflow:visible!important;
+  transform:none!important;
+  border:0!important;
+  border-radius:0!important;
+  background:none!important;
+  box-shadow:none!important;
+}
+.pz-basmat-photo:before{
+  content:"";
+  position:absolute;
+  inset:8px -7px -8px 7px;
+  border-radius:50% 50% 50% 14px;
+  background:var(--pz-basmat-gradient);
+  opacity:.95;
+  box-shadow:0 18px 42px rgba(21,26,46,.38);
+  z-index:0;
+}
+.pz-basmat-photo img{
+  position:relative!important;
+  inset:auto!important;
+  width:100%!important;
+  height:100%!important;
+  object-fit:cover!important;
+  object-position:center!important;
+  transform:none!important;
+  border-radius:50% 50% 50% 14px!important;
+  border:2px solid rgba(245,197,24,.66);
+  z-index:2;
+  display:block;
+  filter:saturate(.96) contrast(1.05);
+}
+.pz-photo.pz-basmat-photo{width:148px!important;height:188px!important}
+.pz-profile-photo.pz-basmat-photo{width:166px!important;height:214px!important}
+
+/* Official Basmat in the floating action and center service navigation */
+.pz-fab.pz-basmat-fab{
+  background:var(--pz-basmat-gradient)!important;
+  border-radius:50% 50% 50% 14px!important;
+  transform:none!important;
+}
+.pz-fab.pz-basmat-fab:after{
+  border-radius:50% 50% 50% 9px!important;
+}
+.pz-nav-services .pz-nav-icon{
+  background:var(--pz-basmat-gradient)!important;
+  border-color:rgba(123,91,255,.35)!important;
+  border-radius:50% 50% 50% 9px!important;
+  color:#fff!important;
+  box-shadow:0 7px 18px rgba(70,54,227,.28)!important;
+}
+.pz-nav button.on .pz-nav-icon{
+  border-radius:50% 50% 50% 9px!important;
+}
+
+/* Retire the experimental water-drop visual layer */
+.pz-drop-portrait,.pz-drop-frame,.pz-hero-drop-glow{display:none!important}
+.pz-profile-stage-v2:before{display:none!important}
+
+@media(max-width:390px){
+  .pz-photo.pz-basmat-photo{width:132px!important;height:170px!important}
+  .pz-profile-photo.pz-basmat-photo{width:145px!important;height:190px!important}
+}
