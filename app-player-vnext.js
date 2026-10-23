@@ -210,11 +210,26 @@
   if(typeof NAV!=='undefined') NAV.player=[];
   if(typeof TITLES!=='undefined') Object.assign(TITLES,{feed:'مساحتي',publicView:'هويتي الرياضية',records:'أدائي',explore:'اكتشف',opps:'فرصي'});
 
+  /* Own the global navigation factory for the player. This prevents older wrappers
+     from re-injecting the classless capsule after VNext has rendered. */
+  const prevNavHtml=window.navHtml||navHtml;
+  window.navHtml=navHtml=function(){
+    return (typeof ME!=='undefined'&&ME&&ME.role==='player') ? PV.nav() : prevNavHtml();
+  };
+
   const prevRender=window.render;
   window.render=render=async function(){
     /* Deterministic shell: never let a quick-action/menu from a previous route leak
        into auth, public visitor mode, or another role. */
     document.querySelectorAll('#pv-fab,#pv-fab-menu,.pv-sheet,.pv-scrim').forEach(n=>n.remove());
+    /* Tear down Leaflet before any render replaces its container. */
+    try{
+      if(window.PL3&&PL3._map){
+        PL3._map.off();
+        PL3._map.remove();
+        PL3._map=null;
+      }
+    }catch(e){ if(window.PL3) PL3._map=null; }
     document.body.classList.remove('pvnext-active');
     const before=document.getElementById('app'); if(before) before.classList.remove('pvnext-shell');
     await prevRender();
@@ -233,4 +248,7 @@
       if(app && !app.querySelector('.pv-page')) app.classList.add('pv-legacy-route');
     }catch(e){console.warn('PV decorate',e);}
   };
+  /* A persisted player session may have rendered once before this late-loaded module.
+     Re-render once so VNext becomes the owner immediately. */
+  setTimeout(()=>{ try{ if(ME&&ME.role==='player'&&VIEW!=='auth'&&VIEW!=='role') render(); }catch(e){} },0);
 })();
