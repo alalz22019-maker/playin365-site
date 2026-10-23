@@ -225,3 +225,101 @@ body.pz-player .hd,body.pz-player .nav{display:none!important}
  .pz-profile-analytics{grid-template-columns:1fr}.pz-scout-grid{grid-template-columns:1fr 1fr}.pz-rating-layout{grid-template-columns:1fr}.pz-rating-layout .pz-donut{margin:auto}
  .pz-record-hero{grid-template-columns:1fr 72px}.pz-record-score{width:68px;height:68px}
 }
+
+
+/* Hero correction — true player drop, full name, premium navigation */
+.pz-hero-v2{min-height:465px}
+.pz-hero-v2 .pz-hero-bg{
+ background:
+  linear-gradient(180deg,rgba(3,5,13,.04) 0,rgba(3,5,13,.16) 34%,rgba(3,5,13,.89) 78%,rgba(3,5,13,.98) 100%),
+  linear-gradient(90deg,rgba(3,5,13,.7),rgba(3,5,13,.04) 63%,rgba(3,5,13,.38)),
+  var(--pz-stadium) center/cover no-repeat
+}
+.pz-hero-drop-glow{
+ position:absolute;width:260px;height:260px;right:-95px;top:62px;z-index:-2;
+ border-radius:60% 45% 62% 28%;transform:rotate(-28deg);
+ background:radial-gradient(circle at 45% 42%,rgba(154,121,255,.33),rgba(104,72,255,.12) 45%,transparent 72%);
+ filter:blur(2px);pointer-events:none
+}
+.pz-person-v2{grid-template-columns:155px minmax(0,1fr);gap:16px;align-items:center;margin-top:34px}
+.pz-photo.pz-drop-portrait,.pz-profile-photo.pz-drop-portrait{
+ width:155px;height:auto;overflow:visible;border:0!important;border-radius:0!important;transform:none!important;
+ background:none!important;box-shadow:none!important;position:relative
+}
+.pz-profile-photo.pz-drop-portrait{width:170px}
+.pz-drop-portrait svg{display:block;width:100%;height:auto;overflow:visible;filter:drop-shadow(0 22px 30px rgba(0,0,0,.42))}
+.pz-drop-portrait image{filter:saturate(.95) contrast(1.06)}
+.pz-drop-frame{fill:none;stroke:var(--pz-g);stroke-width:2.3;vector-effect:non-scaling-stroke}
+.pz-drop-portrait:after{
+ content:"";position:absolute;width:42px;height:42px;left:-4px;bottom:15px;border-radius:58% 52% 58% 18%;
+ background:linear-gradient(145deg,var(--pz-v),var(--pz-v2));transform:rotate(-28deg);
+ box-shadow:0 10px 22px rgba(104,72,255,.32);z-index:-1
+}
+.pz-person-copy{padding-bottom:0;align-self:center}
+.pz-player-name{
+ margin:6px 0 5px!important;display:flex;flex-direction:column;gap:0;
+ font-size:30px!important;line-height:1.02!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;
+ letter-spacing:-.5px;text-wrap:balance
+}
+.pz-player-name span{display:block;max-width:100%;white-space:normal}
+.pz-person-copy p{font-size:10.5px}
+.pz-person-copy code{font-size:9.5px}
+
+.pz-proof-v2{overflow:hidden;border-radius:18px;background:rgba(5,8,18,.69);box-shadow:0 12px 30px rgba(0,0,0,.22)}
+.pz-proof-v2 div{position:relative;padding:13px 3px}
+.pz-proof-v2 div+div:before{content:"";position:absolute;inset-inline-start:0;top:24%;bottom:24%;width:1px;background:rgba(255,255,255,.08)}
+.pz-proof-v2 b{font-size:24px;line-height:1}
+.pz-proof-v2 span{font-size:7.2px;line-height:1.35;margin-top:5px;display:block}
+.pz-proof-v2 .featured{background:linear-gradient(155deg,rgba(244,201,79,.15),rgba(104,72,255,.12))}
+.pz-proof-v2 .featured b{color:var(--pz-g);text-shadow:0 0 18px rgba(244,201,79,.18)}
+
+.pz-share{display:grid;place-items:center}.pz-share .pz-icon{width:18px;height:18px}
+
+/* Bottom navigation: custom vector system only */
+.pz-nav{padding:6px 5px 7px;min-height:67px}
+.pz-nav button{gap:4px;color:#828ba3}
+.pz-nav button b{font-size:7.5px;line-height:1}
+.pz-nav-icon{
+ width:34px!important;height:34px!important;display:grid!important;place-items:center!important;
+ border-radius:14px!important;background:transparent!important;box-shadow:none!important;color:currentColor;transition:.18s ease
+}
+.pz-nav-icon .pz-icon{width:20px;height:20px;stroke-width:1.8}
+.pz-nav button.on .pz-nav-icon{
+ border-radius:58% 52% 58% 16px!important;background:linear-gradient(145deg,var(--pz-v),var(--pz-v2))!important;
+ color:#fff;transform:translateY(-4px) rotate(-2deg);box-shadow:0 9px 22px rgba(104,72,255,.38)!important
+}
+.pz-nav button.on b{color:#fff}
+.pz-nav-services .pz-nav-icon{
+ border:1px solid rgba(154,121,255,.22);background:rgba(104,72,255,.08)!important;color:#ad9bff
+}
+.pz-nav-services .pz-nav-icon .pz-icon{width:21px;height:21px}
+
+.pz-fab{display:grid;place-items:center;border-radius:60% 52% 58% 17px;font-size:0}
+.pz-fab .pz-icon{width:25px;height:25px;position:relative;z-index:2}
+.pz-service-icon .pz-icon,.pz-route-title>span .pz-icon{width:20px;height:20px}
+.pz-service-icon{font-size:0}
+
+/* Public player hero uses the player itself as the visual drop; no detached decorative blob */
+.pz-profile-cover-v2{min-height:555px}
+.pz-profile-cover-v2 .pz-profile-drop{display:none!important}
+.pz-profile-stage-v2{grid-template-columns:170px minmax(0,1fr);gap:17px;align-items:center;margin-top:36px}
+.pz-profile-stage-v2 .pz-profile-copy h1{font-size:32px!important}
+.pz-profile-stage-v2:before{
+ content:"";position:absolute;width:250px;height:250px;right:-115px;top:95px;border-radius:62% 48% 61% 24%;
+ background:radial-gradient(circle at 40% 40%,rgba(104,72,255,.28),rgba(104,72,255,.05) 54%,transparent 70%);
+ transform:rotate(-25deg);pointer-events:none
+}
+.pz-profile-stage-v2>*{position:relative;z-index:1}
+
+@media(max-width:390px){
+ .pz-person-v2{grid-template-columns:135px minmax(0,1fr);gap:12px}
+ .pz-photo.pz-drop-portrait{width:135px}
+ .pz-player-name{font-size:27px!important}
+ .pz-proof-v2 b{font-size:21px}
+ .pz-proof-v2 span{font-size:6.7px}
+ .pz-profile-stage-v2{grid-template-columns:145px minmax(0,1fr);gap:12px}
+ .pz-profile-photo.pz-drop-portrait{width:145px}
+ .pz-profile-stage-v2 .pz-player-name{font-size:28px!important}
+}
+
+.pz-side .pz-icon{width:19px;height:19px;stroke-width:1.8}
