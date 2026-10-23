@@ -694,8 +694,8 @@ PL3.drawMap = async () => {
   const el = document.getElementById("pi_map");
   if(!el || !PL3.mapData) return;
   const ok = await PL3.loadLeaflet();
-  if(!ok || !window.L || !document.getElementById("pi_map")) {
-    if(el) el.innerHTML = `<div style="height:100%;display:grid;place-items:center;background:#e6e1d5;text-align:center;padding:20px">
+  if(!ok || !window.L || !el.isConnected || document.getElementById("pi_map")!==el) {
+    if(el && el.isConnected) el.innerHTML = `<div style="height:100%;display:grid;place-items:center;background:#e6e1d5;text-align:center;padding:20px">
       <span style="font-size:11px;font-weight:800;color:#5b6078;line-height:1.9">تعذّر تحميل الخريطة الآن — القائمة أسفلها تعمل</span></div>`;
     return;
   }
@@ -723,7 +723,9 @@ PL3.drawMap = async () => {
     L.marker(ll,{interactive:false,icon:L.divIcon({className:"",iconSize:[130,18],iconAnchor:[65,9],
       html:`<span style="display:block;text-align:center;font:900 9px Cairo;color:#a83b25;background:rgba(255,255,255,.9);border:1px solid rgba(232,83,31,.35);border-radius:999px;padding:1px 7px;white-space:nowrap">فرد — نطاق تقريبي</span>`})}).addTo(map); });
   if(bounds.length>1) map.fitBounds(bounds,{padding:[70,60],maxZoom:13});
-  setTimeout(()=>map.invalidateSize(),120);
+  setTimeout(()=>{ try{
+    if(PL3._map===map && el.isConnected && document.getElementById("pi_map")===el) map.invalidateSize();
+  }catch(e){} },120);
 };
 window.locateMe = () => {
   if(!navigator.geolocation||!PL3._map) return toast("الموقع غير متاح على هذا الجهاز",1);
