@@ -44,38 +44,6 @@
     const w=document.getElementById("pi_ushe"); w.querySelector("[data-cancel]").onclick=()=>w._done(false); w.querySelector("[data-ok]").onclick=()=>w._done(true); return p;
   };
 
-  /* ١ · رمز الأكاديمية */
-  window.joinByCode = async () => {
-    const r = await PI.sheet({icon:"⌗", title:"ارتبط بأكاديميتك", sub:"الرمز يعطيك إياه مشرف الأكاديمية — ستّة أحرف", fields:[{id:"c",label:"رمز الانضمام",placeholder:"NK7-4A2",ltr:true}], note:"حين تُرسله يُسجَّل باسمك واسم من أصدر الرمز — ويظهر في سجل الشفافية.", ok:"ارتبط — باسمي"});
-    if(!r) return; const c=r.c.toUpperCase();
-    const {data:seat} = await sb.from("pi_seats").select("*").eq("join_code",c).limit(1).maybeSingle();
-    if(!seat){ toast("رمز غير معروف — راجع مشرف أكاديميتك",1); return setTimeout(()=>window.joinByCode(),900); }
-    if(seat.linked_id){ toast("هذا المقعد مرتبط بحساب آخر",1); return; }
-    const yes = await PI.confirmSheet({icon:"◉", title:"مقعد «"+esc(seat.name)+"»", body:`في ${esc(seat.org)}${seat.group_name?" · "+esc(seat.group_name):""}\nتربطه بحسابك؟ ينتقل إليك ما وُقّع لهذا المقعد.`, ok:"نعم — اربطه", cancel:"لا"});
-    if(!yes) return;
-    const {error} = await sb.from("pi_seats").update({linked_id:ME.id, linked_at:new Date().toISOString()}).eq("id",seat.id);
-    if(error) return toast("تعذّر: "+error.message,1);
-    const patch={org:seat.org}; if(seat.pos&&!ME.pos) patch.pos=seat.pos; if(seat.age&&!ME.age) patch.age=seat.age; if(seat.shirt&&!ME.shirt) patch.shirt=seat.shirt;
-    await sb.from("profiles").update(patch).eq("id",ME.id); Object.assign(ME,patch);
-    await sb.from("attendance").update({player_name:ME.name}).eq("seat_id",seat.id);
-    await trans(`ارتبط بمقعده في ${seat.org} برمزه — لا بربط الجهة`);
-    toast("ارتبطتَ بـ"+seat.org+" — وانتقل ما وُقّع لك"); render();
-  };
-
-  /* ٢ · إذن ولي الأمر */
-  window.guardianConsent = async () => {
-    const r = await PI.sheet({icon:"🔒", title:"إذن وليّ أمرك", sub:"مرة واحدة — للمتابعة والتعاملات العادية", fields:[{id:"g",label:"اسم وليّ الأمر",placeholder:"مثال: خالد القحطاني"}], note:"يغطّي التدريب والحضور والتقييم والانضمام لفئة بلا استئذان في كل مرة. ويبقى الاستئذان لازمًا في: "+((typeof SEAT!=="undefined"&&SEAT.GRAVE)?SEAT.GRAVE.join(" · "):"التعاقد · الانتقال · الطبي")+".", ok:"سجّل الإذن"});
-    if(!r) return; const g=r.g;
-    const {error} = await sb.from("profiles").update({guardian_name:g, guardian_consent_at:new Date().toISOString(), guardian_scope:"عادي"}).eq("id",ME.id);
-    if(error) return toast(/guardian/.test(error.message)?"الإذن لم يُفعَّل في القاعدة بعد":"تعذّر: "+error.message,1);
-    Object.assign(ME,{guardian_name:g, guardian_consent_at:new Date().toISOString()});
-    await sb.from("transparency").insert({actor:g+" — وليّ أمر", action:`أذِن بمتابعة ${ME.name} وتعاملاته العادية — ويبقى الجسيم باستئذان`});
-    toast("سُجّل الإذن باسم "+g); render();
-  };
-
-  /* ٤ · «انشر لقطة من هدفك» — كان بلا أمر: يفتح إضافة لقطة موسومة بالحدث */
-  window.postClip = (evId, minute) => { if(typeof window.addMedia==="function"){ go("myCard"); setTimeout(()=>window.addMedia(), 500); return; } go("myCard"); };
-
   /* ٥ · كاشف الأخطاء للحسابات التجريبية فقط */
   const gate=()=>{ const d=document.getElementById("__piErr"); if(!d) return; const demo = (typeof DEMO!=="undefined"&&DEMO.on); d.style.display = demo ? "" : "none"; };
   new MutationObserver(gate).observe(document.documentElement,{childList:true,subtree:true}); gate();

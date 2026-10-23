@@ -149,62 +149,6 @@ T.role=()=>`<main>
     <button class="btn" onclick="saveRole()">ابدأ</button>
   </div></main>`;
 
-T.home=async()=>{
-  const matches=CACHE.matches=await q("matches",sb.from("matches").select("*").order("created_at",{ascending:false}).limit(20));
-  const today=matches.find(m=>m.status==="today"||m.status==="live");
-  const open=matches.find(m=>m.status==="open");
-  const evs=CACHE.myEvents=await q("events",sb.from("match_events").select("*,matches(title)").eq("who",ME.name).order("created_at",{ascending:false}).limit(5));
-  return `<main>
-    <div><b style="font-size:18px">هلا ${esc(ME.name.split(" ")[0])}</b><span class="muted" style="display:block;margin-top:3px">${today?"عندك مباراة اليوم "+esc(today.match_time):"يومك هادئ"}</span></div>
-    ${today?`<div class="stage"><div style="display:flex;justify-content:space-between;margin-bottom:10px"><span style="font-size:10px;font-weight:900;color:#f5c518">مباراة اليوم</span><span style="font-size:10px;color:#c6cade;font-weight:800">${esc(today.comp)}</span></div>
-      <div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:14px">${esc(today.title)}</b><b class="ltr" style="font-size:16px">${esc(today.match_time)}</b></div>
-      <button class="btn gold" style="margin-top:13px" onclick="joinMatch('${today.id}',1)">أكّد حضورك</button></div>`:""}
-    <div class="card"><div style="display:flex;justify-content:space-between;margin-bottom:10px"><b class="h2">آخر ما دخل سجلك</b><a onclick="go('records')" style="font-size:11px;font-weight:900">السجل ←</a></div>
-      ${evs.length?evs.slice(0,2).map(e=>`<div class="lrow"><span class="ic">${e.type==="goal"?"⚽":"◎"}</span><div style="flex:1;min-width:0"><b style="font-size:12px;display:block">${esc(evLabel(e))} · ${esc(e.matches?e.matches.title:"")}</b><span class="muted">سجّله ${esc(e.recorded_by)}</span></div></div>`).join(""):`<span class="muted">سجلك يبدأ من أول مباراة — انضم لمباراة قريبة.</span>`}</div>
-    ${open?`<div class="card"><div style="display:flex;justify-content:space-between;margin-bottom:9px"><b class="h2">قريب منك</b><a onclick="go('explore')" style="font-size:11px;font-weight:900">استكشف ←</a></div>
-      <div style="background:#faf8f3;border:1px solid #e9e4d8;border-radius:15px;padding:13px"><b style="font-size:12.5px;display:block">${esc(open.title)}</b>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px"><span class="muted">${esc(open.match_time)} · ${N(open.fee)} ر.س</span><button class="btn" style="width:auto;padding:8px 20px;border-radius:999px;font-size:11px" onclick="joinMatch('${open.id}')">انضم</button></div></div></div>`:""}
-  </main>`;
-};
-window.joinMatch=async(mid,att)=>{
-  const {error}=await sb.from("match_joins").upsert({match_id:mid,player_id:ME.id,player_name:ME.name,attended:!!att},{onConflict:"match_id,player_id"});
-  if(error) return toast("تعذّر: "+error.message,1);
-  toast(att?"حضورك مؤكد — أُخطر المنظم":"انضممت — تدخل تقويمك");
-};
-
-T.records=async()=>{
-  const evs=await q("events",sb.from("match_events").select("*,matches(title)").eq("who",ME.name).order("created_at",{ascending:false}));
-  const goals=evs.filter(e=>e.type==="goal").length, assists=evs.filter(e=>e.type==="assist").length;
-  const played=(await q("joins",sb.from("match_joins").select("id").eq("player_id",ME.id).eq("attended",true))).length;
-  CACHE.played=played;
-  return `<main>
-    <div class="stat3"><div class="stat"><b>${played}</b><span class="muted">مباراة</span></div><div class="stat"><b style="color:#4636e3">${goals}</b><span class="muted">هدف</span></div><div class="stat"><b style="color:#c78c00">${assists}</b><span class="muted">صناعة</span></div></div>
-    ${evs.length?evs.map(e=>`<div class="card" style="padding:13px 14px;display:flex;gap:11px;align-items:flex-start"><span class="ic" style="${e.type==="yellow"?"background:#151a2e;color:#f5c518":""}">${e.type==="goal"?"⚽":e.type==="yellow"?"▮":"◎"}</span><div style="flex:1;min-width:0"><b style="font-size:12px;display:block">${esc(evLabel(e))} · الدقيقة ${N(e.minute)}</b><span class="muted">${esc(e.matches?e.matches.title:"")} — سجّله ${esc(e.recorded_by)}</span></div></div>`).join(""):`<div class="card" style="text-align:center;padding:30px"><b style="font-size:13px">سجلك يبدأ من أول مباراة</b><p class="muted" style="margin:7px 0 0">كل حدث يدخل هنا لحظة تسجيله من المنظم أو حكمه.</p></div>`}
-    <div class="dnote">كل سطر باسم من كتبه. خطأ تقني؟ بلاغ عام لا يغيّر نتيجة ولا حدثًا — التصحيح حق المنظم وحده.</div>
-  </main>`;
-};
-
-T.rating=async()=>{
-  const played=CACHE.played??(await q("joins",sb.from("match_joins").select("id").eq("player_id",ME.id).eq("attended",true))).length;
-  const has=played>=5;
-  return `<main>
-    <div class="stage" style="text-align:center"><b class="ltr" style="font-size:44px;font-family:'Space Grotesk'">${has?"7.8":"—"}</b><span style="display:block;font-size:11px;color:#c6cade;font-weight:700;margin-top:6px">${has?"محدّث بعد كل مباراة موثّقة":`بعد ${N(5-played)} مباريات موثّقة يظهر رقمك`}</span></div>
-    ${has?`<div class="card"><div class="bar"><span style="width:50%;background:#151a2e"></span><span style="width:30%;background:#4636e3"></span><span style="width:15%;background:#c78c00"></span><span style="width:5%;background:#c9c2b2"></span></div>
-      <div style="display:flex;gap:10px;margin-top:9px;font-size:10px;font-weight:800;color:#565d78;flex-wrap:wrap"><span>مقيس ${N("50%")}</span><span>خبراء ${N("30%")}</span><span>داعمون ${N("15%")}</span><span>جمهور ${N("5%")}</span></div>
-      <p style="margin:10px 0 0;font-size:11px;color:#565d78;font-weight:600;line-height:1.9">سقف صلب: الداعمون + الجمهور ≤ ${N("20%")} مهما بلغ العدد.</p></div>`:""}
-    <div class="note">لا تقييم قبل ${N(5)} مباريات موثّقة — «—» لا صفر: الصفر يُقرأ حكمًا والشرطة انتظارًا.</div>
-  </main>`;
-};
-
-T.explore=async()=>{
-  const ms=await q("matches",sb.from("matches").select("*").in("status",["open","today","live"]).order("created_at",{ascending:false}));
-  return `<main>
-    <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="chip" style="background:#4636e3;color:#fff">مباريات مفتوحة</span><span class="chip" style="background:#fff;border:1px solid #e9e4d8;color:#565d78">ملاعب</span><span class="chip" style="background:#fff;border:1px solid #e9e4d8;color:#565d78">بطولات</span></div>
-    ${ms.length?ms.map(m=>`<div class="card"><div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:10px;font-weight:900;color:${m.status==="live"?"#e8531f":"#c78c00"}">${m.status==="live"?"● مباشر":m.status==="open"?"مفتوحة":"اليوم"}</span><span class="muted">${esc(m.venue)}</span></div><b style="font-size:12.5px;display:block">${esc(m.title)}</b>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px"><span class="muted">${esc(m.match_time)}${m.fee>0?" · "+N(m.fee)+" ر.س":""} · المنظم: ${esc(m.organizer_name)}</span><button class="btn" style="width:auto;padding:8px 18px;border-radius:999px;font-size:11px" onclick="joinMatch('${m.id}')">انضم</button></div></div>`).join(""):`<div class="card" style="text-align:center;padding:28px"><b>لا مباريات مفتوحة الآن</b><p class="muted" style="margin:6px 0 0">المنظمون ينشئونها من زر +</p></div>`}
-  </main>`;
-};
-
 T.newMatch=()=>`<main>
   <div class="card"><b class="h2" style="display:block;margin-bottom:11px">إنشاء مباراة — أنت المنظم المسؤول</b>
     <div class="fld"><label>العنوان</label><input id="nm_t" placeholder="سباعية ودية / الصقور × الشرق"></div>
