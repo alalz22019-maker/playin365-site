@@ -12,46 +12,46 @@ PZ.close=function(){document.querySelectorAll('.pz-sheet,.pz-sheet-bg').forEach(
 PZ.brand=function(){return '<span class="pz-brand"><span class="play">Play</span><span class="in">In</span><sup>365</sup></span>'};
 PZ.photo=function(p,cls){
  const demoId='89a89d4d-6792-48ff-9017-086532d128b0';
- const demoPhoto='https://images.unsplash.com/photo-1761225091881-0d3bda9f6d5a?auto=format&fit=crop&fm=jpg&ixlib=rb-4.1.0&q=82&w=1200';
+ const demoPhoto='https://images.unsplash.com/photo-1751394211199-6e37aac1c4b9?auto=format&fit=crop&fm=jpg&ixlib=rb-4.1.0&q=82&w=1200';
  const src=(p&&String(p.id)===demoId)?demoPhoto:((p&&p.avatar_url)||demoPhoto);
- return '<div class="'+cls+' pz-drop-portrait"><svg viewBox="0 0 180 220" role="img" aria-label="صورة اللاعب"><defs><clipPath id="pzPlayerDrop"><path d="M31 18C73-1 133 5 159 43c27 40 15 99-24 137-25 25-53 38-78 35-33-4-53-31-48-65l9-75c4-31 2-45 13-57Z"/></clipPath></defs><image href="'+PZ.e(src)+'" x="0" y="0" width="180" height="220" preserveAspectRatio="xMidYMid slice" clip-path="url(#pzPlayerDrop)"/><path class="pz-drop-frame" d="M31 18C73-1 133 5 159 43c27 40 15 99-24 137-25 25-53 38-78 35-33-4-53-31-48-65l9-75c4-31 2-45 13-57Z"/></svg></div>'
+ const uid='pzDrop'+Math.random().toString(36).slice(2,8);
+ return '<div class="'+cls+' pz-drop-portrait"><svg viewBox="0 0 180 224" role="img" aria-label="صورة اللاعب"><defs><clipPath id="'+uid+'"><path d="M90 7C90 7 30 72 30 131C30 180 56 212 90 212C127 212 153 181 153 138C153 91 119 50 90 7Z"/></clipPath></defs><path class="pz-drop-aura" d="M90 7C90 7 30 72 30 131C30 180 56 212 90 212C127 212 153 181 153 138C153 91 119 50 90 7Z"/><image href="'+PZ.e(src)+'" x="0" y="0" width="180" height="224" preserveAspectRatio="xMidYMid slice" clip-path="url(#'+uid+')"/><path class="pz-drop-frame" d="M90 7C90 7 30 72 30 131C30 180 56 212 90 212C127 212 153 181 153 138C153 91 119 50 90 7Z"/></svg></div>'
 };
 PZ.playerName=function(name){
- const parts=String(name||'').trim().split(/\s+/).filter(Boolean);
- if(parts.length<=1)return '<span>'+PZ.e(parts[0]||'لاعب')+'</span>';
- const first=parts.shift(),rest=parts.join(' ');
- return '<span>'+PZ.e(first)+'</span><span>'+PZ.e(rest)+'</span>'
+ const s=String(name||'لاعب').trim().replace(/\s+/g,' ');
+ if(s.length<=17)return '<span class="pz-name-line">'+PZ.e(s)+'</span>';
+ const parts=s.split(' '),cut=Math.ceil(parts.length/2);
+ return '<span class="pz-name-line">'+PZ.e(parts.slice(0,cut).join(' '))+'</span><span class="pz-name-line">'+PZ.e(parts.slice(cut).join(' '))+'</span>'
 };
 PZ.icon=function(name,cls){
- const icons={
-  home:'<path d="M4 11.5 12 5l8 6.5V20a1 1 0 0 1-1 1h-5v-6h-4v6H5a1 1 0 0 1-1-1Z"/>',
-  opps:'<circle cx="10" cy="12" r="5"/><path d="m14 8 5-5m0 0v4m0-4h-4M8 12h4m-2-2v4"/>',
-  services:'<path d="M8 3.5c2.2 2.6 3.5 4.4 3.5 6.2A3.5 3.5 0 1 1 4.5 9.7C4.5 7.9 5.8 6.1 8 3.5Z"/><path d="M16 10.5c2.2 2.6 3.5 4.4 3.5 6.2a3.5 3.5 0 1 1-7 0c0-1.8 1.3-3.6 3.5-6.2Z"/>',
-  records:'<path d="M4 19V5m0 14h16"/><path d="m7 15 3-4 3 2 5-6"/><circle cx="7" cy="15" r=".8"/><circle cx="10" cy="11" r=".8"/><circle cx="13" cy="13" r=".8"/><circle cx="18" cy="7" r=".8"/>',
-  profile:'<path d="M12 3.5c3.2 3.8 5 6.2 5 8.6a5 5 0 0 1-10 0c0-2.4 1.8-4.8 5-8.6Z"/><circle cx="12" cy="10.5" r="1.6"/><path d="M9.5 15c.8-1.3 1.7-2 2.5-2s1.7.7 2.5 2"/>',
-  rating:'<path d="M5 16a7 7 0 1 1 14 0"/><path d="m12 12 4-3"/><circle cx="12" cy="12" r="1"/><path d="M7 18h10"/>',
-  trophy:'<path d="M8 4h8v4a4 4 0 0 1-8 0Z"/><path d="M8 6H5v1a3 3 0 0 0 3 3m8-4h3v1a3 3 0 0 1-3 3M12 12v4m-3 4h6m-5-4h4"/>',
-  wallet:'<rect x="4" y="6" width="16" height="13" rx="3"/><path d="M7 6V4m10 2V4M4 10h16m-5 4h3"/>',
-  health:'<path d="M12 20S4.5 15.7 4.5 9.5A4 4 0 0 1 12 7.4a4 4 0 0 1 7.5 2.1C19.5 15.7 12 20 12 20Z"/><path d="m7.5 12 2.2 0 1.2-2.4 2.1 4.8 1.1-2.4h2.4"/>',
-  messages:'<path d="M5 5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-5 3v-3H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z"/><path d="M7 9h10M7 13h6"/>',
-  views:'<path d="M2.8 12s3.3-5 9.2-5 9.2 5 9.2 5-3.3 5-9.2 5-9.2-5-9.2-5Z"/><circle cx="12" cy="12" r="2.2"/>',
-  privacy:'<path d="M12 3 19 6v5c0 4.6-2.8 8-7 10-4.2-2-7-5.4-7-10V6Z"/><path d="M9.5 12.5 11 14l3.8-4"/>',
-  explore:'<circle cx="12" cy="12" r="8"/><path d="m15.5 8.5-2.2 4.8-4.8 2.2 2.2-4.8Z"/>',
-  search:'<circle cx="10.5" cy="10.5" r="5.5"/><path d="m15 15 5 5"/>',
-  community:'<circle cx="9" cy="9" r="3"/><circle cx="16.5" cy="10" r="2.5"/><path d="M3.5 19c.7-3 2.6-4.5 5.5-4.5s4.8 1.5 5.5 4.5m0-.5c.6-2.1 1.9-3.2 4-3.2 1.1 0 2 .3 2.8.9"/>',
-  news:'<path d="M5 4h13a2 2 0 0 1 2 2v13H6a2 2 0 0 1-2-2V5a1 1 0 0 1 1-1Z"/><path d="M8 8h8M8 12h8M8 16h5"/>',
-  market:'<path d="M6 8h12l1 12H5Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',
-  settings:'<path d="M5 7h14M8 12h8M5 17h14"/><circle cx="9" cy="7" r="1.7"/><circle cx="15" cy="12" r="1.7"/><circle cx="11" cy="17" r="1.7"/>',
-  memberships:'<path d="M4 7h16v12H4Z"/><path d="M8 7V5h8v2M8 12h8m-8 3h5"/>',
-  notifications:'<path d="M6 17h12l-1.5-2V10a4.5 4.5 0 0 0-9 0v5ZM10 20h4"/>',
-  coach:'<rect x="6" y="4" width="12" height="16" rx="2"/><path d="M9 4V3h6v1m-6 5h6m-6 4h4m-4 4h6"/>',
-  match:'<circle cx="12" cy="12" r="8"/><path d="m12 8 3 2-1 3h-4l-1-3Zm-3-3 1 3m5-3-1 3m-6 8 2-3m6 3-2-3"/>',
-  menu:'<path d="M5 7h14M5 12h14M5 17h14"/>',
-  back:'<path d="m15 5-7 7 7 7"/>',
-  plus:'<path d="M12 6v12M6 12h12"/>',
-  share:'<path d="M12 4v11"/><path d="m8 8 4-4 4 4"/><path d="M5 12v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/>'
+ const I={
+ home:'<path d="M4 11.5 12 5l8 6.5V20a1 1 0 0 1-1 1h-5v-6h-4v6H5a1 1 0 0 1-1-1Z"/>',
+ profile:'<rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="9" cy="11" r="2.2"/><path d="M5.8 16c.7-1.8 1.8-2.7 3.2-2.7s2.5.9 3.2 2.7M14.5 9h3.5m-3.5 4h3.5"/>',
+ records:'<path d="M4 19V5m0 14h16"/><path d="m7 15 3-4 3 2 5-6"/><circle cx="7" cy="15" r=".7"/><circle cx="10" cy="11" r=".7"/><circle cx="13" cy="13" r=".7"/><circle cx="18" cy="7" r=".7"/>',
+ opps:'<circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/>',
+ explore:'<circle cx="12" cy="12" r="8"/><path d="m15.5 8.5-2.2 4.8-4.8 2.2 2.2-4.8Z"/>',
+ services:'<rect x="4" y="4" width="6" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5"/><rect x="14" y="14" width="6" height="6" rx="1.5"/>',
+ rating:'<path d="M5 17a7 7 0 1 1 14 0"/><path d="m12 12 4-3"/><circle cx="12" cy="12" r="1"/><path d="M8 20h8"/>',
+ trophy:'<path d="M8 4h8v4a4 4 0 0 1-8 0Z"/><path d="M8 6H5v1a3 3 0 0 0 3 3m8-4h3v1a3 3 0 0 1-3 3M12 12v4m-3 4h6"/>',
+ wallet:'<rect x="4" y="6" width="16" height="13" rx="3"/><path d="M7 6V4m10 2V4M4 10h16m-5 4h3"/>',
+ health:'<path d="M12 20S4.5 15.7 4.5 9.5A4 4 0 0 1 12 7.4a4 4 0 0 1 7.5 2.1C19.5 15.7 12 20 12 20Z"/><path d="M7.5 12h2.2l1.2-2.4 2.1 4.8 1.1-2.4h2.4"/>',
+ messages:'<path d="M5 5h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-5 3v-3H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z"/><path d="M7 9h10M7 13h6"/>',
+ views:'<path d="M2.8 12s3.3-5 9.2-5 9.2 5 9.2 5-3.3 5-9.2 5-9.2-5-9.2-5Z"/><circle cx="12" cy="12" r="2.2"/>',
+ privacy:'<path d="M12 3 19 6v5c0 4.6-2.8 8-7 10-4.2-2-7-5.4-7-10V6Z"/><path d="M9.5 12.5 11 14l3.8-4"/>',
+ search:'<circle cx="10.5" cy="10.5" r="5.5"/><path d="m15 15 5 5"/>',
+ community:'<circle cx="9" cy="9" r="3"/><circle cx="16.5" cy="10" r="2.5"/><path d="M3.5 19c.7-3 2.6-4.5 5.5-4.5s4.8 1.5 5.5 4.5m0-.5c.6-2.1 1.9-3.2 4-3.2"/>',
+ news:'<path d="M5 4h13a2 2 0 0 1 2 2v13H6a2 2 0 0 1-2-2V5a1 1 0 0 1 1-1Z"/><path d="M8 8h8M8 12h8M8 16h5"/>',
+ market:'<path d="M6 8h12l1 12H5Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',
+ settings:'<path d="M5 7h14M8 12h8M5 17h14"/><circle cx="9" cy="7" r="1.7"/><circle cx="15" cy="12" r="1.7"/><circle cx="11" cy="17" r="1.7"/>',
+ memberships:'<path d="M4 7h16v12H4Z"/><path d="M8 7V5h8v2M8 12h8m-8 3h5"/>',
+ notifications:'<path d="M6 17h12l-1.5-2V10a4.5 4.5 0 0 0-9 0v5ZM10 20h4"/>',
+ coach:'<rect x="6" y="4" width="12" height="16" rx="2"/><path d="M9 4V3h6v1m-6 5h6m-6 4h4m-4 4h6"/>',
+ match:'<circle cx="12" cy="12" r="8"/><path d="m12 8 3 2-1 3h-4l-1-3Zm-3-3 1 3m5-3-1 3m-6 8 2-3m6 3-2-3"/>',
+ menu:'<path d="M5 7h14M5 12h14M5 17h14"/>',
+ back:'<path d="m15 5-7 7 7 7"/>',
+ share:'<path d="M12 4v11"/><path d="m8 8 4-4 4 4"/><path d="M5 12v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/>'
  };
- return '<svg class="pz-icon '+(cls||'')+'" viewBox="0 0 24 24" aria-hidden="true">'+(icons[name]||icons.services)+'</svg>';
+ return '<svg class="pz-icon '+(cls||'')+'" viewBox="0 0 24 24" aria-hidden="true">'+(I[name]||I.services)+'</svg>'
 };
 
 PZ.services=[
@@ -93,21 +93,30 @@ notifications:['notifications','NOTIFICATIONS','الإشعارات','كل ما �
 coachBrief:['coach','COACH BRIEF','خطة التدريب','ما تحتاجه قبل الحصة'],
 matchView:['match','MATCH','تفاصيل المباراة','المصدر الواحد لأحداث المباراة']
 };
-PZ.top=function(back){return '<header class="pz-top"><button class="pz-side" onclick="'+(back||"window.PZ.openServices()")+'">'+PZ.icon(back?'back':'services')+'</button><button style="border:0;background:none" onclick="window.PZ.go(\'feed\')">'+PZ.brand()+'</button><button class="pz-side" onclick="window.PZ.openServices()">'+PZ.icon('menu')+'</button></header>'};
+PZ.top=function(back){return '<header class="pz-top"><button class="pz-side" onclick="'+(back||"window.PZ.openServices()")+'">'+PZ.icon(back?'back':'services')+'</button><button class="pz-logo-btn" onclick="window.PZ.go(\'feed\')">'+PZ.brand()+'</button><button class="pz-side" onclick="window.PZ.openServices()">'+PZ.icon('menu')+'</button></header>'};
 PZ.nav=function(active){
- const a=[['home','مساحتي','feed'],['opps','فرصي','opps'],['services','الخدمات','services'],['records','أدائي','records'],['profile','هويتي','publicView']];
+ const a=[['profile','هويتي','publicView'],['records','سجلي','records'],['home','الرئيسية','feed'],['explore','حولك','explore'],['opps','فرصي','opps']];
  return '<nav class="pz-nav">'+a.map(function(x){
-  const icon='<span class="pz-nav-icon">'+PZ.icon(x[0])+'</span>';
-  if(x[2]==='services')return '<button class="pz-nav-services" onclick="window.PZ.openServices()">'+icon+'<b>'+x[1]+'</b></button>';
-  return '<button class="'+(active===x[2]?'on':'')+'" onclick="window.PZ.go(\''+x[2]+'\')">'+icon+'<b>'+x[1]+'</b></button>'
+  const cls=(x[2]==='feed'?'pz-nav-home ':'')+(active===x[2]?'on':'');
+  return '<button class="'+cls+'" onclick="window.PZ.go(\''+x[2]+'\')"><span class="pz-nav-icon">'+PZ.icon(x[0])+'</span><b>'+x[1]+'</b></button>'
  }).join('')+'</nav>'
 };
-PZ.page=function(route,body){const m=PZ.meta[route]||['services','PLAYER SPACE',route,'هويتك الرياضية'];return '<div class="pz-page">'+PZ.top("window.PZ.go('feed')")+'<section class="pz-route-head"><div class="pz-route-title"><span>'+PZ.icon(m[0])+'</span><div><small>'+m[1]+'</small><h1>'+PZ.e(m[2])+'</h1><p>'+PZ.e(m[3])+'</p></div></div></section><main class="pz-route-main">'+body+'</main>'+PZ.nav(route)+'<button class="pz-fab" onclick="window.PZ.toggleFab()">'+PZ.icon('plus')+'</button></div>'};
+PZ.page=function(route,body){const m=PZ.meta[route]||['services','PLAYER SPACE',route,'هويتك الرياضية'];return '<div class="pz-page pz-route-'+PZ.e(route)+'">'+PZ.top("window.PZ.go('feed')")+'<section class="pz-route-head"><div class="pz-route-title"><span>'+PZ.icon(m[0])+'</span><div><small>'+m[1]+'</small><h1>'+PZ.e(m[2])+'</h1><p>'+PZ.e(m[3])+'</p></div></div></section><main class="pz-route-main">'+body+'</main>'+PZ.nav(route)+'</div>'};
 PZ.empty=function(t,s,a,r){return '<div class="pz-empty"><b>'+PZ.e(t)+'</b><small>'+PZ.e(s||'')+'</small>'+(a?'<div class="pz-actions" style="justify-content:center"><button class="pz-action primary" onclick="window.PZ.go(\''+r+'\')">'+PZ.e(a)+'</button></div>':'')+'</div>'};
-PZ.grid=function(f,q){f=f||'all';q=String(q||'').trim().toLowerCase();const rows=PZ.services.filter(function(s){return(f==='all'||s[4]===f)&&(!q||(s[1]+' '+s[2]).toLowerCase().includes(q))});return rows.map(function(s){return '<button class="pz-service-row" data-kind="'+s[4]+'" onclick="window.PZ.go(\''+s[3]+'\')"><i>'+PZ.icon(s[0])+'</i><span><b>'+s[1]+'</b><small>'+s[2]+'</small></span><em class="pz-kind">'+(s[4]==='private'?'خاص':'مشترك')+'</em></button>'}).join('')||PZ.empty('لا توجد نتيجة','جرّب كلمة أخرى')};
-PZ.openServices=function(){PZ.close();document.body.insertAdjacentHTML('beforeend','<div class="pz-sheet-bg" onclick="window.PZ.close()"></div><section class="pz-sheet"><div class="pz-sheet-grab"></div><div class="pz-sheet-head"><div><b>كل خدمات اللاعب</b><small>وصول واحد لكل شيء</small></div><button onclick="window.PZ.close()">×</button></div><label class="pz-search"><span>⌕</span><input id="pzServiceSearch" data-filter="all" placeholder="ابحث عن خدمة..." oninput="window.PZ.searchServices(this)"></label><div class="pz-filters"><button class="on" onclick="window.PZ.filterServices(\'all\',this)">الكل</button><button onclick="window.PZ.filterServices(\'private\',this)">خاص</button><button onclick="window.PZ.filterServices(\'shared\',this)">مشترك</button></div><div class="pz-all-services" id="pzServiceGrid">'+PZ.grid('all','')+'</div></section>')};
-PZ.searchServices=function(i){const g=document.getElementById('pzServiceGrid');if(g)g.innerHTML=PZ.grid(i.dataset.filter||'all',i.value)};
-PZ.filterServices=function(f,b){document.querySelectorAll('.pz-filters button').forEach(function(x){x.classList.remove('on')});if(b)b.classList.add('on');const i=document.getElementById('pzServiceSearch');if(i)i.dataset.filter=f;const g=document.getElementById('pzServiceGrid');if(g)g.innerHTML=PZ.grid(f,i?i.value:'')};
+PZ.grid=function(f,q){q=String(q||'').trim().toLowerCase();const rows=PZ.services.filter(function(s){return !q||(s[1]+' '+s[2]).toLowerCase().includes(q)});return rows.map(function(s){return '<button class="pz-service-row" data-kind="'+s[4]+'" onclick="window.PZ.go(\''+s[3]+'\')"><i>'+PZ.icon(s[0])+'</i><span><b>'+s[1]+'</b><small>'+s[2]+'</small></span><em class="pz-kind">'+(s[4]==='private'?'خاص':'مشترك')+'</em></button>'}).join('')||PZ.empty('لا توجد نتيجة','جرّب كلمة أخرى')};
+PZ.serviceGroup=function(title,routes){
+ const rows=routes.map(function(r){return PZ.services.find(function(s){return s[3]===r})}).filter(Boolean);
+ return '<section class="pz-service-group"><h3>'+title+'</h3><div class="pz-service-group-grid">'+rows.map(function(s){return '<button class="pz-service-row" data-kind="'+s[4]+'" onclick="window.PZ.go(\''+s[3]+'\')"><i>'+PZ.icon(s[0])+'</i><span><b>'+s[1]+'</b><small>'+s[2]+'</small></span></button>'}).join('')+'</div></section>'
+};
+PZ.serviceGroups=function(){return [
+ PZ.serviceGroup('مسيرتي',['publicView','records','ratingDetail','cabinet']),
+ PZ.serviceGroup('يومي الرياضي',['opps','wallet','health','messages']),
+ PZ.serviceGroup('اكتشف',['explore','find','pitch','news','market']),
+ PZ.serviceGroup('الخصوصية والحساب',['viewLog','privacy','settings'])
+].join('')};
+PZ.openServices=function(){PZ.close();document.body.insertAdjacentHTML('beforeend','<div class="pz-sheet-bg" onclick="window.PZ.close()"></div><section class="pz-sheet"><div class="pz-sheet-grab"></div><div class="pz-sheet-head"><div><b>مركز اللاعب</b><small>خدماتك مرتبة حسب احتياجك</small></div><button onclick="window.PZ.close()">×</button></div><label class="pz-search"><span>'+PZ.icon('search')+'</span><input id="pzServiceSearch" placeholder="ابحث عن خدمة..." oninput="window.PZ.searchServices(this)"></label><div id="pzServiceGrid">'+PZ.serviceGroups()+'</div></section>')};
+PZ.searchServices=function(i){const g=document.getElementById('pzServiceGrid');if(!g)return;g.innerHTML=i.value.trim()?'<div class="pz-all-services">'+PZ.grid('all',i.value)+'</div>':PZ.serviceGroups()};
+PZ.filterServices=function(){};
 PZ.share=async function(name){const url=location.origin+location.pathname+'?player='+encodeURIComponent(name||ME.name);try{if(navigator.share){await navigator.share({title:'PlayIn365 — هويتك الرياضية',url:url});return}await navigator.clipboard.writeText(url);toast('نُسخ رابط هويتك')}catch(e){try{await navigator.clipboard.writeText(url);toast('نُسخ رابط هويتك')}catch(x){}}};
 PZ.byMatch=function(evs){const m={};(evs||[]).forEach(function(e){(m[e.match_id]=m[e.match_id]||[]).push(e)});return Object.values(m)};
 PZ.score=function(g){let s=6;(g||[]).forEach(function(e){if(e.type==='goal')s+=.5;if(e.type==='assist')s+=.3;if(e.type==='red')s-=.5});return Math.max(1,Math.min(10,Math.round(s*10)/10))};
@@ -158,16 +167,17 @@ PZ.home=async function(){
  const verified=new Set(evs.map(function(e){return e.match_id}).concat(joins.filter(function(j){return j.attended}).map(function(j){return j.match_id}))).size;
  const next=matches.find(function(m){return m.status==='live'})||matches.find(function(m){return m.status==='today'})||matches.find(function(m){return m.status==='open'});
  const code=ME.athlete_id||ME.handle||('PI-'+String(ME.id||'').slice(0,8).toUpperCase());
- const quick=PZ.services.filter(function(s){return['records','opps','wallet','health','messages','viewLog'].includes(s[3])});
- const photos=['https://images.unsplash.com/photo-1767916732786-a83902ffc25c?auto=format&fit=crop&fm=jpg&ixlib=rb-4.1.0&q=72&w=1200','https://images.unsplash.com/photo-1761225091881-0d3bda9f6d5a?auto=format&fit=crop&fm=jpg&ixlib=rb-4.1.0&q=76&w=1000','https://images.unsplash.com/photo-1767916732786-a83902ffc25c?auto=format&fit=crop&fm=jpg&ixlib=rb-4.1.0&q=72&w=1200'];
- const updates=(news||[]).slice(0,3);while(updates.length<3)updates.push({title:updates.length===0?'بطولة جديدة':updates.length===1?'تجربة أداء':'مباراة مفتوحة',summary:''});
+ const quick=PZ.services.filter(function(s){return['records','opps','health','wallet'].includes(s[3])});
+ const photos=['https://images.unsplash.com/photo-1767916732786-a83902ffc25c?auto=format&fit=crop&fm=jpg&ixlib=rb-4.1.0&q=72&w=1200','https://images.unsplash.com/photo-1751394211199-6e37aac1c4b9?auto=format&fit=crop&fm=jpg&ixlib=rb-4.1.0&q=72&w=1000'];
+ const updates=(news||[]).slice(0,2);while(updates.length<2)updates.push({title:updates.length===0?'بطولة جديدة':'تجربة أداء',summary:''});
  let body=PZ.pulse(news,matches);
- body+='<section class="pz-hero pz-hero-v2"><div class="pz-hero-bg"></div><div class="pz-hero-grain"></div><div class="pz-hero-drop-glow"></div><div class="pz-hero-in"><div class="pz-kicker"><span class="pz-chip">هويتك الرياضية</span><button class="pz-share" onclick="window.PZ.share(\''+PZ.e(ME.name)+'\')">'+PZ.icon('share')+'</button></div><div class="pz-person pz-person-v2">'+PZ.photo(ME,'pz-photo')+'<div class="pz-person-copy"><small>ATHLETE IDENTITY · '+PZ.e(ME.age?'U'+ME.age:'ATHLETE')+'</small><h1 class="pz-player-name">'+PZ.playerName(ME.display_name||ME.name)+'</h1><p>'+PZ.e(ME.pos||'لاعب')+(ME.org?' · '+PZ.e(ME.org):'')+'</p><code>'+PZ.e(code)+'</code></div></div><div class="pz-proof pz-proof-v2"><div><b>'+verified+'</b><span>مباراة موثقة</span></div><div><b>'+goals+'</b><span>هدف</span></div><div><b>'+assists+'</b><span>صناعة</span></div><div class="featured"><b>'+PZ.e(rating)+'</b><span>التقييم</span></div></div><div class="pz-next"><small>'+(next&&next.status==='live'?'LIVE NOW':'NEXT MOVE')+'</small><b>'+PZ.e(next?next.title:'اكتشف خطوتك القادمة')+'</b><p>'+PZ.e(next?[(next.match_time||''),(next.venue||'')].filter(Boolean).join(' · '):'مباراة · أكاديمية · تجربة أداء')+'</p><button onclick="'+(next?"window.PZ.go('matchView','"+PZ.e(next.id)+"')":"window.PZ.go('explore')")+'">'+(next?'فتح التفاصيل':'اكتشف حولك')+' ←</button></div></div></section>';
- body+='<section><div class="pz-section-head"><div><span class="pz-eyebrow">PLAYER HUB</span><h2>كل شيء قريب منك</h2></div><button onclick="window.PZ.openServices()">كل الخدمات</button></div><div class="pz-service-grid">'+quick.map(function(s){return '<button class="pz-service-tile" onclick="window.PZ.go(\''+s[3]+'\')"><i class="pz-service-icon">'+s[0]+'</i><b>'+s[1]+'</b><small>'+s[2]+'</small></button>'}).join('')+'</div></section>';
- body+='<section><div class="pz-section-head"><div><span class="pz-eyebrow">SPORTS PULSE</span><h2>آخر المستجدات</h2></div><button onclick="window.PZ.go(\'news\')">عرض الكل</button></div><div class="pz-horizontal">'+updates.map(function(n,i){return '<button class="pz-news-card" onclick="window.PZ.go(\'news\')"><div class="pz-news-bg" style="background-image:url('+photos[i]+')"></div><div class="pz-news-copy"><em>'+(i===0?'بطولة':i===1?'فرصة':'مباراة')+'</em><b>'+PZ.e(n.title||'مستجد رياضي')+'</b><small>'+PZ.e(n.summary||'من نبض PlayIn365')+'</small></div></button>'}).join('')+'</div></section>';
- body+='<section><div class="pz-section-head"><div><span class="pz-eyebrow">PERFORMANCE</span><h2>أداؤك في لقطة</h2></div><button onclick="window.PZ.go(\'records\')">التفاصيل</button></div><div class="pz-performance"><div class="pz-chart"><div class="pz-chart-top"><div><small>FORM INDEX</small><b>'+PZ.e(rating)+'</b></div><small>'+verified+' مباريات</small></div>'+PZ.spark(series)+'</div><div class="pz-stat-stack"><button onclick="window.PZ.go(\'cabinet\')"><b>'+badges.length+'</b><span>إنجازات</span></button><button onclick="window.PZ.go(\'viewLog\')"><b>'+views.length+'</b><span>ظهور ملفك</span></button><button onclick="window.PZ.go(\'health\')"><b>'+PZ.e(health[0]&&health[0].state||'—')+'</b><span>الجاهزية</span></button></div></div></section>';
- body+='<section><div class="pz-section-head"><div><span class="pz-eyebrow">OPPORTUNITIES</span><h2>وش ينتظرك؟</h2></div><button onclick="window.PZ.go(\'opps\')">كل الفرص</button></div><div class="pz-horizontal">'+(opps.length?opps:[{kind:'اكتشاف',title:'ابدأ باكتشاف الفرص حولك',org:'PlayIn365',status:'open'}]).slice(0,5).map(function(o){return '<button class="pz-opp-card" onclick="window.PZ.go(\'opps\')"><em>'+PZ.e(o.kind||'فرصة')+'</em><b>'+PZ.e(o.title||'فرصة رياضية')+'</b><small>'+PZ.e(o.org||'')+'</small><i>'+PZ.e(o.status||'جديدة')+'</i></button>'}).join('')+'</div></section>';
- return '<div class="pz-page">'+PZ.top()+'<main class="pz-main">'+body+'</main>'+PZ.nav('feed')+'<button class="pz-fab" onclick="window.PZ.toggleFab()">'+PZ.icon('plus')+'</button></div>';
+ body+='<section class="pz-identity-card"><div class="pz-identity-shape"></div><div class="pz-identity-head"><span class="pz-chip">ملف لاعب موثّق</span><button class="pz-share" onclick="window.PZ.share(\''+PZ.e(ME.name)+'\')">'+PZ.icon('share')+'</button></div><div class="pz-identity-body"><div class="pz-identity-copy"><small>'+PZ.e(ME.age?'U'+ME.age:'ATHLETE')+' · '+PZ.e(ME.pos||'لاعب')+'</small><h1 class="pz-player-name">'+PZ.playerName(ME.display_name||ME.name)+'</h1><p>'+(ME.org?PZ.e(ME.org):'أضف ناديك أو أكاديميتك')+'</p><code>'+PZ.e(code)+'</code><button class="pz-inline-cta" onclick="window.PZ.go(\'publicView\')">عرض هويتي ←</button></div>'+PZ.photo(ME,'pz-photo')+'</div><div class="pz-proof pz-proof-v3"><div><b>'+verified+'</b><span>مباراة موثقة</span></div><div><b>'+goals+'</b><span>هدف</span></div><div><b>'+assists+'</b><span>صناعة</span></div><div><b>'+PZ.e(rating)+'</b><span>تقييم</span></div></div></section>';
+ body+='<section class="pz-next-card"><div class="pz-next-main"><span class="pz-eyebrow">'+(next&&next.status==='live'?'LIVE NOW':'NEXT MOVE')+'</span><h2>'+PZ.e(next?next.title:'اكتشف خطوتك القادمة')+'</h2><p>'+PZ.e(next?[(next.match_time||''),(next.venue||'')].filter(Boolean).join(' · '):'مباراة · أكاديمية · تجربة أداء')+'</p></div><button onclick="'+(next?"window.PZ.go('matchView','"+PZ.e(next.id)+"')":"window.PZ.go('explore')")+'">'+(next?'التفاصيل':'اكتشف')+'</button></section>';
+ body+='<section><div class="pz-section-head"><div><span class="pz-eyebrow">QUICK ACCESS</span><h2>الأهم الآن</h2></div><button onclick="window.PZ.openServices()">كل الخدمات</button></div><div class="pz-service-grid pz-service-grid-4">'+quick.map(function(s){return '<button class="pz-service-tile" onclick="window.PZ.go(\''+s[3]+'\')"><i class="pz-service-icon">'+PZ.icon(s[0])+'</i><b>'+s[1]+'</b><small>'+s[2]+'</small></button>'}).join('')+'</div></section>';
+ body+='<section><div class="pz-section-head"><div><span class="pz-eyebrow">PERFORMANCE</span><h2>اتجاهك الرياضي</h2></div><button onclick="window.PZ.go(\'records\')">السجل</button></div><div class="pz-performance"><div class="pz-chart"><div class="pz-chart-top"><div><small>FORM INDEX</small><b>'+PZ.e(rating)+'</b></div><small>'+verified+' مباريات</small></div>'+PZ.spark(series)+'</div><div class="pz-stat-stack"><button onclick="window.PZ.go(\'cabinet\')"><b>'+badges.length+'</b><span>إنجازات</span></button><button onclick="window.PZ.go(\'viewLog\')"><b>'+views.length+'</b><span>مشاهدة</span></button><button onclick="window.PZ.go(\'health\')"><b>'+PZ.e(health[0]&&health[0].state||'—')+'</b><span>الجاهزية</span></button></div></div></section>';
+ body+='<section><div class="pz-section-head"><div><span class="pz-eyebrow">SPORTS PULSE</span><h2>آخر المستجدات</h2></div><button onclick="window.PZ.go(\'news\')">عرض الكل</button></div><div class="pz-horizontal">'+updates.map(function(n,i){return '<button class="pz-news-card" onclick="window.PZ.go(\'news\')"><div class="pz-news-bg" style="background-image:url('+photos[i]+')"></div><div class="pz-news-copy"><em>'+(i===0?'بطولة':'فرصة')+'</em><b>'+PZ.e(n.title||'مستجد رياضي')+'</b><small>'+PZ.e(n.summary||'من نبض PlayIn365')+'</small></div></button>'}).join('')+'</div></section>';
+ body+='<section><div class="pz-section-head"><div><span class="pz-eyebrow">OPPORTUNITIES</span><h2>فرصك</h2></div><button onclick="window.PZ.go(\'opps\')">عرض الكل</button></div><div class="pz-horizontal">'+(opps.length?opps:[{kind:'اكتشاف',title:'ابدأ باكتشاف الفرص حولك',org:'PlayIn365',status:'open'}]).slice(0,3).map(function(o){return '<button class="pz-opp-card" onclick="window.PZ.go(\'opps\')"><em>'+PZ.e(o.kind||'فرصة')+'</em><b>'+PZ.e(o.title||'فرصة رياضية')+'</b><small>'+PZ.e(o.org||'')+'</small><i>'+PZ.e(o.status||'جديدة')+'</i></button>'}).join('')+'</div></section>';
+ return '<div class="pz-page pz-home">'+PZ.top()+'<main class="pz-main">'+body+'</main>'+PZ.nav('feed')+'</div>';
 };
 
 PZ.publicProfile=async function(){
