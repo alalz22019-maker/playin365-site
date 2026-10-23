@@ -165,3 +165,63 @@ body.pz-player .hd,body.pz-player .nav{display:none!important}
 .pz-visitor-cta{position:fixed;bottom:9px;inset-inline:9px;max-width:502px;margin:auto;z-index:98;display:grid;grid-template-columns:1.25fr 1fr;gap:6px;background:rgba(5,7,19,.95);border:1px solid var(--pz-edge);border-radius:18px;padding:6px;backdrop-filter:blur(18px)}.pz-visitor-cta button{border:0;border-radius:11px;background:#fff;color:#101526;padding:12px;font:900 9px Cairo}.pz-visitor-cta .primary{background:linear-gradient(135deg,var(--pz-v),#805cff);color:#fff}
 @media(max-width:390px){.pz-service-grid{grid-template-columns:1fr 1fr}.pz-performance{grid-template-columns:1fr}.pz-private-grid{grid-template-columns:1fr 1fr}.pz-all-services{grid-template-columns:1fr}.pz-person{grid-template-columns:112px 1fr}.pz-photo{width:112px;height:155px}.pz-profile-stage{grid-template-columns:128px 1fr}.pz-profile-photo{width:128px;height:184px}.pz-profile-copy h1{font-size:27px}.pz-badges{grid-template-columns:1fr 1fr}}
 @media(prefers-reduced-motion:reduce){.pz-pulse-track,.pz-live{animation:none!important}}
+
+
+
+/* Finish pass — recruiter clarity, richer storytelling, quick actions */
+.pz-fab-menu{position:fixed;z-index:97;right:max(18px,calc((100vw - 520px)/2 + 18px));bottom:145px;width:210px;padding:7px;
+ background:rgba(9,13,28,.97);border:1px solid var(--pz-edge);border-radius:20px;box-shadow:0 24px 60px rgba(0,0,0,.5);backdrop-filter:blur(20px)}
+.pz-fab-menu button{width:100%;border:0;background:none;color:#fff;padding:9px 8px;display:flex;align-items:center;gap:9px;text-align:start;font-family:Cairo}
+.pz-fab-menu button+button{border-top:1px solid rgba(255,255,255,.055)}
+.pz-fab-menu button span{width:34px;height:34px;display:grid;place-items:center;border-radius:52% 52% 52% 9px;background:rgba(104,72,255,.13);color:#bfaeff}
+.pz-fab-menu button b{font-size:9px}.pz-fab-menu .pz-icon{width:18px;height:18px}
+.pz-inline-link{border:0;background:none;color:var(--pz-g);padding:0;font:900 9px Cairo;text-decoration:none}
+
+.pz-scout-panel{position:relative;overflow:hidden;background:
+ linear-gradient(145deg,rgba(104,72,255,.1),rgba(255,255,255,.018))}
+.pz-scout-panel:after{content:"";position:absolute;width:150px;height:150px;left:-70px;bottom:-85px;border-radius:52% 52% 52% 0;background:rgba(104,72,255,.1);transform:rotate(-35deg)}
+.pz-scout-panel>*{position:relative;z-index:1}
+.pz-verified-mini{font-size:7px;color:#8de3c5;font-weight:900;background:rgba(72,212,164,.09);border:1px solid rgba(72,212,164,.25);border-radius:999px;padding:4px 7px}
+.pz-scout-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.pz-scout-grid div{border:1px solid rgba(255,255,255,.065);background:rgba(255,255,255,.025);border-radius:14px;padding:10px 5px;text-align:center}
+.pz-scout-grid b{display:block;font:700 20px 'Space Grotesk'}.pz-scout-grid span{display:block;font-size:6.5px;color:var(--pz-muted);font-weight:800;line-height:1.4}
+.pz-proof-chain{display:flex;gap:9px;align-items:center;margin-top:9px;padding:10px;border-radius:14px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06)}
+.pz-proof-chain>span{width:35px;height:35px;display:grid;place-items:center;border-radius:52% 52% 52% 8px;background:rgba(104,72,255,.13);color:#bfaeff}
+.pz-proof-chain .pz-icon{width:18px;height:18px}.pz-proof-chain b{display:block;font-size:9px}.pz-proof-chain small{display:block;font-size:7px;color:var(--pz-muted);margin-top:2px}
+
+.pz-profile-analytics{display:grid;grid-template-columns:1.15fr .85fr;gap:9px;align-items:stretch}
+.pz-fingerprint{border:1px solid var(--pz-edge);border-radius:20px;padding:10px;background:linear-gradient(180deg,rgba(104,72,255,.07),rgba(255,255,255,.018));display:flex;flex-direction:column;justify-content:space-between}
+.pz-fingerprint>small{font:700 7px 'Space Grotesk';letter-spacing:1.1px;color:var(--pz-v2)}.pz-fingerprint>span{font-size:6.5px;color:var(--pz-muted);font-weight:800;text-align:center}
+.pz-radar{width:100%;max-width:225px;margin:auto;display:block;overflow:visible}
+.pz-radar-outer{fill:none;stroke:#3a425c;stroke-width:1.4}.pz-radar-grid{fill:none;stroke:#242b43;stroke-width:1}
+.pz-radar-data{fill:rgba(104,72,255,.2);stroke:var(--pz-v2);stroke-width:2.5}.pz-radar-dot{fill:var(--pz-g);stroke:#090d1c;stroke-width:1.5}
+.pz-radar text{font-family:Cairo,sans-serif;font-size:7px;font-weight:800;fill:#8f97ad}
+
+.pz-premium-empty{display:flex;flex-direction:column;align-items:center;text-align:center;padding:25px 14px;border:1px dashed rgba(255,255,255,.13);border-radius:18px;background:radial-gradient(circle at 50% 10%,rgba(104,72,255,.07),transparent 55%)}
+.pz-empty-drop{width:54px;height:54px;display:grid;place-items:center;border-radius:52% 52% 52% 10px;background:linear-gradient(145deg,var(--pz-v),var(--pz-v2));color:#fff;transform:rotate(-7deg);box-shadow:0 12px 28px rgba(104,72,255,.2)}
+.pz-empty-drop.gold{background:linear-gradient(145deg,#a77500,var(--pz-g));color:#191209}.pz-empty-drop .pz-icon{width:25px;height:25px}
+.pz-premium-empty b{font-size:10px;margin-top:10px}.pz-premium-empty small{max-width:310px;font-size:7.5px;color:var(--pz-muted);line-height:1.7;margin-top:4px}
+.pz-premium-empty button{margin-top:10px;border:1px solid var(--pz-edge);background:#12182b;color:#fff;border-radius:11px;padding:9px 13px;font:900 8.5px Cairo}
+
+.pz-record-hero{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:16px;border:1px solid rgba(154,121,255,.18);border-radius:22px;background:
+ linear-gradient(135deg,rgba(104,72,255,.15),rgba(244,201,79,.035)),
+ var(--pz-stadium) center/cover no-repeat;position:relative;overflow:hidden}
+.pz-record-hero:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,7,19,.94),rgba(5,7,19,.72))}
+.pz-record-hero>*{position:relative;z-index:1}.pz-record-hero h2{font-size:18px;margin:2px 0}.pz-record-hero p{font-size:7.5px;color:#b4bbcd;margin:3px 0 0;max-width:260px}
+.pz-record-score{width:78px;height:78px;border-radius:52% 52% 52% 13px;background:linear-gradient(145deg,var(--pz-v),var(--pz-v2));display:grid;place-items:center;text-align:center;box-shadow:0 12px 30px rgba(104,72,255,.28)}
+.pz-record-score b{display:block;font:700 27px 'Space Grotesk'}.pz-record-score small{display:block;font:700 6px 'Space Grotesk';letter-spacing:.8px;color:#ddd7ff}
+.pz-mini-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:7px}.pz-mini-metrics span{font-size:6.5px;color:#aeb5c8;padding:5px;border:1px solid rgba(255,255,255,.055);border-radius:8px;text-align:center}.pz-mini-metrics b{font:700 9px 'Space Grotesk';color:#fff}
+
+.pz-event-list{display:grid;gap:2px}.pz-event{display:grid;grid-template-columns:39px 1fr auto;gap:9px;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.065)}
+.pz-event:last-child{border-bottom:0}.pz-event-icon{width:37px;height:37px;display:grid;place-items:center;border-radius:52% 52% 52% 9px;background:#151d38;color:#a99aff}
+.pz-event.goal .pz-event-icon{background:rgba(72,212,164,.11);color:#65dbb3}.pz-event.assist .pz-event-icon{background:rgba(104,72,255,.14);color:#aa98ff}.pz-event.card .pz-event-icon{background:rgba(244,201,79,.1);color:#f4c94f}
+.pz-event-icon .pz-icon{width:18px;height:18px}.pz-event b{display:block;font-size:9.5px}.pz-event small{display:block;font-size:7px;color:var(--pz-muted);margin-top:2px}.pz-event em{font-style:normal;font:700 8px 'Space Grotesk';color:#c7ccdd}
+
+.pz-rating-layout{display:grid;grid-template-columns:145px 1fr;gap:16px;align-items:center}.pz-rating-note{font-size:7px;color:var(--pz-muted);line-height:1.7;text-align:center;margin:8px 0 0}
+.pz-rating-sources{display:grid;gap:9px}.pz-rating-source>div:first-child{display:flex;justify-content:space-between;align-items:center}.pz-rating-source b{font-size:9px}.pz-rating-source span{font:700 9px 'Space Grotesk';color:var(--pz-g)}.pz-rating-source small{display:block;font-size:6.5px;color:var(--pz-muted);margin:1px 0 4px}
+.pz-source-track{height:6px;border-radius:999px;background:#252c44;overflow:hidden}.pz-source-track i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--pz-v),var(--pz-g))}
+
+@media(max-width:390px){
+ .pz-profile-analytics{grid-template-columns:1fr}.pz-scout-grid{grid-template-columns:1fr 1fr}.pz-rating-layout{grid-template-columns:1fr}.pz-rating-layout .pz-donut{margin:auto}
+ .pz-record-hero{grid-template-columns:1fr 72px}.pz-record-score{width:68px;height:68px}
+}
