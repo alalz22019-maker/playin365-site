@@ -28,3 +28,9 @@ body.pz-player .pz-v4-fab{display:none!important}
 /* Final player-shell cleanup */
 body.pz-player .pz-fab{display:none!important}
 .pz-pass-name h1{word-spacing:6px}
+
+/* Final hierarchy polish */
+.pz-command-hero{min-height:225px!important;padding-top:22px!important;padding-bottom:16px!important}
+.pz-command-hero h1{margin-top:18px!important;font-size:26px!important}
+.pz-hero-metrics{margin-top:15px!important}
+.pz-radar-tabs button{cursor:pointer}
