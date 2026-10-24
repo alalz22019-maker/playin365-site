@@ -64,5 +64,5 @@ PZ.myCard=async function(){
  '<section class="pz5-profile-share"><div><span class="pz5-label">SCAN TO OPEN</span><h2>هوية رياضية قابلة للمشاركة</h2><p>صورة اللاعب، هويته، أرقامه وإنجازاته في رابط واحد.</p></div><img src="'+qr()+'" alt="رمز QR لهوية اللاعب"><b>'+v(code)+'</b></section></main>'+PZ.nav('publicView')+'</div>';
  return PZ.page('myCard',body)
 };
-PZ.bind('feed',PZ.home);PZ.bind('home',PZ.home);PZ.bind('myCard',PZ.myCard);
+PZ.bind('feed',PZ.home);PZ.bind('home',PZ.home);PZ.bind('myCard',PZ.myCard);PZ.bind('publicView',PZ.myCard);
 })();
