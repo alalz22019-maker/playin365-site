@@ -52,3 +52,30 @@
  .pi-id-badge{min-height:54px}
  .pi-id-badge-icon{width:28px;height:28px;flex-basis:28px}
 }
+/* Card lives in a 520px app column even on desktop: size typography from the card, not viewport. */
+.pi-id-photo-wrap{align-self:start;width:100%;height:auto;min-width:0;max-width:100%;aspect-ratio:1}
+.pi-id-photo{width:100%;height:auto;aspect-ratio:1}
+.pi-id-summary h1{font-size:27px;line-height:1.32}
+.pi-id-summary p{font-size:12px;line-height:1.5;margin:6px 0 12px}
+.pi-id-brand{font-size:27px}
+.pi-id-kicker{font-size:9px}
+.pi-id-verified{font-size:11px}
+.pi-id-data b{font-size:13px}
+.pi-id-data>div:last-child b{font-size:10px}
+.pi-id-data small{font-size:8px}
+.pi-id-performance span{font-size:9px}
+.pi-id-performance b{font-size:19px}
+.pi-id-badge b{font-size:10px}
+.pi-id-badge small{font-size:8px}
+.pi-id-qr b{font-size:9px}
+.pi-id-qr small{font-size:7px}
+@media(min-width:700px){
+ .pi-id-summary h1{font-size:30px}
+ .pi-id-summary p{font-size:13px}
+ .pi-id-data b{font-size:15px}
+ .pi-id-data>div:last-child b{font-size:12px}
+ .pi-id-data small{font-size:9px}
+ .pi-id-performance b{font-size:21px}
+ .pi-id-badge b{font-size:12px}
+ .pi-id-badge small{font-size:9px}
+}
