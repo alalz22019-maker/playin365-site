@@ -79,3 +79,8 @@
  .pi-id-badge b{font-size:12px}
  .pi-id-badge small{font-size:9px}
 }
+/* Composition refinements for the actual 520px player app shell */
+.pi-id-page-head{display:none}
+.pi-id-main{padding-top:0}
+.pi-id-lower{grid-template-columns:minmax(0,1fr) minmax(96px,22%)}
+@media(min-width:700px){.pi-id-lower{grid-template-columns:minmax(0,1fr) minmax(96px,22%)}}
