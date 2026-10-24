@@ -132,3 +132,16 @@
  .pi-id-badge{min-height:43px}
  .pi-id-qr{padding:6px}
 }
+
+/* Final hierarchy tuning at the card's own responsive width. */
+.pi-id-brand{font-size:clamp(30px,7.1cqw,44px)}
+.pi-id-verified{min-height:clamp(31px,6.4cqw,43px);padding-inline:clamp(12px,2.8cqw,19px)}
+.pi-id-verified i{width:clamp(18px,3.3cqw,24px);height:clamp(18px,3.3cqw,24px)}
+.pi-id-summary h1{font-size:clamp(27px,8.1cqw,48px)}
+.pi-id-badge-icon svg{display:block;width:72%;height:72%;fill:none;stroke:currentColor;stroke-width:2.3;stroke-linecap:round;stroke-linejoin:round}
+.pi-id-achievements .pi-id-badge:nth-of-type(2) .pi-id-badge-icon{color:#f8dc6b;background:rgba(213,182,66,.11);box-shadow:0 0 15px rgba(213,182,66,.24)}
+.pi-id-achievements .pi-id-badge:nth-of-type(3) .pi-id-badge-icon{color:#aa72ff;background:rgba(70,54,227,.16);box-shadow:0 0 16px rgba(124,97,255,.28)}
+.pi-id-achievements .pi-id-badge:nth-of-type(4) .pi-id-badge-icon{color:#36dcf2;background:rgba(0,166,214,.12);box-shadow:0 0 16px rgba(0,166,214,.25)}
+.pi-id-achievements .pi-id-badge:nth-of-type(2) .pi-id-badge-icon svg{stroke:currentColor}
+.pi-id-achievements .pi-id-badge:nth-of-type(3) .pi-id-badge-icon svg{stroke:currentColor}
+.pi-id-achievements .pi-id-badge:nth-of-type(4) .pi-id-badge-icon svg{stroke:currentColor}
