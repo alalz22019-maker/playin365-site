@@ -6,6 +6,7 @@ var v=function(x,f){return esc(x==null||x===''?(f||'—'):x)};
 var qr=function(){var u=location.origin+location.pathname+'?player='+encodeURIComponent(ME.name||'سعود القحطاني');return 'https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=8&data='+encodeURIComponent(u)};
 var num=function(x){return x==null||x===''?'—':x};
 var top5=function(){return '<header class="pz5-top"><button onclick="window.PZ.openServices()">☰</button><div class="pz5-brand">Play<span>In</span><sup>365</sup></div><button onclick="window.PZ.go(\'publicView\')">〈</button></header>'};
+PZ.page=function(route,body){return body};
 PZ.nav=function(active){
  var a=[['home','الرئيسية','feed'],['records','تقدمي','records'],['opps','فرصي وتفاعلي','opps'],['profile','هويتي','publicView']];
  return '<nav class="pz5-nav">'+a.map(function(x){return '<button class="'+(active===x[2]?'on':'')+'" onclick="window.PZ.go(\''+x[2]+'\')"><span>'+PZ.icon(x[0])+'</span><b>'+x[1]+'</b></button>'}).join('')+'<button onclick="window.PZ.openServices()"><span>'+PZ.icon('services')+'</span><b>المزيد</b></button></nav>';
