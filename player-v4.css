@@ -24,3 +24,7 @@ body.pz-player .pz-nav-v4 .pz-nav-icon{width:32px;height:32px}
 body.pz-player .pz-v4-fab{display:none!important}
 .pz-pass-shell{padding-bottom:235px!important}
 @media(max-width:520px){body.pz-player .pz-nav-v4{border-radius:22px}.pz-live-rails{padding-inline:10px}.pz-command-hero{padding-inline:18px}}
+
+/* Final player-shell cleanup */
+body.pz-player .pz-fab{display:none!important}
+.pz-pass-name h1{word-spacing:6px}
