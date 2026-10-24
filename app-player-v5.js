@@ -5,6 +5,7 @@ var esc=PZ.e||function(x){return String(x==null?'':x).replace(/[&<>"']/g,functio
 var v=function(x,f){return esc(x==null||x===''?(f||'—'):x)};
 var qr=function(){var u=location.origin+location.pathname+'?player='+encodeURIComponent(ME.name||'سعود القحطاني');return 'https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=8&data='+encodeURIComponent(u)};
 var num=function(x){return x==null||x===''?'—':x};
+var top5=function(){return '<header class="pz5-top"><button onclick="window.PZ.openServices()">☰</button><div class="pz5-brand">Play<span>In</span><sup>365</sup></div><button onclick="window.PZ.go(\'publicView\')">〈</button></header>'};
 PZ.nav=function(active){
  var a=[['home','الرئيسية','feed'],['records','تقدمي','records'],['opps','فرصي وتفاعلي','opps'],['profile','هويتي','publicView']];
  return '<nav class="pz5-nav">'+a.map(function(x){return '<button class="'+(active===x[2]?'on':'')+'" onclick="window.PZ.go(\''+x[2]+'\')"><span>'+PZ.icon(x[0])+'</span><b>'+x[1]+'</b></button>'}).join('')+'<button onclick="window.PZ.openServices()"><span>'+PZ.icon('services')+'</span><b>المزيد</b></button></nav>';
@@ -37,7 +38,7 @@ PZ.home=async function(){
  var week=cal.slice(0,4).map(eventLine).join('')||'<div class="pz5-empty">لم يشارك المدرب خطة الأسبوع بعد.</div>';
  var matchList=matches.slice(0,3).map(matchRow).join('')||'<div class="pz5-empty">لا توجد مباريات مضافة اليوم.</div>';
  var badgeList=badges.slice(0,3).map(function(b){return '<span>✦ '+v(b.title||b.name,'إنجاز موثق')+'</span>'}).join('')||'<span>افتح أول إنجاز لك من الملعب</span>';
- var body='<div class="pz5-page">'+PZ.top()+
+ var body='<div class="pz5-page">'+top5()+
  '<div class="pz5-rails"><div class="pz5-rail alert"><b>تنبيهاتك</b><div><span>'+alertText+'</span><span>'+alertText+'</span></div></div><div class="pz5-rail games"><b>المباريات التي تهمك</b><div><span>'+matchText+'</span><span>'+matchText+'</span></div></div></div>'+
  '<main class="pz5-main">'+
  '<section class="pz5-hero"><div class="pz5-hero-orbit"></div><div class="pz5-eyebrow">PLAYER COMMAND CENTER <span>● LIVE</span></div><h1>يا '+v(ME.display_name||ME.name,'سعود')+'،<br><mark>خلّ يومك يلعب لصالحك.</mark></h1><p>قراراتك الرياضية اليوم في مكان واحد: جاهزيتك، خطتك، مبارياتك، وفرصك.</p><div class="pz5-hero-bottom"><div class="pz5-score"><span>FORM</span><strong>'+v(rating)+'</strong><small>/10</small></div><div class="pz5-hero-action"><button onclick="window.PZ.go(\'health\')">سجّل جاهزيتك <b>+</b></button><small>'+v(readiness)+'</small></div></div></section>'+
