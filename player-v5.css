@@ -8,7 +8,7 @@ body.pz-player .pz-top{background:rgba(7,8,18,.86)!important;border-color:rgba(2
 .pz5-main,.pz5-profile-main{padding:0 16px 148px;display:flex;flex-direction:column;gap:14px}
 .pz5-rails{position:sticky;top:0;z-index:40;background:#070812;padding:5px 10px 8px;border-bottom:1px solid rgba(255,255,255,.06)}
 .pz5-rail{display:flex;align-items:center;height:34px;border-radius:9px;overflow:hidden;background:#111426;border:1px solid rgba(255,255,255,.1);margin:4px 0;font-size:10px}
-.pz5-rail b{height:100%;display:flex;align-items:center;padding:0 9px;white-space:nowrap;font-size:9px;color:#a99aff;border-inline-end:2px solid #7b5cff}
+.pz5-rail b{height:100%;display:flex;align-items:center;padding:0 9px;white-space:nowrap;font-size:9px;color:#a99aff;border-inline-end:2px solid #7b5cff;flex:0 0 auto;background:#111426;position:relative;z-index:2}
 .pz5-rail.games b{color:#f5c518;border-color:#f5c518}.pz5-rail>div{display:flex;min-width:max-content;animation:pz5ticker 24s linear infinite}.pz5-rail>div span{padding:0 28px;white-space:nowrap;color:#ddd9f7;font-weight:700}.pz5-rail.games>div span{color:#f5c518}@keyframes pz5ticker{to{transform:translateX(50%)}} 
 .pz5-hero{position:relative;overflow:hidden;border-radius:30px;background:linear-gradient(135deg,#171a3a,#0e1023 65%);padding:24px 20px 18px;border:1px solid rgba(152,126,255,.26);min-height:247px}
 .pz5-hero:after{content:"";position:absolute;inset:auto -10% -45% 24%;height:220px;border:1px solid rgba(153,125,255,.35);border-radius:50%;box-shadow:0 0 0 36px rgba(123,92,255,.06),0 0 0 72px rgba(123,92,255,.05);transform:rotate(-20deg)}
