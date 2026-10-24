@@ -21,17 +21,16 @@ PZ.identityCard=function(ev,joins,badges){
   var goals=ev.filter(function(x){return x.type==='goal'}).length||7;
   var assists=ev.filter(function(x){return x.type==='assist'}).length||2;
   var src=e(playerSrc(ME));
-  var age=e(ME.age_group||ME.category||'U14'),shirt=e(ME.jersey_number||ME.shirt_number||'18'),position=e(ME.pos||'RB'),foot=e(ME.preferred_foot||'Right foot');
+  var age=e(ME.age_group||ME.category||'U14'),shirt=e(ME.jersey_number||ME.shirt_number||'18'),position=e(ME.position_code||ME.pos_en||'RB'),foot=e(ME.preferred_foot||'Right foot');
   var b1=badges[0]&&badges[0].title||'هداف موسم 2025';
   var b2=badges[1]&&badges[1].title||'أفضل لاعب في بطولة الاتحاد السعودي';
   var b3=badges[2]&&badges[2].title||'1000 دقيقة لعب خلال الموسم';
   return '<section class="pi-id-card" aria-label="بطاقة هوية اللاعب">'+
     '<div class="pi-id-card-top"><div><span class="pi-id-kicker">PLAYER IDENTITY · VERIFIED ATHLETE</span><div class="pi-id-brand">Play<span>In</span><sup>365</sup></div></div><span class="pi-id-verified"><i>✓</i> موثق</span></div>'+
     '<div class="pi-id-card-body">'+
-      '<div class="pi-id-photo-wrap"><svg class="pi-id-photo" viewBox="0 0 1000 1000" role="img" aria-label="صورة اللاعب"><defs><clipPath id="pi-br-clip"><path d="'+BR_PATH+'"/></clipPath><linearGradient id="pi-photo-shine" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#00a6d6" stop-opacity=".28"/><stop offset=".65" stop-color="#4636e3" stop-opacity=".08"/><stop offset="1" stop-color="#d5b642" stop-opacity=".28"/></linearGradient></defs><path d="'+BR_PATH+'" fill="#151a2e" clip-path="url(#pi-br-clip)"/><image href="'+src+'" x="0" y="0" width="1000" height="1000" preserveAspectRatio="xMidYMid slice" clip-path="url(#pi-br-clip)"/><path d="'+BR_PATH+'" fill="url(#pi-photo-shine)" clip-path="url(#pi-br-clip)"/><path d="'+BR_PATH+'" fill="none" stroke="#d5b642" stroke-width="18"/><path d="'+BR_PATH+'" fill="none" stroke="#4636e3" stroke-width="7" opacity=".75" transform="translate(22 22) scale(.956)"/></svg><span class="pi-id-photo-label">صورة اللاعب</span></div>'+
+      '<div class="pi-id-photo-wrap"><svg class="pi-id-photo" viewBox="0 0 1000 1000" role="img" aria-label="صورة اللاعب"><defs><clipPath id="pi-br-clip"><path d="'+BR_PATH+'"/></clipPath><linearGradient id="pi-photo-shine" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#00a6d6" stop-opacity=".28"/><stop offset=".65" stop-color="#4636e3" stop-opacity=".08"/><stop offset="1" stop-color="#d5b642" stop-opacity=".28"/></linearGradient></defs><path d="'+BR_PATH+'" fill="#151a2e" clip-path="url(#pi-br-clip)"/><image href="'+src+'" x="-125" y="-35" width="1250" height="1250" preserveAspectRatio="xMidYMid slice" clip-path="url(#pi-br-clip)"/><path d="'+BR_PATH+'" fill="url(#pi-photo-shine)" clip-path="url(#pi-br-clip)"/><path d="'+BR_PATH+'" fill="none" stroke="#62d8ff" stroke-width="12"/></svg><span class="pi-id-photo-label">صورة اللاعب</span></div>'+
       '<div class="pi-id-summary"><div class="pi-id-name-row"><div><h1>'+val(ME.display_name||ME.name,'سعود القحطاني')+'</h1><p>'+val(ME.org||'أكاديمية النخبة','أكاديمية النخبة')+'</p></div></div>'+
         '<div class="pi-id-data"><div><b>'+age+'</b><small>الفئة العمرية</small></div><div><b>'+shirt+'</b><small>رقم القميص</small></div><div><b>'+position+'</b><small>المركز</small></div><div><b>'+foot+'</b><small>القدم المفضلة</small></div></div>'+
-        '<div class="pi-id-performance"><div><span>المباريات</span><b>'+verified+'</b></div><div><span>الأهداف</span><b>'+goals+'</b></div><div><span>الصناعة</span><b>'+assists+'</b></div><div><span>التقييم</span><b>6.8</b></div></div>'+
       '</div>'+
     '</div>'+
     '<div class="pi-id-lower"><div class="pi-id-achievements"><div class="pi-id-section-title"><span>CAREER SIGNALS</span><b>أبرز الإنجازات</b></div>'+badge('⚽',b1,'موسم 2025')+badge('✦',b2,'إنجاز موثق')+badge('◷',b3,'إحصائية الموسم')+'</div>'+
@@ -53,7 +52,7 @@ PZ.myCard=async function(){
     '<main class="pi-id-main">'+
       '<div class="pi-id-page-head"><div><span class="pi-id-kicker">PUBLIC ATHLETE IDENTITY</span><h1>هوية اللاعب</h1><p>بطاقة واحدة تجمع صورتك، هويتك، مركزك، أرقامك وإنجازاتك — جاهزة للمشاركة.</p></div><button onclick="window.PZ.share(\''+e(ME.name||'سعود القحطاني')+'\')">شارك الهوية ↗</button></div>'+
       PZ.identityCard(ev,joins,badges)+
-      '<div class="pi-id-actions"><button class="primary" onclick="window.PZ.share(\''+e(ME.name||'سعود القحطاني')+'\')">شارك البطاقة</button><button onclick="navigator.clipboard&&navigator.clipboard.writeText(location.href)">انسخ رابط الهوية</button><span>الرقم الرقمي داخل البطاقة وتحت الباركود مباشرة: <b>'+val(code)+'</b></span></div>'+
+      '<div class="pi-id-actions"><button class="primary" onclick="window.PZ.share(\''+e(ME.name||'سعود القحطاني')+'\')">شارك البطاقة</button><button onclick="navigator.clipboard&&navigator.clipboard.writeText(location.href)">انسخ رابط الهوية</button></div>'+
     '</main>'+PZ.nav('publicView')+'</div>';
   return body;
 };
