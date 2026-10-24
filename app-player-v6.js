@@ -12,7 +12,14 @@ function playerSrc(p){
 function e(x){return PZ.e?PZ.e(x):String(x==null?'':x).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 function val(x,f){return e(x==null||x===''?(f||'—'):x)}
 function stat(value,label,accent){return '<div class="pi-id-stat"><strong class="'+(accent||'')+'">'+val(value)+'</strong><span>'+label+'</span></div>'}
-function badge(icon,title,meta){return '<div class="pi-id-badge"><span class="pi-id-badge-icon">'+icon+'</span><div><b>'+title+'</b><small>'+meta+'</small></div></div>'}
+function badge(icon,title,meta){
+  var marks={
+    '⚽':'<svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="19"/><path d="m24 13 7 5-3 8h-8l-3-8 7-5Zm-7 5-7-1m18 1 7-1m-15 8-4 8m12-8 4 8m-8-23v-5m-4 28 4 4 4-4"/></svg>',
+    '✦':'<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M13 18h22v8a11 11 0 0 1-22 0v-8Zm0 3H8v4a9 9 0 0 0 9 9m14-13h9v4a9 9 0 0 1-9 9m-7 3v6m-7 0h14"/><path d="m24 20 1.7 3.5 3.8.5-2.8 2.7.7 3.8-3.4-1.8-3.4 1.8.7-3.8-2.8-2.7 3.8-.5L24 20Z"/></svg>',
+    '◷':'<svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="26" r="16"/><path d="M24 16v11l7 4M19 5h10m-5 0v5"/></svg>'
+  };
+  return '<div class="pi-id-badge"><span class="pi-id-badge-icon">'+(marks[icon]||icon)+'</span><div><b>'+title+'</b><small>'+meta+'</small></div></div>';
+}
 
 PZ.identityCard=function(ev,joins,badges){
   ev=ev||[];joins=joins||[];badges=badges||[];
@@ -26,7 +33,7 @@ PZ.identityCard=function(ev,joins,badges){
   var b2=badges[1]&&badges[1].title||'أفضل لاعب في بطولة الاتحاد السعودي';
   var b3=badges[2]&&badges[2].title||'1000 دقيقة لعب خلال الموسم';
   return '<section class="pi-id-card" aria-label="بطاقة هوية اللاعب">'+
-    '<div class="pi-id-card-top"><div><span class="pi-id-kicker">PLAYER IDENTITY · VERIFIED ATHLETE</span><div class="pi-id-brand">Play<span>In</span><sup>365</sup></div></div><span class="pi-id-verified"><i>✓</i> موثق</span></div>'+
+    '<div class="pi-id-card-top"><div><div class="pi-id-brand">Play<span>In</span><sup>365</sup></div></div><span class="pi-id-verified"><i>✓</i> موثق</span></div>'+
     '<div class="pi-id-card-body">'+
       '<div class="pi-id-photo-wrap"><svg class="pi-id-photo" viewBox="0 0 1000 1000" role="img" aria-label="صورة اللاعب"><defs><clipPath id="pi-br-clip"><path d="'+BR_PATH+'"/></clipPath><linearGradient id="pi-photo-shine" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#00a6d6" stop-opacity=".28"/><stop offset=".65" stop-color="#4636e3" stop-opacity=".08"/><stop offset="1" stop-color="#d5b642" stop-opacity=".28"/></linearGradient></defs><path d="'+BR_PATH+'" fill="#151a2e" clip-path="url(#pi-br-clip)"/><image href="'+src+'" x="-125" y="-35" width="1250" height="1250" preserveAspectRatio="xMidYMid slice" clip-path="url(#pi-br-clip)"/><path d="'+BR_PATH+'" fill="url(#pi-photo-shine)" clip-path="url(#pi-br-clip)"/><path d="'+BR_PATH+'" fill="none" stroke="#62d8ff" stroke-width="12"/></svg><span class="pi-id-photo-label">صورة اللاعب</span></div>'+
       '<div class="pi-id-summary"><div class="pi-id-name-row"><div><h1>'+val(ME.display_name||ME.name,'سعود القحطاني')+'</h1><p>'+val(ME.org||'أكاديمية النخبة','أكاديمية النخبة')+'</p></div></div>'+
@@ -36,7 +43,6 @@ PZ.identityCard=function(ev,joins,badges){
     '<div class="pi-id-lower"><div class="pi-id-achievements"><div class="pi-id-section-title"><span>CAREER SIGNALS</span><b>أبرز الإنجازات</b></div>'+badge('⚽',b1,'موسم 2025')+badge('✦',b2,'إنجاز موثق')+badge('◷',b3,'إحصائية الموسم')+'</div>'+
       '<div class="pi-id-qr"><img src="'+('https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=8&data='+encodeURIComponent(location.origin+location.pathname+'?player='+encodeURIComponent(ME.name||'سعود القحطاني'))) +'" alt="باركود هوية اللاعب"><b>'+val(code)+'</b><small>امسح لفتح الهوية الرقمية</small></div>'+
     '</div>'+
-    '<div class="pi-id-footer"><span>هوية رياضية موثقة وقابلة للمشاركة</span><span>PLAYIN365</span></div>'+
   '</section>';
 };
 
