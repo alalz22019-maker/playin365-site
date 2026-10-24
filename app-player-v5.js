@@ -7,7 +7,7 @@ var qr=function(){var u=location.origin+location.pathname+'?player='+encodeURICo
 var num=function(x){return x==null||x===''?'—':x};
 PZ.nav=function(active){
  var a=[['home','الرئيسية','feed'],['records','تقدمي','records'],['opps','فرصي وتفاعلي','opps'],['profile','هويتي','publicView']];
- return '<nav class="pz5-nav">'+a.map(function(x){return '<button class="'+(active===x[2]?'on':'')+'" onclick="window.PZ.go(\''+x[2]+'\')"><span>'+PZ.icon(x[0])+'</span><b>'+x[1]+'</b></button>}).join('')+'<button onclick="window.PZ.openServices()"><span>'+PZ.icon('services')+'</span><b>المزيد</b></button></nav>';
+ return '<nav class="pz5-nav">'+a.map(function(x){return '<button class="'+(active===x[2]?'on':'')+'" onclick="window.PZ.go(\''+x[2]+'\')"><span>'+PZ.icon(x[0])+'</span><b>'+x[1]+'</b></button>'}).join('')+'<button onclick="window.PZ.openServices()"><span>'+PZ.icon('services')+'</span><b>المزيد</b></button></nav>';
 };
 function stat(value,label,accent){return '<div class="pz5-stat"><strong class="'+(accent||'')+'">'+v(value)+'</strong><span>'+label+'</span></div>'}
 function eventLine(c,i){return '<div class="pz5-event '+(i===0?'now':'')+'"><span class="pz5-time">'+v(c.start_time,'—')+'</span><span class="pz5-dot"></span><div><b>'+v(c.title,'جلسة تدريب')+'</b><small>'+v(c.location,'خطة المدرب')+'</small></div></div>'}
