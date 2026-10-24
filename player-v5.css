@@ -1,3 +1,4 @@
+.pz5-top{height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid rgba(255,255,255,.08);background:rgba(7,8,18,.9);position:sticky;top:0;z-index:55}.pz5-top>button{width:34px;height:34px;border:1px solid rgba(255,255,255,.13);border-radius:12px;background:#111426;color:#d9d8e8;font:700 18px Cairo;cursor:pointer}.pz5-brand{font:700 25px "Space Grotesk";direction:ltr;letter-spacing:-1.7px;color:#fff}.pz5-brand span{color:#f5c518}.pz5-brand sup{font-size:10px;color:#9d7cff;vertical-align:super;letter-spacing:0}.pz5-page .pz-fab,.pz5-profile-page .pz-fab,.pz5-page .pz-v4-fab,.pz5-profile-page .pz-v4-fab{display:none!important}
 
 body.pz-player{background:#070812!important;color:#f8f7f2!important}
 body.pz-player .shell{max-width:520px;background:#070812!important;box-shadow:none!important}
