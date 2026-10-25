@@ -29,9 +29,11 @@ PZ.identityCard=function(ev,joins,badges){
   var assists=ev.filter(function(x){return x.type==='assist'}).length||2;
   var src=e(playerSrc(ME));
   var age=e(ME.age_group||ME.category||'U14'),shirt=e(ME.jersey_number||ME.shirt_number||'18'),position=e(ME.position_code||ME.pos_en||'RB'),foot=e(ME.preferred_foot||'Right foot');
-  var b1=badges[0]&&badges[0].title||'هداف موسم 2025';
-  var b2=badges[1]&&badges[1].title||'أفضل لاعب في بطولة الاتحاد السعودي';
-  var b3=badges[2]&&badges[2].title||'1000 دقيقة لعب خلال الموسم';
+  var b1=badges[0]&&badges[0].title||'أضف أول إنجاز موثّق';
+  var b2=badges[1]&&badges[1].title||'إنجازاتك على خط المسيرة';
+  var b3=badges[2]&&badges[2].title||'إحصاءاتك الموسمية';
+  var badgeMeta=function(row,empty){return !row?empty:(row.verified_by||row.verified_at||row.is_verified===true?'موثّق':'بانتظار التوثيق')};
+  var m1=badgeMeta(badges[0],'يظهر بعد اعتماد الجهة'),m2=badgeMeta(badges[1],'يتحدّث عند التوثيق'),m3=badgeMeta(badges[2],'بعد تسجيل المباريات');
   return '<section class="pi-id-card" aria-label="بطاقة هوية اللاعب">'+
     '<div class="pi-id-card-top"><div><div class="pi-id-brand">Play<span>In</span><sup>365</sup></div></div><span class="pi-id-verified"><i>✓</i> موثق</span></div>'+
     '<div class="pi-id-card-body">'+
@@ -40,7 +42,7 @@ PZ.identityCard=function(ev,joins,badges){
         '<div class="pi-id-data"><div><b>'+age+'</b><small>الفئة العمرية</small></div><div><b>'+shirt+'</b><small>رقم القميص</small></div><div><b>'+position+'</b><small>المركز</small></div><div><b>'+foot+'</b><small>القدم المفضلة</small></div></div>'+
       '</div>'+
     '</div>'+
-    '<div class="pi-id-lower"><div class="pi-id-achievements"><div class="pi-id-section-title"><span>CAREER SIGNALS</span><b>أبرز الإنجازات</b></div>'+badge('⚽',b1,'موسم 2025')+badge('✦',b2,'إنجاز موثق')+badge('◷',b3,'إحصائية الموسم')+'</div>'+
+    '<div class="pi-id-lower"><div class="pi-id-achievements"><div class="pi-id-section-title"><span>CAREER SIGNALS</span><b>أبرز الإنجازات</b></div>'+badge('⚽',b1,m1)+badge('✦',b2,m2)+badge('◷',b3,m3)+'</div>'+
       '<div class="pi-id-qr"><img src="'+('https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=8&data='+encodeURIComponent(location.origin+location.pathname+'?player='+encodeURIComponent(ME.name||'سعود القحطاني'))) +'" alt="باركود هوية اللاعب"><b>'+val(code)+'</b><small>امسح لفتح الهوية الرقمية</small></div>'+
     '</div>'+
   '</section>';
