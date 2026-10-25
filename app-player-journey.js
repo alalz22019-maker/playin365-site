@@ -128,7 +128,7 @@
       var officialDate = matchDate(match);
       var d = dateParts(officialDate || (!yearOf(match && match.comp) ? event.created_at || match && match.created_at : ''));
       var seasonYear = yearOf(match && match.comp);
-      items.push({ year: d.year, month: d.month, date: d.stamp, type: kind.kind, icon: kind.icon, title: kind.label, meta: [event.matches && (event.matches.title || event.matches.comp), event.minute ? event.minute + '′' : ''].filter(Boolean).join(' · '), verified: !!event.recorded_by, matchId: event.match_id ? String(event.match_id) : '', matchTitle: event.matches && (event.matches.title || event.matches.name) || '' });
+      items.push({ year: d.year, month: d.month, date: d.stamp, type: kind.kind, icon: kind.icon, title: kind.label, meta: [event.matches && (event.matches.title || event.matches.comp), event.minute ? event.minute + '′' : ''].filter(Boolean).join(' · '), verified: !!(event.recorded_by || event._verified_public), matchId: event.match_id ? String(event.match_id) : '', matchTitle: event.matches && (event.matches.title || event.matches.name) || '' });
       if (!d.year && seasonYear) items[items.length - 1].year = seasonYear;
     });
     return items.filter(function (item) { return item.year || item.title; }).sort(function (a, b) {
@@ -319,8 +319,12 @@
   }
   async function loadHistory(player, preloaded, publicMode) {
     var who = player.name;
+    var eventQuery = sb.from('match_events').select(publicMode ? 'id,match_id,minute,type,who,created_at' : '*').eq('who', who).order('created_at', { ascending: true }).limit(200);
+    // Public history must only include events with an academy recorder. The
+    // recorder ID stays out of the public payload; RLS remains the real gate.
+    if (publicMode) eventQuery = eventQuery.not('recorded_by', 'is', null);
     var results = await Promise.all([
-      preloaded ? Promise.resolve(preloaded.events || []) : safe('journey-events', sb.from('match_events').select(publicMode ? 'id,match_id,minute,type,who,created_at' : '*').eq('who', who).order('created_at', { ascending: true }).limit(200)),
+      preloaded ? Promise.resolve(preloaded.events || []) : safe('journey-events', eventQuery),
       preloaded ? Promise.resolve(preloaded.joins || []) : safe('journey-joins', sb.from('match_joins').select(publicMode ? 'match_id,player_name,attended' : '*').eq('player_name', who).limit(300)),
       preloaded ? Promise.resolve(preloaded.badges || []) : safe('journey-badges', sb.from('pi_badges').select(publicMode ? 'badge_key,title,earned_at,signed_by,match_id,match_title' : '*').eq('person', who).limit(60)),
       safe('journey-career', sb.from('pi_career').select(publicMode ? 'org,title,group_name,from_year,to_year,verified_by,verified_at,created_at' : '*').eq('person', who).order('from_year', { ascending: true }).limit(60)),
@@ -331,7 +335,7 @@
     var events = results[0] || [], joins = results[1] || [], ids = [...new Set(events.map(function (event) { return event.match_id; }).concat(joins.map(function (join) { return join.match_id; })).filter(Boolean))].slice(0, 100);
     var matches = [];
     if (ids.length) matches = await safe('journey-matches', sb.from('matches').select(publicMode ? 'id,title,comp,venue,match_date,match_time,status,score_a,score_b,team_a,team_b,kickoff_at,starts_at' : '*').in('id', ids));
-    if (publicMode) events.forEach(function (event) { event.is_verified = true; });
+    if (publicMode) events.forEach(function (event) { event._verified_public = true; });
     matches = completedMatches(events, joins, matches);
     var matchById = {};
     matches.forEach(function (match) { matchById[String(match.id)] = match; });
