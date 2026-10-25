@@ -281,9 +281,11 @@
   }
   function playerCityFeature(player) {
     var city = String(player.identity_city || player.city || player.home_city || player.region || '').trim();
+    // Riyadh is a user-directed geographic marker for this player, not an inferred academy transfer.
+    if (!city && String(player.athlete_id || '').toUpperCase() === 'PI-89A89D4D') city = 'الرياض';
     if (!city) return '';
     if (/^(riyadh|ar[ -]?riyadh|الرياض)$/i.test(city)) city = 'الرياض';
-    return '<section class="pj-city-anchor" aria-label="مدينة اللاعب المسجلة"><span class="pj-city-signal">' + icon('pin') + '<i></i></span><div class="pj-city-copy"><span class="pj-label">PLAYER BASE · CITY</span><b>' + e(city) + '</b><small>مدينة اللاعب المسجلة في ملفه</small></div><span class="pj-city-seal">معلومة مكانية</span></section>';
+    return '<section class="pj-city-anchor" aria-label="محطة مكانية ضمن مسار اللاعب"><span class="pj-city-signal">' + icon('pin') + '<i></i></span><div class="pj-city-copy"><span class="pj-label">PLAYER ARC · CITY MARKER</span><b>' + e(city) + '</b><small>محطة مكانية في المسار — دون افتراض انتقال أكاديمية</small></div><span class="pj-city-seal">مسار جغرافي</span></section>';
   }
   function isTournament(match) {
     var name = norm(match.comp || match.competition_name || match.tournament_name || match.title || match.name || '');
