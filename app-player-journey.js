@@ -2,7 +2,7 @@
   'use strict';
 
   var P = window.PZ;
-  if (!P || !window.sb || !P.identityCard) return;
+  if (!P || typeof sb === 'undefined' || !sb || !P.identityCard) return;
 
   var baseMyCard = P.myCard;
   var baseIdentityCard = P.identityCard;
