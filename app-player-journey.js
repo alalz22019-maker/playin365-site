@@ -686,7 +686,7 @@
       identity_position: source.position_code || source.pos || '',
       identity_org: source.org || ''
     });
-    if (previewDemoMode()) player = Object.assign(player, { age_group: player.age_group || 'U14', jersey_number: player.jersey_number || '18', position_code: player.position_code || 'RB', identity_position: player.identity_position || 'RB', preferred_foot: 'Right foot', org: player.org || 'أكاديمية النخبة — بيانات تجريبية', identity_org: player.identity_org || player.org });
+    if (previewDemoMode()) player = Object.assign(player, { age_group: 'U14', category: 'U14', age: 14, jersey_number: '18', shirt_number: '18', shirt: '18', position_code: 'RB', pos_en: 'RB', pos: 'RB', identity_position: 'RB', preferred_foot: 'Right foot', foot: 'Right foot', org: player.org || 'أكاديمية النخبة — بيانات تجريبية', identity_org: player.identity_org || player.org });
     var history = previewDemoMode() ? demoHistory(player) : await loadHistory(player, null, true);
     var previous = ME;
     var card = '';
