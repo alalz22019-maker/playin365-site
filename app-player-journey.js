@@ -248,7 +248,7 @@
       return '<g class="pj-pulse-point" aria-label="' + e(title) + '"><title>' + e(title) + '</title><line x1="' + point.x.toFixed(1) + '" y1="' + point.y.toFixed(1) + '" x2="' + point.x.toFixed(1) + '" y2="' + bottom + '"/><circle class="pj-pulse-halo" cx="' + point.x.toFixed(1) + '" cy="' + point.y.toFixed(1) + '" r="' + (point.r + 5).toFixed(1) + '"/><circle cx="' + point.x.toFixed(1) + '" cy="' + point.y.toFixed(1) + '" r="' + point.r.toFixed(1) + '"/><text x="' + point.x.toFixed(1) + '" y="' + (bottom + 17) + '" text-anchor="middle">' + e(point.label) + '</text><text class="pj-pulse-year" x="' + point.x.toFixed(1) + '" y="' + (bottom + 29) + '" text-anchor="middle">' + e(point.year) + '</text></g>';
     }).join('');
     var svgWidth = Math.round(width);
-    return '<section class="pj-pulse" aria-label="نبض أحداث اللاعب الموثقة"><div class="pj-pulse-head"><div><span class="pj-label">MOMENTS · MONTH BY MONTH</span><h3>نبض المسيرة</h3><p>حجم العلامة يعكس كثافة اللحظات الموثقة، والمسافة تعكس الزمن بين السجلات — لا تقييمًا افتراضيًا.</p></div><span class="pj-pulse-key"><i></i> شهر موثّق</span></div><div class="pj-pulse-graph" tabindex="0" aria-label="مخطط زمني قابل للتمرير أفقيًا"><svg width="' + svgWidth + '" height="132" viewBox="0 0 ' + svgWidth + ' 132" role="img" aria-label="توزيع الأحداث المسجلة حسب الشهر"><defs><linearGradient id="pjPulseArea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#48d9ff" stop-opacity=".3"/><stop offset="1" stop-color="#4436d8" stop-opacity="0"/></linearGradient></defs><path class="pj-pulse-grid" d="M16 23h' + (svgWidth - 32) + 'M16 59h' + (svgWidth - 32) + 'M16 95h' + (svgWidth - 32) + '"/><path class="pj-pulse-area" d="' + area + '"/><path class="pj-pulse-line" d="' + path + '"/>' + marks + '</svg></div><p class="pj-pulse-foot">الإنجازات المسجلة على مستوى الموسم تبقى في خط الرحلة، ولا تُنسب إلى شهر غير محدد.</p></section>';
+    return '<section class="pj-pulse" aria-label="أحداث اللاعب حسب الشهر"><div class="pj-pulse-head"><div><span class="pj-label">PLAYER ACTIVITY · MONTHLY</span><h3>النشاط الشهري</h3><p>الأهداف والمشاركات والإنجازات المسجلة في كل شهر.</p></div><span class="pj-pulse-key"><i></i> شهر فيه سجل</span></div><div class="pj-pulse-graph" tabindex="0" aria-label="مخطط نشاط اللاعب حسب الشهر"><svg width="' + svgWidth + '" height="132" viewBox="0 0 ' + svgWidth + ' 132" role="img" aria-label="الأحداث المسجلة حسب الشهر"><defs><linearGradient id="pjPulseArea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#48d9ff" stop-opacity=".3"/><stop offset="1" stop-color="#4436d8" stop-opacity="0"/></linearGradient></defs><path class="pj-pulse-grid" d="M16 23h' + (svgWidth - 32) + 'M16 59h' + (svgWidth - 32) + 'M16 95h' + (svgWidth - 32) + '"/><path class="pj-pulse-area" d="' + area + '"/><path class="pj-pulse-line" d="' + path + '"/>' + marks + '</svg></div><p class="pj-pulse-foot">الإنجازات المسجلة للموسم تظهر ضمن الموسم، إذا لم يُحدد شهرها.</p></section>';
   }
   function seasonAtlas(items) {
     var groups = monthTimeline(foldMatchMoments(items));
@@ -262,7 +262,7 @@
       var emptyMonths = newerStamp !== null && olderStamp !== null ? newerStamp - olderStamp - 1 : 0;
       if (older && emptyMonths > 0) {
         var gapHeight = Math.min(62, 12 + emptyMonths * 8);
-        stream += '<div class="pj-time-gap" data-pj-gap-year="' + e(group.year || 'غير مؤرخ') + '" style="--pj-gap-height:' + gapHeight + 'px" title="الفاصل الزمني بين السجلات لا يعني غياب النشاط"><i></i><small>فاصل زمني بين السجلات</small></div>';
+        stream += '<div class="pj-time-gap" data-pj-gap-year="' + e(group.year || 'غير مؤرخ') + '" style="--pj-gap-height:' + gapHeight + 'px" title="فترة بين السجلات"><i></i><small>فترة بين السجلات</small></div>';
       }
     });
     return '<div class="pj-atlas-head"><span class="pj-atlas-line"></span><div class="pj-year-orbit" role="tablist" aria-label="تصفية الرحلة حسب السنة"><button class="pj-year-node is-selected" role="tab" type="button" data-pj-year="all" aria-selected="true" aria-pressed="true"><i>الكل</i><small>المسيرة</small></button>' + years.map(function (year) { return '<button class="pj-year-node" role="tab" type="button" data-pj-year="' + e(year) + '" aria-selected="false" aria-pressed="false"><i>' + e(year) + '</i><small>الموسم</small></button>'; }).join('') + '</div></div><div class="pj-month-stream">' + stream + '</div>';
@@ -277,7 +277,7 @@
     }).join('') : '<span class="pj-route-origin">أول محطة موثّقة تظهر بعد اعتمادها</span>';
     var path = stations.length > 1 ? '<path class="pj-route-path" d="M15 83 C78 83 74 34 139 43 S204 87 251 58 S333 28 425 35"/>' : '';
     var title = stations.length > 1 ? 'محطات أكاديمية موثّقة' : 'محطة أكاديمية موثّقة';
-    return '<section class="pj-route"><div class="pj-route-top"><div><span class="pj-label">ACADEMY HISTORY · VERIFIED</span><h3>' + title + '</h3></div><span class="pj-route-count">سجل المسيرة</span></div><div class="pj-route-art"><svg viewBox="0 0 440 118" preserveAspectRatio="none" aria-hidden="true"><path class="pj-route-pitch" d="M0 10h440v98H0zM220 10v98m0-65a16 16 0 1 0 0 32 16 16 0 0 0 0-32M0 39h54v40H0m440-40h-54v40h54"/>' + path + '</svg><div class="pj-route-dots">' + dots + '</div></div><p class="pj-route-caption">تظهر هنا السجلات التي اعتمدتها الجهة فقط؛ لا نضيف انتقالًا أو محطة من التخمين.</p></section>';
+    return '<section class="pj-route"><div class="pj-route-top"><div><span class="pj-label">ACADEMY HISTORY · VERIFIED</span><h3>' + title + '</h3></div><span class="pj-route-count">السجل المعتمد</span></div><div class="pj-route-art"><svg viewBox="0 0 440 118" preserveAspectRatio="none" aria-hidden="true"><path class="pj-route-pitch" d="M0 10h440v98H0zM220 10v98m0-65a16 16 0 1 0 0 32 16 16 0 0 0 0-32M0 39h54v40H0m440-40h-54v40h54"/>' + path + '</svg><div class="pj-route-dots">' + dots + '</div></div><p class="pj-route-caption">المحطات المعروضة معتمدة من الأكاديمية.</p></section>';
   }
   function playerCityFeature(player) {
     var city = String(player.identity_city || player.city || player.home_city || player.region || '').trim();
@@ -285,7 +285,7 @@
     if (!city && String(player.athlete_id || '').toUpperCase() === 'PI-89A89D4D') city = 'الرياض';
     if (!city) return '';
     if (/^(riyadh|ar[ -]?riyadh|الرياض)$/i.test(city)) city = 'الرياض';
-    return '<section class="pj-city-anchor" aria-label="محطة مكانية ضمن مسار اللاعب"><span class="pj-city-signal">' + icon('pin') + '<i></i></span><div class="pj-city-copy"><span class="pj-label">PLAYER ARC · CITY MARKER</span><b>' + e(city) + '</b><small>محطة مكانية في المسار — دون افتراض انتقال أكاديمية</small></div><span class="pj-city-seal">مسار جغرافي</span></section>';
+    return '<section class="pj-city-anchor" aria-label="مدينة اللاعب"><span class="pj-city-signal">' + icon('pin') + '<i></i></span><div class="pj-city-copy"><span class="pj-label">PLAYER CITY</span><b>' + e(city) + '</b><small>المدينة</small></div><span class="pj-city-seal">الموقع</span></section>';
   }
   function isTournament(match) {
     var name = norm(match.comp || match.competition_name || match.tournament_name || match.title || match.name || '');
@@ -313,7 +313,7 @@
   }
   function honors(data) {
     var items = data.badges.concat(data.certs.filter(function (row) { return row.title; }).map(function (row) { return { title: row.title, proof: row.issuer, verified_by: row.verified_by }; })).sort(function (a, b) { return Number(hasProof(b)) - Number(hasProof(a)); }).slice(0, 6);
-    if (!items.length) return '<div class="pj-honor-empty"><span class="pj-honor-empty-orbit">' + icon('trophy') + '</span><div><b>مكان أول إنجاز موثّق</b><small>حين تعتمده الأكاديمية، يظهر هنا كوسام في رحلة اللاعب.</small></div><span class="pj-honor-empty-stars" aria-hidden="true">✦　✧　✦</span></div>';
+    if (!items.length) return '<div class="pj-honor-empty"><span class="pj-honor-empty-orbit">' + icon('trophy') + '</span><div><b>لا توجد إنجازات معتمدة بعد</b><small>تظهر هنا بعد اعتمادها من الأكاديمية.</small></div><span class="pj-honor-empty-stars" aria-hidden="true">✦　✧　✦</span></div>';
     var verified = items.filter(hasProof), unverified = items.filter(function (x) { return !hasProof(x); });
     return '<div class="pj-honor-field"><div class="pj-honor-feature">' + icon('trophy') + '<small>' + (verified.length ? 'أقوى إشارة موثقة' : 'إنجاز أضافه اللاعب') + '</small><b>' + e((verified[0] || items[0]).title || (verified[0] || items[0]).badge_key || 'إنجاز') + '</b><span>' + e((verified[0] || items[0]).proof || (verified[0] || items[0]).signed_by || (hasProof(verified[0] || items[0]) ? 'اعتماد الجهة' : 'بانتظار توثيق الجهة')) + '</span></div><div class="pj-honor-constellation">' + items.slice(verified.length ? 1 : 0).map(function (item, index) { return '<div class="pj-honor-star ' + (hasProof(item) ? 'verified' : '') + '" style="--star:' + index + '"><span>' + icon('star') + '</span><b>' + e(item.title || item.badge_key || 'إنجاز') + '</b><small>' + (hasProof(item) ? 'موثّق' : 'مضاف') + '</small></div>'; }).join('') + '</div></div>';
   }
@@ -327,7 +327,7 @@
       var consent = media.public === true || media.is_public === true || media.consent === true || media.consent_status === 'granted';
       return consent && media.url && media.event_id && eventIds.has(String(media.event_id));
     }).slice(0, 5);
-    if (!clips.length) return '<div class="pj-clips-empty"><span>' + icon('match') + '</span><p>اللقطات المرتبطة بحدث موثّق ومسموح نشره ستظهر هنا.</p></div>';
+    if (!clips.length) return '<div class="pj-clips-empty"><span>' + icon('match') + '</span><p>لا توجد لقطات متاحة الآن.</p></div>';
     return '<div class="pj-clips">' + clips.map(function (item) { return '<a class="pj-clip" href="' + e(item.url) + '" target="_blank" rel="noopener noreferrer"><span>' + icon(item.kind === 'video' ? 'match' : 'star') + '</span><b>' + e(item.label || item.match_title || 'لقطة موثقة') + '</b><small>' + e(item.match_title || 'من سجل المباراة') + ' ↗</small></a>'; }).join('') + '</div>';
   }
   function journeyView(player, data, owner) {
@@ -335,13 +335,13 @@
     var identityPosition = player.identity_position || player.position_code || player.pos_en || 'RB';
     var years = [...new Set(items.map(function (item) { return item.year; }).filter(Boolean))].sort();
     var yearRange = years.length ? years[0] + (years.length > 1 ? ' — ' + years[years.length - 1] : '') : 'PLAYER ARC';
-    return '<section class="pj-journey" aria-label="رحلة اللاعب"><header class="pj-heading"><div><span class="pj-label">THE PLAYER ARC · ' + e(yearRange) + '</span><h2>من هنا… تبدأ الحكاية</h2><p>مدينة اللاعب، محطاته الرياضية، مواسمه، واللحظات التي لها سجل.</p></div><span class="pj-arc-seal"><i></i> سجل موثّق</span></header>'+ 
+    return '<section class="pj-journey" aria-label="ملف اللاعب"><header class="pj-heading"><div><span class="pj-label">PLAYER PROFILE · ' + e(yearRange) + '</span><h2>ملف اللاعب</h2><p>المسيرة، المشاركات، والإنجازات المسجلة.</p></div><span class="pj-arc-seal"><i></i> موثّق</span></header>'+ 
       playerCityFeature(player)+academyRoute(player, data)+seasonPulse(items)+
-      '<section class="pj-story-section pj-atlas"><div class="pj-section-title"><div><span class="pj-label">SEASONS · MONTHS · MOMENTS</span><h3>رحلة اللاعب عبر الزمن</h3><p>اختر موسمًا، ثم تتبّع محطاته شهرًا بشهر.</p></div><span class="pj-title-glyph purple">' + icon('arrow') + '</span></div>' + seasonAtlas(items) + '</section>'+
-      '<section class="pj-story-section"><div class="pj-section-title"><div><span class="pj-label">TOURNAMENT FOOTPRINT</span><h3>بصمته في البطولات</h3><p>مشاركات مرتبطة بمباريات مكتملة وسجل حضور.</p></div><span class="pj-title-glyph gold">' + icon('trophy') + '</span></div>' + tournamentTrail(data) + '</section>'+
-      '<section class="pj-story-section pj-proof-deck pj-proof-deck-honors"><div class="pj-proof-column"><div class="pj-section-title"><div><span class="pj-label">PROOF OF PROGRESS</span><h3>إنجازات لها شاهد</h3></div><span class="pj-title-glyph gold">' + icon('star') + '</span></div>' + honors(data) + '</div><div class="pj-proof-column"><div class="pj-section-title"><div><span class="pj-label">TACTICAL FOOTPRINT</span><h3>مكانه في الملعب</h3></div><span class="pj-title-glyph cyan">' + icon('match') + '</span></div>' + roleMap(Object.assign({}, player, { identity_position: identityPosition })) + '</div></section>'+
-      '<section class="pj-story-section"><div class="pj-section-title"><div><span class="pj-label">MATCH EVIDENCE</span><h3>لقطات من أرض الملعب</h3></div><span class="pj-title-glyph cyan">' + icon('match') + '</span></div>' + clipReel(data) + '</section>'+
-      '<footer class="pj-footnote"><span>PLAYIN365 · PLAYER STORY</span><small>' + (owner ? 'أنت تتحكم بما يظهر في هذا الملف.' : 'المعروض هنا مقتصر على البيانات المنشورة والموثّقة.') + '</small></footer></section>';
+      '<section class="pj-story-section pj-atlas"><div class="pj-section-title"><div><span class="pj-label">SEASONS · MONTHS · RECORDS</span><h3>سجل اللاعب</h3><p>اختر السنة لعرض السجل.</p></div><span class="pj-title-glyph purple">' + icon('arrow') + '</span></div>' + seasonAtlas(items) + '</section>'+
+      '<section class="pj-story-section"><div class="pj-section-title"><div><span class="pj-label">TOURNAMENTS</span><h3>البطولات</h3><p>مشاركات اللاعب المسجلة.</p></div><span class="pj-title-glyph gold">' + icon('trophy') + '</span></div>' + tournamentTrail(data) + '</section>'+
+      '<section class="pj-story-section pj-proof-deck pj-proof-deck-honors"><div class="pj-proof-column"><div class="pj-section-title"><div><span class="pj-label">ACHIEVEMENTS</span><h3>الإنجازات</h3></div><span class="pj-title-glyph gold">' + icon('star') + '</span></div>' + honors(data) + '</div><div class="pj-proof-column"><div class="pj-section-title"><div><span class="pj-label">POSITION</span><h3>مركز اللاعب</h3></div><span class="pj-title-glyph cyan">' + icon('match') + '</span></div>' + roleMap(Object.assign({}, player, { identity_position: identityPosition })) + '</div></section>'+
+      '<section class="pj-story-section"><div class="pj-section-title"><div><span class="pj-label">MATCH CLIPS</span><h3>لقطات المباريات</h3></div><span class="pj-title-glyph cyan">' + icon('match') + '</span></div>' + clipReel(data) + '</section>'+
+      '<footer class="pj-footnote"><span>PLAYIN365</span><small>' + (owner ? 'تحكم بما يظهر في ملفك.' : 'بيانات منشورة وموثّقة.') + '</small></footer></section>';
   }
   function completedMatches(events, joins, records) {
     var matches = {};
@@ -448,7 +448,7 @@
     var card = '';
     try { ME = player; card = P.identityCard(history.events, history.joins, history.badges); }
     finally { ME = previous; }
-    return '<div class="pi-id-page pj-public-page">' + P.top("history.back()") + '<main class="pi-id-main"><div class="pj-public-heading"><span class="pj-label">PLAYER STORY · VERIFIED RECORD</span><h1>رحلة اللاعب</h1><p>بطاقة الهوية أولًا، ثم محطات المسيرة والبطولات والإنجازات.</p></div>' + card + '<div class="pi-id-actions"><button class="primary" onclick="window.PZ.share(\'' + e(player.name) + '\')">شارك الهوية ↗</button></div><div class="pj-mount">' + journeyView(player, history, false) + '</div></main></div>';
+    return '<div class="pi-id-page pj-public-page">' + P.top("history.back()") + '<main class="pi-id-main"><div class="pj-public-heading"><span class="pj-label">PLAYER PROFILE</span><h1>ملف اللاعب</h1><p>الهوية، الإنجازات، والمشاركات.</p></div>' + card + '<div class="pi-id-actions"><button class="primary" onclick="window.PZ.share(\'' + e(player.name) + '\')">شارك الهوية ↗</button></div><div class="pj-mount">' + journeyView(player, history, false) + '</div></main></div>';
   }
 
   var originalPublicProfile = P.publicProfile;
