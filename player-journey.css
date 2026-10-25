@@ -365,3 +365,8 @@
 .pj-time-gap small{position:relative;z-index:1;padding:2px 7px;border:1px solid rgba(102,152,208,.13);border-radius:999px;background:rgba(9,24,51,.82);color:#8395b2;font:600 7.5px Cairo}
 .pj-time-gap[hidden]{display:none}
 @media(max-width:420px){.pj-city-anchor{grid-template-columns:46px minmax(0,1fr);gap:9px;padding:12px 10px}.pj-city-signal{width:43px;height:43px}.pj-city-signal svg{width:20px;height:20px}.pj-city-copy .pj-label{font-size:7px}.pj-city-copy b{font-size:23px}.pj-city-seal{grid-column:2;justify-self:start;margin-top:-2px;padding:3px 7px;font-size:7px}.pj-route-top h3{font-size:14px}.pj-time-gap small{font-size:7px}}
+
+.pj-month-marker b{font-size:12px}
+.pj-month-marker small{font-size:10px}
+.pj-event-copy b{font-size:12px}
+.pj-event-copy small{font-size:10px}
