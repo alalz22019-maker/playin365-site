@@ -27,7 +27,7 @@ PZ.icon=function(name,cls){
  const icons={
   home:'<path d="M4 11.5 12 5l8 6.5V20a1 1 0 0 1-1 1h-5v-6h-4v6H5a1 1 0 0 1-1-1Z"/>',
   opps:'<circle cx="10" cy="12" r="5"/><path d="m14 8 5-5m0 0v4m0-4h-4M8 12h4m-2-2v4"/>',
-  services:'<path d="M8 3.5c2.2 2.6 3.5 4.4 3.5 6.2A3.5 3.5 0 1 1 4.5 9.7C4.5 7.9 5.8 6.1 8 3.5Z"/><path d="M16 10.5c2.2 2.6 3.5 4.4 3.5 6.2a3.5 3.5 0 1 1-7 0c0-1.8 1.3-3.6 3.5-6.2Z"/>',
+  services:'<rect x="4" y="4" width="6" height="6" rx="1.2"/><rect x="14" y="4" width="6" height="6" rx="1.2"/><rect x="4" y="14" width="6" height="6" rx="1.2"/><rect x="14" y="14" width="6" height="6" rx="1.2"/>',
   records:'<path d="M4 19V5m0 14h16"/><path d="m7 15 3-4 3 2 5-6"/><circle cx="7" cy="15" r=".8"/><circle cx="10" cy="11" r=".8"/><circle cx="13" cy="13" r=".8"/><circle cx="18" cy="7" r=".8"/>',
   profile:'<path d="M12 3.5c3.2 3.8 5 6.2 5 8.6a5 5 0 0 1-10 0c0-2.4 1.8-4.8 5-8.6Z"/><circle cx="12" cy="10.5" r="1.6"/><path d="M9.5 15c.8-1.3 1.7-2 2.5-2s1.7.7 2.5 2"/>',
   rating:'<path d="M5 16a7 7 0 1 1 14 0"/><path d="m12 12 4-3"/><circle cx="12" cy="12" r="1"/><path d="M7 18h10"/>',
