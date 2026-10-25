@@ -24,16 +24,20 @@ function badge(icon,title,meta){
 PZ.identityCard=function(ev,joins,badges){
   ev=ev||[];joins=joins||[];badges=badges||[];
   var code=ME.athlete_id||ME.handle||'PI-89A89D4D';
-  var verified=new Set(ev.map(function(x){return x.match_id}).concat(joins.filter(function(x){return x.attended}).map(function(x){return x.match_id}))).size||5;
-  var goals=ev.filter(function(x){return x.type==='goal'}).length||7;
-  var assists=ev.filter(function(x){return x.type==='assist'}).length||2;
+  var appearanceIds=new Set(joins.filter(function(x){return x.attended===true||x.attended==='true'||x.attended===1}).map(function(x){return String(x.match_id||'')}).filter(Boolean));
+  var goalRows=ev.filter(function(x){return x.type==='goal'}),assistRows=ev.filter(function(x){return x.type==='assist'});
+  var stats=[];
+  if(goalRows.length)stats.push({title:goalRows.length+' أهداف مسجلة',is_verified:goalRows.every(function(x){return !!x.recorded_by}),kind:'⚽',meta:goalRows.every(function(x){return !!x.recorded_by})?'من سجل مباريات موثّق':'من سجل المباريات'});
+  if(assistRows.length)stats.push({title:assistRows.length+' صناعة أهداف',is_verified:assistRows.every(function(x){return !!x.recorded_by}),kind:'✦',meta:assistRows.every(function(x){return !!x.recorded_by})?'من سجل مباريات موثّق':'من سجل المباريات'});
+  if(appearanceIds.size)stats.push({title:appearanceIds.size+' مشاركات موثّقة',is_verified:true,kind:'◷',meta:'حضور مثبت في المباريات'});
+  var signals=badges.slice(0,3).concat(stats).slice(0,3);
+  var code=e(ME.athlete_id||ME.handle||'PI-89A89D4D');
   var src=e(playerSrc(ME));
   var age=e(ME.age_group||ME.category||'U14'),shirt=e(ME.jersey_number||ME.shirt_number||'18'),position=e(ME.position_code||ME.pos_en||'RB'),foot=e(ME.preferred_foot||'Right foot');
-  var b1=badges[0]&&badges[0].title||'أضف أول إنجاز موثّق';
-  var b2=badges[1]&&badges[1].title||'إنجازاتك على خط المسيرة';
-  var b3=badges[2]&&badges[2].title||'إحصاءاتك الموسمية';
   var badgeMeta=function(row,empty){return !row?empty:(row.verified_by||row.verified_at||row.is_verified===true?'موثّق':'بانتظار التوثيق')};
-  var m1=badgeMeta(badges[0],'يظهر بعد اعتماد الجهة'),m2=badgeMeta(badges[1],'يتحدّث عند التوثيق'),m3=badgeMeta(badges[2],'بعد تسجيل المباريات');
+  var signalIcon=function(row,index){return row&&row.kind?row.kind:(['⚽','✦','◷'][index])};
+  var b1=signals[0]&&signals[0].title||'أضف أول إنجاز موثّق',b2=signals[1]&&signals[1].title||'إنجازاتك على خط المسيرة',b3=signals[2]&&signals[2].title||'إحصاءاتك الموسمية';
+  var m1=badgeMeta(signals[0],'يظهر بعد اعتماد الجهة'),m2=badgeMeta(signals[1],'يتحدّث عند التوثيق'),m3=badgeMeta(signals[2],'بعد تسجيل المباريات');
   return '<section class="pi-id-card" aria-label="بطاقة هوية اللاعب">'+
     '<div class="pi-id-card-top"><div><div class="pi-id-brand">Play<span>In</span><sup>365</sup></div></div><span class="pi-id-verified"><i>✓</i> موثق</span></div>'+
     '<div class="pi-id-card-body">'+
@@ -42,7 +46,7 @@ PZ.identityCard=function(ev,joins,badges){
         '<div class="pi-id-data"><div><b>'+age+'</b><small>الفئة العمرية</small></div><div><b>'+shirt+'</b><small>رقم القميص</small></div><div><b>'+position+'</b><small>المركز</small></div><div><b>'+foot+'</b><small>القدم المفضلة</small></div></div>'+
       '</div>'+
     '</div>'+
-    '<div class="pi-id-lower"><div class="pi-id-achievements"><div class="pi-id-section-title"><span>CAREER SIGNALS</span><b>أبرز الإنجازات</b></div>'+badge('⚽',b1,m1)+badge('✦',b2,m2)+badge('◷',b3,m3)+'</div>'+
+    '<div class="pi-id-lower"><div class="pi-id-achievements"><div class="pi-id-section-title"><span>CAREER SIGNALS</span><b>إنجازات وأرقام</b></div>'+badge(signalIcon(signals[0],0),b1,m1)+badge(signalIcon(signals[1],1),b2,m2)+badge(signalIcon(signals[2],2),b3,m3)+'</div>'+
       '<div class="pi-id-qr"><img src="'+('https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=8&data='+encodeURIComponent(location.origin+location.pathname+'?player='+encodeURIComponent(ME.name||'سعود القحطاني'))) +'" alt="باركود هوية اللاعب"><b>'+val(code)+'</b><small>امسح لفتح الهوية الرقمية</small></div>'+
     '</div>'+
   '</section>';
