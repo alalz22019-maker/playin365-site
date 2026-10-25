@@ -314,3 +314,25 @@
   .pj-footnote small{text-align:left}
 }
 @media(prefers-reduced-motion:reduce){.pj-route-path{animation:none!important}}
+
+/* Verified career rhythm: editorial chart, not another metric tile. */
+.pj-pulse{position:relative;margin:21px -5px 2px;padding:14px 7px 10px;overflow:hidden;border-block:1px solid rgba(95,167,244,.27);background:linear-gradient(105deg,rgba(7,37,78,.22),rgba(11,30,68,.52),rgba(23,18,68,.2))}
+.pj-pulse:after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background:repeating-linear-gradient(165deg,transparent 0 24px,rgba(79,154,255,.035) 25px,transparent 26px 47px);mask-image:linear-gradient(90deg,transparent,#000 24%,#000 86%,transparent)}
+.pj-pulse-head{position:relative;z-index:1;display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+.pj-pulse-head h3{margin:4px 0 1px;color:#f5f8ff;font:900 18px/1.35 Cairo,sans-serif}
+.pj-pulse-head p{max-width:260px;margin:2px 0 0;color:#9eafcb;font:600 9px/1.7 Cairo,sans-serif}
+.pj-pulse-key{display:inline-flex;align-items:center;gap:5px;flex:none;margin-bottom:3px;color:#a8eaff;font:800 8px Cairo;white-space:nowrap}
+.pj-pulse-key i{width:7px;height:7px;border-radius:50%;background:#55dcf2;box-shadow:0 0 10px #55dcf2}
+.pj-pulse-graph{position:relative;z-index:1;height:140px;margin:2px -1px 0}
+.pj-pulse-graph svg{display:block;width:100%;height:100%;overflow:visible}
+.pj-pulse-grid{fill:none;stroke:rgba(137,179,230,.14);stroke-width:1;stroke-dasharray:2 5}
+.pj-pulse-area{fill:url(#pjPulseArea)}
+.pj-pulse-line{fill:none;stroke:#55dcf2;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 6px rgba(73,221,255,.55))}
+.pj-pulse-point line{stroke:rgba(85,220,242,.24);stroke-width:1;stroke-dasharray:2 4}
+.pj-pulse-point circle{fill:#0b1d40;stroke:#a8f2ff;stroke-width:2.2;filter:drop-shadow(0 0 7px rgba(73,221,255,.72))}
+.pj-pulse-point text{fill:#d8eaff;font:700 8px Cairo,sans-serif}
+.pj-pulse-point .pj-pulse-year{fill:#7e95ba;font:700 7px 'Space Grotesk',Cairo,sans-serif}
+.pj-pulse-point .pj-pulse-value{fill:#ffe16e;font:700 8px 'Space Grotesk',Cairo,sans-serif}
+.pj-share-note{margin:7px 1px 0;padding:7px 10px;border-inline-start:2px solid #f4c51c;background:linear-gradient(90deg,rgba(245,197,24,.08),transparent);color:#e4d9a0;font:700 9px/1.7 Cairo,sans-serif}
+@media(max-width:420px){.pj-pulse{margin-inline:-2px;padding-inline:3px}.pj-pulse-head h3{font-size:17px}.pj-pulse-head p{font-size:8px}.pj-pulse-key{font-size:7px}.pj-pulse-graph{height:133px}}
+@media(prefers-reduced-motion:reduce){.pj-pulse-line{filter:none}}
