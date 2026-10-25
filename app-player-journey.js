@@ -62,6 +62,7 @@
       .pj-contact-request p{margin:8px 0;color:#e4ebf6;font:600 12px/1.8 Cairo}
       .pj-contact-request .pj-contact-method{direction:ltr;unicode-bidi:isolate;text-align:left;color:#f5cf52;font:700 12px 'Space Grotesk',sans-serif;overflow-wrap:anywhere}
       .pj-contact-share{display:block;margin-top:12px}
+      .pj-contact-owner-note{flex-basis:100%;margin:0;color:#98abc4;font:600 11px/1.7 Cairo}
       .pj-contact-decision{display:flex;gap:8px;margin-top:10px}
       .pj-contact-decision button{flex:1}
       .pj-contact-reject{border:1px solid #4a5365;background:#141b2b;color:#e7eaf2}
@@ -525,9 +526,10 @@
       var player = Object.assign({}, cardCapture && cardCapture.player || ME, { identity_position: cardCapture && cardCapture.position || (ME && (ME.position_code || ME.pos_en || 'RB')), identity_org: cardCapture && cardCapture.org || (ME && (ME.org || 'أكاديمية النخبة')) });
       var history = await loadHistory(player, cardCapture);
       var inbox = player && ME && ME.id && ME.role === 'player' ? await contactInbox(ME.id) : '';
+      var contactPreview = player && player.role === 'player' ? '<div class="pi-id-actions pj-public-actions pj-contact-owner-preview"><button class="pj-contact-trigger" type="button" data-pj-contact-preview>طلب تواصل</button><small class="pj-contact-owner-note">يظهر للجهات الموثّقة عند زيارة ملفك العام.</small></div>' : '';
       var mount = '<div class="pj-mount">' + journeyView(player, history, true) + '</div>';
       var shareNote = maySharePublic(player) ? '' : '<p class="pj-share-note">رمز الهوية يفتح الملف عند نشره للعامة؛ إعداد الظهور هو الذي يحدد إتاحة الصفحة.</p>';
-      return markup.replace('</main>', shareNote + inbox + mount + '</main>');
+      return markup.replace('</main>', shareNote + contactPreview + inbox + mount + '</main>');
     } catch (error) {
       console.warn('PlayIn365 player journey', error);
       return markup;
@@ -545,6 +547,8 @@
 
   document.addEventListener('click', function (event) {
     var target = event.target;
+    var previewButton = target.closest && target.closest('[data-pj-contact-preview]');
+    if (previewButton) { shareNotice('يظهر زر التواصل للجهات الموثّقة عند زيارة ملفك العام.'); return; }
     var openButton = target.closest && target.closest('[data-pj-contact-open]');
     if (openButton) { window.PJContact.open(openButton.getAttribute('data-target-id')); return; }
     var closeButton = target.closest && target.closest('[data-pj-contact-close]');
