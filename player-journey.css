@@ -262,6 +262,7 @@
 .pj-public-page .pi-id-main{padding-bottom:120px}
 .pj-public-page .pj-mount{margin-bottom:20px}
 .pj-year-node[role="tab"]{cursor:pointer}
+.pj-month-group[hidden]{display:none!important}
 .pj-year-node[aria-pressed="true"]{filter:drop-shadow(0 5px 12px rgba(245,197,24,.18))}
 .pj-honor-empty{position:relative;min-height:91px;display:grid;grid-template-columns:54px 1fr auto;align-items:center;gap:10px;padding:8px 13px;overflow:hidden;border-inline-start:0;background:radial-gradient(ellipse at 94% 50%,rgba(245,197,24,.11),transparent 36%),linear-gradient(105deg,rgba(91,58,12,.13),rgba(16,34,63,.12))}
 .pj-honor-empty:before{content:"";position:absolute;inset-inline-end:28px;top:-39px;width:135px;height:135px;border:1px solid rgba(245,197,24,.12);border-radius:50% 50% 50% 18px;box-shadow:0 0 0 12px rgba(245,197,24,.025),0 0 0 25px rgba(139,92,255,.025);pointer-events:none}
