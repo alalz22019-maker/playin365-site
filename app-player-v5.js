@@ -114,8 +114,8 @@ PZ.loadSportsRadar=async function(){
  renderRadarRows()
 };
 PZ.home=async function(){
- var today=todayRiyadh(),weekEnd=addIsoDays(today,6);
- var d=await Promise.all([
+ var today=todayRiyadh(),weekEnd=addIsoDays(today,6),demo=isPreviewDemo();
+ var d=demo?[[],[],[],[],[],[],[]]:await Promise.all([
   PZ.safe('matches',sb.from('matches').select('*').order('created_at',{ascending:false}).limit(60)),
   PZ.safe('events',sb.from('match_events').select('*').eq('who',ME.name).order('created_at',{ascending:false}).limit(120)),
   PZ.safe('joins',sb.from('match_joins').select('*').eq('player_id',ME.id)),
@@ -125,7 +125,7 @@ PZ.home=async function(){
   PZ.safe('badges',sb.from('pi_badges').select('*').eq('person',ME.name).limit(20))
  ]);
  var matches=d[0]||[],ev=d[1]||[],joins=d[2]||[],opps=d[3]||[],health=d[4]||[],cal=d[5]||[],badges=d[6]||[];
- var demo=isPreviewDemo(),coachRating='—',coachMeta='لا يوجد تقييم حديث';
+ var coachRating='—',coachMeta='لا يوجد تقييم حديث';
  if(demo){var sample=demoPack(today);matches=sample.matches;ev=sample.events;joins=sample.joins;opps=sample.opps;health=sample.health;cal=sample.calendar;badges=sample.badges;coachRating='7.8';coachMeta='تقييم تجريبي · آخر حصة'}
  var trustedEvents=ev.filter(function(e){return !!e.recorded_by});
  var goals=trustedEvents.filter(function(e){return e.type==='goal'}).length;
