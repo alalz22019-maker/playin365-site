@@ -49,7 +49,9 @@
     return null;
   }
   function getPosition(player) {
-    var raw = norm(player.position_code || player.pos_en || player.position || player.pos || '');
+    // Use the exact value shown on the identity card so the pitch marker can
+    // never contradict the player's public position label.
+    var raw = norm(player.identity_position || player.position_code || player.pos_en || player.position || player.pos || '');
     var code = raw.match(/(?:^|[^a-z])(gk|rb|rwb|lb|lwb|cb|rcb|lcb|dm|cdm|cm|cam|am|rw|lw|rm|lm|st|cf|fw)(?:$|[^a-z])/);
     if (code) raw = code[1];
     var map = {
@@ -127,7 +129,7 @@
       return Number(a.year || 0) - Number(b.year || 0) || (monthNames.indexOf(a.month) - monthNames.indexOf(b.month));
     });
   }
-  function academyRail(player, data) {
+  function academyStations(player, data) {
     var stations = data.career.filter(hasProof).map(function (row) {
       return { name: row.org, year: yearOf(row.from_year || row.to_year), meta: [row.group_name, row.title].filter(Boolean).join(' · '), icon: 'academy' };
     });
@@ -138,6 +140,10 @@
     var unique = [];
     stations.forEach(function (station) { if (!unique.some(function (s) { return norm(s.name) === norm(station.name); })) unique.push(station); });
     unique.sort(function (a, b) { return Number(a.year || 9999) - Number(b.year || 9999); });
+    return unique;
+  }
+  function academyRail(player, data) {
+    var unique = academyStations(player, data);
     if (!unique.length) return '<div class="pj-empty-trail"><span class="pj-empty-mark">' + icon('academy') + '</span><div><b>المسار يبدأ من أول محطة موثّقة</b><small>تظهر انتقالات اللاعب هنا بعد اعتمادها من الأكاديمية، دون إدخال محطات غير مؤكدة.</small></div></div>';
     return '<div class="pj-stations" role="list">' + unique.map(function (station, index) {
       return '<div class="pj-station ' + (station.current ? 'is-current' : '') + '" role="listitem"><span class="pj-station-connector" aria-hidden="true"></span><span class="pj-station-mark">' + icon(station.icon) + '</span><div class="pj-station-copy"><small>' + (station.current ? 'الجهة المسجلة' : station.year ? e(station.year) : 'محطة موثقة') + '</small><b>' + e(station.name) + '</b><span>' + e(station.meta || 'أكاديمية موثقة') + '</span></div><span class="pj-station-seal">' + (station.current ? 'من الملف' : 'موثّق') + '</span></div>';
@@ -155,12 +161,27 @@
       return '<section class="pj-month-group"><div class="pj-month-marker"><span></span><b>' + e(group.month) + '</b>' + (group.year ? '<small>' + e(group.year) + '</small>' : '') + '</div><div class="pj-month-events">' + group.items.map(eventRow).join('') + '</div></section>';
     }).join('') + '</div>';
   }
+  function academyRoute(player, data) {
+    var stations = academyStations(player, data).slice(-5);
+    var dots = stations.length ? stations.map(function (station, i) {
+      var label = station.year || (station.current ? 'الآن' : 'موثّق');
+      return '<span class="pj-route-dot ' + (station.current ? 'live' : '') + '" style="--step:' + i + ';--offset:' + (i % 2 ? '10px' : '-10px') + '"><i>' + e(label) + '</i><small>' + e(station.name) + '</small></span>';
+    }).join('') : '<span class="pj-route-origin">أول محطة موثّقة تظهر بعد اعتمادها</span>';
+    var count = data.career.filter(hasProof).length + data.alumni.filter(hasProof).length;
+    return '<section class="pj-route"><div class="pj-route-top"><span class="pj-label">ACADEMY ROUTE</span><span class="pj-route-count">' + e(count) + ' <small>محطات معتمدة</small></span></div><div class="pj-route-art"><svg viewBox="0 0 440 118" preserveAspectRatio="none" aria-hidden="true"><path class="pj-route-pitch" d="M0 10h440v98H0zM220 10v98m0-65a16 16 0 1 0 0 32 16 16 0 0 0 0-32M0 39h54v40H0m440-40h-54v40h54"/><path class="pj-route-path" d="M15 83 C78 83 74 34 139 43 S204 87 251 58 S333 28 425 35"/></svg><div class="pj-route-dots">' + dots + '</div></div><p class="pj-route-caption">' + (player.org ? 'المحطة الحالية من الهوية · ' + e(player.org) + ' — الانتقالات لا تظهر إلا بعد توثيقها' : 'مسار الأكاديميات يُبنى من محطات موثّقة فقط') + '</p></section>';
+  }
+  function isTournament(match) {
+    var name = norm(match.comp || match.competition_name || match.tournament_name || match.title || match.name || '');
+    if (!name || /ودية|ودّية|تدريب|تمرين|تجربة أداء|friendly|training|scrimmage|practice|tryout/.test(name)) return false;
+    if (match.tournament_id || match.competition_id || match.is_tournament === true) return true;
+    return /دوري|بطولة|كأس|كاس|league|tournament|cup|championship/.test(name);
+  }
   function tournamentTrail(data) {
     var comps = {};
     data.matches.forEach(function (match) {
       var attended = data.joins.some(function (join) { return isAttended(join) && String(join.match_id) === String(match.id); });
-      if (!attended || !isCompleted(match)) return;
-      var name = match.comp || match.title;
+      if (!attended || !isCompleted(match) || !isTournament(match)) return;
+      var name = match.comp || match.competition_name || match.tournament_name || match.title;
       if (!name) return;
       comps[name] = comps[name] || { name: name, appearances: 0, last: matchDate(match) || yearOf(name) };
       comps[name].appearances++;
@@ -194,15 +215,14 @@
   }
   function journeyView(player, data, owner) {
     var items = groupHistory(data);
-    var seasons = [...new Set(items.map(function (item) { return item.year; }).filter(Boolean))];
-    var verifiedStations = data.career.filter(hasProof).length + data.alumni.filter(hasProof).length;
+    var identityPosition = player.identity_position || player.position_code || player.pos_en || 'RB';
     return '<section class="pj-journey" aria-label="رحلة اللاعب"><header class="pj-heading"><div><span class="pj-label">THE PLAYER ARC</span><h2>مسيرة تُرى… لا أرقام تُرصّ</h2><p>محطات اللاعب كما جرت، مرتبة من الملعب إلى الإنجاز، وكل علامة مرتبطة بسجل أو اعتماد.</p></div><span class="pj-arc-seal"><i></i> سجل حي</span></header>'+
-      '<section class="pj-route"><div class="pj-route-top"><span class="pj-label">ACADEMY ROUTE</span><span class="pj-route-count">' + e(verifiedStations) + ' <small>محطة معتمدة</small></span></div><div class="pj-route-art"><svg viewBox="0 0 440 118" preserveAspectRatio="none" aria-hidden="true"><path class="pj-route-pitch" d="M0 10h440v98H0zM220 10v98m0-65a16 16 0 1 0 0 32 16 16 0 0 0 0-32M0 39h54v40H0m440-40h-54v40h54"/><path class="pj-route-path" d="M15 83 C78 83 74 34 139 43 S204 87 251 58 S333 28 425 35"/></svg><div class="pj-route-dots">' + (seasons.length ? seasons.slice(-5).map(function (year, i) { return '<span class="pj-route-dot ' + (i === seasons.length - 1 ? 'live' : '') + '" style="--step:' + i + ';--offset:' + (i % 2 ? '10px' : '-10px') + '"><i>' + e(year) + '</i></span>'; }).join('') : '<span class="pj-route-origin">' + (player.org ? e(player.org) : 'أول محطة موثقة') + '</span>') + '</div></div><p class="pj-route-caption">' + (player.org ? 'الجهة المسجلة في الهوية · ' + e(player.org) : 'يُبنى الخط من المحطات التي تعتمدها الأكاديمية') + '</p></section>'+
+      academyRoute(player, data)+
       '<section class="pj-story-section"><div class="pj-section-title"><div><span class="pj-label">CLUB TO CLUB</span><h3>محطات المسيرة</h3></div><span class="pj-title-glyph">' + icon('academy') + '</span></div>' + academyRail(player, data) + '</section>'+
       '<section class="pj-story-section pj-atlas"><div class="pj-section-title"><div><span class="pj-label">SEASONS · MONTHS · MOMENTS</span><h3>سنوات صنعت فرقًا</h3></div><span class="pj-title-glyph purple">' + icon('arrow') + '</span></div>' + seasonAtlas(items) + '</section>'+
       '<section class="pj-story-section"><div class="pj-section-title"><div><span class="pj-label">TOURNAMENT FOOTPRINT</span><h3>أثره في البطولات</h3></div><span class="pj-title-glyph gold">' + icon('trophy') + '</span></div>' + tournamentTrail(data) + '</section>'+
       '<section class="pj-story-section pj-honors"><div class="pj-section-title"><div><span class="pj-label">PROOF OF PROGRESS</span><h3>إنجازات لها شاهد</h3></div><span class="pj-title-glyph gold">' + icon('star') + '</span></div>' + honors(data) + '</section>'+
-      '<section class="pj-story-section">' + roleMap(player) + '</section>'+
+      '<section class="pj-story-section">' + roleMap(Object.assign({}, player, { identity_position: identityPosition })) + '</section>'+
       '<section class="pj-story-section"><div class="pj-section-title"><div><span class="pj-label">MATCH EVIDENCE</span><h3>لقطات من أرض الملعب</h3></div><span class="pj-title-glyph cyan">' + icon('match') + '</span></div>' + clipReel(data) + '</section>'+
       '<footer class="pj-footnote"><span>PLAYIN365 · PLAYER STORY</span><small>' + (owner ? 'أنت تتحكم بما يظهر في هذا الملف.' : 'المعروض هنا مقتصر على البيانات المنشورة والموثّقة.') + '</small></footer></section>';
   }
@@ -235,7 +255,7 @@
 
   var cardCapture = null;
   P.identityCard = function (events, joins, badges) {
-    cardCapture = { events: events || [], joins: joins || [], badges: badges || [] };
+    cardCapture = { events: events || [], joins: joins || [], badges: badges || [], position: ME && (ME.position_code || ME.pos_en || 'RB'), player: ME ? Object.assign({}, ME) : null };
     return baseIdentityCard.apply(this, arguments);
   };
 
@@ -243,7 +263,7 @@
     cardCapture = null;
     var markup = await baseMyCard.apply(this, arguments);
     try {
-      var player = ME;
+      var player = Object.assign({}, cardCapture && cardCapture.player || ME, { identity_position: cardCapture && cardCapture.position || (ME && (ME.position_code || ME.pos_en || 'RB')) });
       var history = await loadHistory(player, cardCapture);
       var mount = '<div class="pj-mount">' + journeyView(player, history, true) + '</div>';
       return markup.replace('</main>', mount + '</main>');
@@ -264,7 +284,8 @@
     var player = Object.assign({}, source, {
       age_group: source.age_group || source.category || (source.age ? 'U' + source.age : ''),
       jersey_number: source.jersey_number || source.shirt_number,
-      position_code: source.position_code || source.pos_en || source.position || source.pos
+      position_code: source.position_code || source.pos_en || source.position || source.pos,
+      identity_position: source.position_code || source.pos_en || 'RB'
     });
     var history = await loadHistory(player);
     var previous = ME;
