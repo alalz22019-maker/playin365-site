@@ -284,7 +284,7 @@
 .pj-position-name b{color:#ffe170;font:900 15px Cairo;text-shadow:0 0 16px rgba(245,197,24,.22)}
 .pj-position-name small{color:#83dff8;font:700 8px Cairo}
 .pj-role-copy p{font-size:9.5px}
-.pj-role-map .pj-pitch{display:block;min-height:160px;overflow:visible;filter:drop-shadow(0 8px 22px rgba(0,119,255,.18))}
+.pj-role-map .pj-pitch{display:block;width:100%;height:auto;min-height:160px;overflow:visible;filter:drop-shadow(0 8px 22px rgba(0,119,255,.18))}
 .pj-role-map .pj-pitch rect,.pj-role-map .pj-pitch path,.pj-role-map .pj-pitch circle{vector-effect:non-scaling-stroke}
 .pj-role-map .pj-pitch>circle:nth-last-of-type(2){filter:drop-shadow(0 0 8px rgba(245,197,24,.55))}
 .pj-proof-column .pj-section-title h3{font-size:18px}
