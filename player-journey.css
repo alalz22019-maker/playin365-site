@@ -175,7 +175,13 @@
 .pj-route-dot i{font-size:10px}
 .pj-route-dot.live{border-color:#fff0a2;background:linear-gradient(145deg,#ffdf55,#cf9512);box-shadow:0 0 0 7px rgba(245,197,24,.12),0 0 30px rgba(245,197,24,.4)}
 .pj-route-dot small{inset-block-start:48px;max-width:86px;color:#e8f4ff;font-size:8.5px;text-shadow:0 2px 7px #06142c}
-.pj-route-caption{margin-top:4px;font-size:9.5px}
+.pj-route-caption{margin-top:4px;font-size:10.5px}
+.pj-route-status{color:#ffe172;font:800 9px Cairo;direction:rtl}
+.pj-route-art.is-current-only .pj-route-path{display:none}
+.pj-route-art.is-current-only .pj-route-dots{justify-content:center}
+.pj-route-art.is-current-only .pj-route-dot{width:52px;height:52px;transform:none;box-shadow:0 0 0 7px rgba(245,197,24,.12),0 0 27px rgba(245,197,24,.28)}
+.pj-route-art.is-current-only .pj-route-dot small{inset-block-start:56px;max-width:140px;font-size:9px}
+.pj-route-art.is-current-only .pj-route-dot i{font-size:10px}
 .pj-story-section{position:relative;margin-top:29px}
 .pj-section-title{position:relative;align-items:flex-start;margin-bottom:13px}
 .pj-section-title h3,.pj-role-copy h3{font-size:19px;letter-spacing:-.3px}
@@ -187,8 +193,8 @@
 .pj-stations:before{inset-block:22px 22px;inset-inline-start:20px;border-inline-start:1px dashed rgba(97,180,255,.52)}
 .pj-station{min-height:69px;padding:7px 0}
 .pj-station-mark{width:43px;height:43px;border-color:rgba(76,169,255,.45);border-radius:50% 50% 50% 12px;background:linear-gradient(145deg,#164277,#091c3c);box-shadow:0 0 15px rgba(29,131,255,.11)}
-.pj-station-copy b{font-size:13px}
-.pj-station-copy span{font-size:9.5px}
+.pj-station-copy b{font-size:14px}
+.pj-station-copy span{font-size:10px}
 .pj-station-seal{font-size:8.5px}
 .pj-empty-trail{padding:13px 12px;border-inline-start-color:#42c8ff;border-radius:0;background:linear-gradient(90deg,rgba(26,113,187,.18),transparent)}
 .pj-atlas-head{margin:3px 0 10px;padding:5px 0 9px;overflow-x:auto;scrollbar-width:none}
@@ -205,8 +211,9 @@
 .pj-month-group{grid-template-columns:75px minmax(0,1fr);gap:8px;padding:11px 0 15px}
 .pj-month-marker{align-items:flex-start;padding-top:5px}
 .pj-month-marker span{inset-inline-start:-17px;top:8px;width:10px;height:10px;border-color:#8ce7ff;background:#0a2145;box-shadow:0 0 12px rgba(73,221,255,.34)}
-.pj-month-marker b{font-size:10.5px}
-.pj-month-marker small{color:#74d8fa;font-size:9px}
+.pj-month-marker b{font-size:11.5px}
+.pj-month-marker small{color:#74d8fa;font-size:9.5px}
+.pj-month-marker small{color:#74d8fa;font-size:9.5px}
 .pj-month-events{gap:2px}
 .pj-event{position:relative;gap:9px;min-height:48px;padding:5px 0;border:0;border-bottom:1px solid rgba(119,159,217,.13);border-radius:0;background:transparent}
 .pj-event:last-child{border-bottom-color:transparent}
@@ -215,15 +222,15 @@
 .pj-event-award .pj-event-icon{border-color:rgba(245,197,24,.38);background:rgba(245,197,24,.12);color:#ffe268}
 .pj-event-goal .pj-event-icon{border-color:rgba(78,225,177,.3);background:rgba(75,225,177,.1);color:#62e4ba}
 .pj-event-assist .pj-event-icon{border-color:rgba(139,98,255,.32);background:rgba(139,98,255,.13);color:#b39bff}
-.pj-event-copy b{font-size:10px;white-space:normal;line-height:1.5}
-.pj-event-copy small{font-size:8.5px}
+.pj-event-copy b{font-size:11px;white-space:normal;line-height:1.5}
+.pj-event-copy small{font-size:9.5px}
 .pj-event-proof{width:18px;height:18px;border-color:rgba(94,210,186,.45);background:rgba(94,210,186,.06)}
 .pj-event-signals{display:flex;align-items:center;flex-wrap:wrap;gap:5px;margin-top:4px}
-.pj-signal{display:inline-flex;align-items:center;gap:4px;padding:3px 7px;border:1px solid rgba(90,216,255,.22);border-radius:999px;background:rgba(21,126,203,.09);color:#a7edff;font:800 8px Cairo}
+.pj-signal{display:inline-flex;align-items:center;gap:4px;padding:3px 7px;border:1px solid rgba(90,216,255,.22);border-radius:999px;background:rgba(21,126,203,.09);color:#a7edff;font:800 9px Cairo}
 .pj-signal svg{width:12px;height:12px}
 .pj-signal-goal{border-color:rgba(245,197,24,.26);background:rgba(245,197,24,.08);color:#ffe270}
 .pj-signal-assist{border-color:rgba(139,98,255,.3);background:rgba(139,98,255,.1);color:#c3abff}
-.pj-minute-list{color:#8fa4c4;font:700 8px 'Space Grotesk';direction:ltr}
+.pj-minute-list{color:#8fa4c4;font:700 9px 'Space Grotesk';direction:ltr}
 .pj-proof-deck{display:grid;grid-template-columns:1fr;gap:24px;padding-top:19px;border-top:1px solid rgba(108,170,242,.22)}
 .pj-proof-column{min-width:0}
 .pj-proof-column+.pj-proof-column{padding-top:18px;border-top:1px dashed rgba(108,170,242,.2)}
@@ -234,8 +241,8 @@
 .pj-cup-wire{inset-inline-start:39px;top:20px;background:linear-gradient(90deg,#f4c51c,rgba(70,147,238,.18))}
 .pj-cup-emblem{width:41px;height:41px;border-color:rgba(109,175,255,.6);background:linear-gradient(145deg,#123967,#0a1b3a);box-shadow:0 0 0 5px rgba(48,122,228,.07)}
 .pj-cup-stop div{padding:6px 8px;border-radius:0;background:linear-gradient(90deg,rgba(8,22,49,.92),rgba(8,22,49,.35));border-inline-start:1px solid rgba(78,161,255,.25)}
-.pj-cup-stop div b{font-size:10px}
-.pj-cup-stop div small{font-size:8.5px}
+.pj-cup-stop div b{font-size:11px}
+.pj-cup-stop div small{font-size:9px}
 .pj-tournament-empty{min-height:61px;padding:7px 2px;border-block:0;border-inline-start:1px solid rgba(245,197,24,.32)}
 .pj-tournament-empty p{font-size:9.5px}
 .pj-honor-field{grid-template-columns:1fr;gap:5px}
@@ -261,6 +268,7 @@
 .pj-public-heading h1{font-size:24px}
 .pj-public-page .pi-id-main{padding-bottom:120px}
 .pj-public-page .pj-mount{margin-bottom:20px}
+.pi-id-main>.pj-mount{margin-bottom:118px}
 .pj-year-node[role="tab"]{cursor:pointer}
 .pj-month-group[hidden]{display:none!important}
 .pj-year-node[aria-pressed="true"]{filter:drop-shadow(0 5px 12px rgba(245,197,24,.18))}
@@ -270,7 +278,7 @@
 .pj-honor-empty-orbit:after{content:"";position:absolute;inset:-6px;border:1px dashed rgba(245,197,24,.3);border-radius:inherit;transform:rotate(-18deg)}
 .pj-honor-empty-orbit svg{width:23px;height:23px;filter:drop-shadow(0 0 7px rgba(245,197,24,.45))}
 .pj-honor-empty b{font-size:11px}
-.pj-honor-empty small{max-width:220px;font-size:8.5px;line-height:1.8}
+.pj-honor-empty small{max-width:220px;font-size:9px;line-height:1.8}
 .pj-honor-empty-stars{position:relative;color:rgba(199,174,255,.68);font-size:14px;letter-spacing:2px;white-space:nowrap}
 .pj-position-name{display:flex;align-items:baseline;flex-wrap:wrap;gap:7px;margin:5px 0}
 .pj-position-name b{color:#ffe170;font:900 15px Cairo;text-shadow:0 0 16px rgba(245,197,24,.22)}
@@ -292,11 +300,13 @@
   .pj-heading p{font-size:9.5px}
   .pj-arc-seal{font-size:7.5px}
   .pj-route-art{height:112px}
-  .pj-route-dot{width:38px;height:38px}
-  .pj-route-dot small{inset-block-start:42px;max-width:72px;font-size:7.5px}
+  .pj-route-dot{width:40px;height:40px}
+  .pj-route-dot small{inset-block-start:44px;max-width:74px;font-size:8.5px}
+  .pj-route-art.is-current-only .pj-route-dot{width:53px;height:53px}
+  .pj-route-art.is-current-only .pj-route-dot small{inset-block-start:57px;max-width:150px;font-size:9px}
   .pj-month-group{grid-template-columns:67px minmax(0,1fr);gap:6px}
   .pj-event{gap:7px}
-  .pj-event-copy b{font-size:9.5px}
+  .pj-event-copy b{font-size:10.5px}
   .pj-proof-deck{gap:20px}
   .pj-honor-empty{grid-template-columns:58px 1fr auto}
   .pj-role-map{grid-template-columns:minmax(0,1fr) 46%;min-height:163px}
