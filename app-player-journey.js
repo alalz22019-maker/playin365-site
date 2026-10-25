@@ -567,7 +567,7 @@
   P.identityCard = function (events, joins, badges) {
     var player = ME ? Object.assign({}, ME) : null;
     if (previewDemoMode() && player) {
-      player = Object.assign(player, { age_group: player.age_group || (player.age ? 'U' + player.age : 'U14'), jersey_number: player.jersey_number || player.shirt || '18', position_code: player.position_code || player.pos_en || player.pos || 'RB', preferred_foot: player.preferred_foot || 'Right foot', org: player.org || 'أكاديمية النخبة — بيانات تجريبية' });
+      player = Object.assign(player, { age_group: 'U14', category: 'U14', age: 14, jersey_number: '18', shirt_number: '18', shirt: '18', position_code: 'RB', pos_en: 'RB', pos: 'RB', preferred_foot: 'Right foot', foot: 'Right foot', org: player.org || 'أكاديمية النخبة — بيانات تجريبية' });
       var sample = demoHistory(player); events = sample.events; joins = sample.joins; badges = sample.badges;
     }
     cardCapture = { events: events || [], joins: joins || [], badges: badges || [], position: player && (player.position_code || player.pos_en || player.pos || ''), org: player && (player.org || ''), player: player };
