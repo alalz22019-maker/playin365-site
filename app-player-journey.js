@@ -136,7 +136,8 @@
     data.alumni.filter(hasProof).forEach(function (row) {
       stations.push({ name: row.dest, year: yearOf(row.dest_year), meta: 'انتقال موثّق', icon: 'arrow' });
     });
-    if (player.org) stations.push({ name: player.org, year: '', meta: 'المحطة الحالية', icon: 'academy', current: true });
+    var identityOrg = player.identity_org || player.org;
+    if (identityOrg) stations.push({ name: identityOrg, year: '', meta: player.org ? 'المحطة الحالية' : 'الجهة المعروضة في الهوية', icon: 'academy', current: true });
     var unique = [];
     stations.forEach(function (station) { if (!unique.some(function (s) { return norm(s.name) === norm(station.name); })) unique.push(station); });
     unique.sort(function (a, b) { return Number(a.year || 9999) - Number(b.year || 9999); });
@@ -168,7 +169,8 @@
       return '<span class="pj-route-dot ' + (station.current ? 'live' : '') + '" style="--step:' + i + ';--offset:' + (i % 2 ? '10px' : '-10px') + '"><i>' + e(label) + '</i><small>' + e(station.name) + '</small></span>';
     }).join('') : '<span class="pj-route-origin">أول محطة موثّقة تظهر بعد اعتمادها</span>';
     var count = data.career.filter(hasProof).length + data.alumni.filter(hasProof).length;
-    return '<section class="pj-route"><div class="pj-route-top"><span class="pj-label">ACADEMY ROUTE</span><span class="pj-route-count">' + e(count) + ' <small>محطات معتمدة</small></span></div><div class="pj-route-art"><svg viewBox="0 0 440 118" preserveAspectRatio="none" aria-hidden="true"><path class="pj-route-pitch" d="M0 10h440v98H0zM220 10v98m0-65a16 16 0 1 0 0 32 16 16 0 0 0 0-32M0 39h54v40H0m440-40h-54v40h54"/><path class="pj-route-path" d="M15 83 C78 83 74 34 139 43 S204 87 251 58 S333 28 425 35"/></svg><div class="pj-route-dots">' + dots + '</div></div><p class="pj-route-caption">' + (player.org ? 'المحطة الحالية من الهوية · ' + e(player.org) + ' — الانتقالات لا تظهر إلا بعد توثيقها' : 'مسار الأكاديميات يُبنى من محطات موثّقة فقط') + '</p></section>';
+    var identityOrg = player.identity_org || player.org;
+    return '<section class="pj-route"><div class="pj-route-top"><span class="pj-label">ACADEMY ROUTE</span><span class="pj-route-count">' + e(count) + ' <small>محطات معتمدة</small></span></div><div class="pj-route-art"><svg viewBox="0 0 440 118" preserveAspectRatio="none" aria-hidden="true"><path class="pj-route-pitch" d="M0 10h440v98H0zM220 10v98m0-65a16 16 0 1 0 0 32 16 16 0 0 0 0-32M0 39h54v40H0m440-40h-54v40h54"/><path class="pj-route-path" d="M15 83 C78 83 74 34 139 43 S204 87 251 58 S333 28 425 35"/></svg><div class="pj-route-dots">' + dots + '</div></div><p class="pj-route-caption">' + (identityOrg ? (player.org ? 'المحطة الحالية من الملف · ' : 'الجهة المعروضة في الهوية · ') + e(identityOrg) + ' — الانتقالات لا تظهر إلا بعد توثيقها' : 'مسار الأكاديميات يُبنى من محطات موثّقة فقط') + '</p></section>';
   }
   function isTournament(match) {
     var name = norm(match.comp || match.competition_name || match.tournament_name || match.title || match.name || '');
@@ -255,7 +257,7 @@
 
   var cardCapture = null;
   P.identityCard = function (events, joins, badges) {
-    cardCapture = { events: events || [], joins: joins || [], badges: badges || [], position: ME && (ME.position_code || ME.pos_en || 'RB'), player: ME ? Object.assign({}, ME) : null };
+    cardCapture = { events: events || [], joins: joins || [], badges: badges || [], position: ME && (ME.position_code || ME.pos_en || 'RB'), org: ME && (ME.org || 'أكاديمية النخبة'), player: ME ? Object.assign({}, ME) : null };
     return baseIdentityCard.apply(this, arguments);
   };
 
@@ -263,7 +265,7 @@
     cardCapture = null;
     var markup = await baseMyCard.apply(this, arguments);
     try {
-      var player = Object.assign({}, cardCapture && cardCapture.player || ME, { identity_position: cardCapture && cardCapture.position || (ME && (ME.position_code || ME.pos_en || 'RB')) });
+      var player = Object.assign({}, cardCapture && cardCapture.player || ME, { identity_position: cardCapture && cardCapture.position || (ME && (ME.position_code || ME.pos_en || 'RB')), identity_org: cardCapture && cardCapture.org || (ME && (ME.org || 'أكاديمية النخبة')) });
       var history = await loadHistory(player, cardCapture);
       var mount = '<div class="pj-mount">' + journeyView(player, history, true) + '</div>';
       return markup.replace('</main>', mount + '</main>');
@@ -285,7 +287,8 @@
       age_group: source.age_group || source.category || (source.age ? 'U' + source.age : ''),
       jersey_number: source.jersey_number || source.shirt_number,
       position_code: source.position_code || source.pos_en || source.position || source.pos,
-      identity_position: source.position_code || source.pos_en || 'RB'
+      identity_position: source.position_code || source.pos_en || 'RB',
+      identity_org: source.org || 'أكاديمية النخبة'
     });
     var history = await loadHistory(player);
     var previous = ME;
