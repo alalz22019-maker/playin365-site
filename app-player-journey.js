@@ -26,6 +26,143 @@
       if (note) note.textContent = message;
     }
   }
+  function contactStyles() {
+    if (document.getElementById('pj-contact-styles')) return;
+    var style = document.createElement('style');
+    style.id = 'pj-contact-styles';
+    style.textContent = `
+      .pj-public-actions{display:flex;gap:10px;flex-wrap:wrap}
+      .pj-public-actions button{flex:1;min-width:145px}
+      .pj-contact-trigger{border:1px solid #4d83c7;background:linear-gradient(135deg,#142f59,#0b1b35);color:#fff;border-radius:14px;padding:13px 18px;font:800 13px Cairo;cursor:pointer}
+      .pj-contact-shade{position:fixed;inset:0;z-index:1200;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(3,8,20,.78);backdrop-filter:blur(10px)}
+      .pj-contact-shade.is-open{display:flex}
+      .pj-contact-dialog{width:min(100%,460px);max-height:92vh;overflow:auto;border:1px solid rgba(76,144,218,.55);border-radius:24px;padding:22px;background:radial-gradient(ellipse at 0 0,rgba(0,166,214,.18),transparent 50%),linear-gradient(150deg,#102b51,#08162d 72%);color:#f5f7fc;box-shadow:0 28px 90px rgba(0,0,0,.48)}
+      .pj-contact-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+      .pj-contact-head h2{margin:0;font:900 22px Cairo}
+      .pj-contact-close{width:38px;height:38px;border-radius:12px;border:1px solid #365277;background:#10223d;color:#fff;font-size:22px;cursor:pointer}
+      .pj-contact-dialog>p{margin:8px 0 18px;color:#b8c9e0;font:600 12px/1.8 Cairo}
+      .pj-contact-field{display:flex;flex-direction:column;gap:7px;margin-top:13px}
+      .pj-contact-field label,.pj-contact-inbox label{font:800 12px Cairo;color:#d9e6f7}
+      .pj-contact-dialog input,.pj-contact-dialog select,.pj-contact-dialog textarea,.pj-contact-inbox input{width:100%;border:1px solid #344d70;border-radius:12px;background:#0a1930;color:#fff;padding:12px 13px;font:600 13px Cairo;outline:none}
+      .pj-contact-dialog textarea{min-height:92px;resize:vertical}
+      .pj-contact-dialog input:focus,.pj-contact-dialog select:focus,.pj-contact-dialog textarea:focus,.pj-contact-inbox input:focus{border-color:#39bde9;box-shadow:0 0 0 3px rgba(57,189,233,.13)}
+      .pj-contact-submit,.pj-contact-approve,.pj-contact-reject{border:0;border-radius:12px;padding:12px 16px;font:900 12px Cairo;cursor:pointer}
+      .pj-contact-submit,.pj-contact-approve{background:linear-gradient(100deg,#4636e3,#7357ff);color:#fff}
+      .pj-contact-submit{width:100%;margin-top:18px}
+      .pj-contact-submit:disabled,.pj-contact-approve:disabled,.pj-contact-reject:disabled{opacity:.55;cursor:wait}
+      .pj-contact-privacy{display:block;margin-top:10px;color:#9cb0ca;font:600 10px/1.7 Cairo}
+      .pj-contact-inbox{margin:16px 0;border:1px solid rgba(63,119,185,.45);border-radius:22px;padding:17px;background:linear-gradient(145deg,#0d2140,#09152a);color:#f6f8fc}
+      .pj-contact-inbox h3{margin:0 0 12px;font:900 16px Cairo}
+      .pj-contact-request{border-top:1px solid rgba(120,158,201,.2);padding:13px 0}
+      .pj-contact-request:first-of-type{border-top:0;padding-top:0}
+      .pj-contact-request-head{display:flex;justify-content:space-between;gap:12px;align-items:center}
+      .pj-contact-request-head b{font:900 13px Cairo}
+      .pj-contact-role{border:1px solid rgba(74,139,216,.45);border-radius:999px;padding:3px 9px;color:#a9d6f1;font:800 10px Cairo;white-space:nowrap}
+      .pj-contact-request small{display:block;margin-top:3px;color:#9eafc9;font:600 10px Cairo}
+      .pj-contact-request p{margin:8px 0;color:#e4ebf6;font:600 12px/1.8 Cairo}
+      .pj-contact-request .pj-contact-method{direction:ltr;unicode-bidi:isolate;text-align:left;color:#f5cf52;font:700 12px 'Space Grotesk',sans-serif;overflow-wrap:anywhere}
+      .pj-contact-share{display:block;margin-top:12px}
+      .pj-contact-decision{display:flex;gap:8px;margin-top:10px}
+      .pj-contact-decision button{flex:1}
+      .pj-contact-reject{border:1px solid #4a5365;background:#141b2b;color:#e7eaf2}
+      @media(max-width:420px){.pj-public-actions{flex-direction:column}.pj-public-actions button{width:100%}.pj-contact-dialog{padding:18px}}
+    `;
+    document.head.appendChild(style);
+  }
+  function contactModalMarkup(player) {
+    contactStyles();
+    return '<div class="pj-contact-shade" id="pj-contact-modal" aria-hidden="true" data-target-player-id="' + e(player.id) + '"><section class="pj-contact-dialog" role="dialog" aria-modal="true" aria-labelledby="pj-contact-title">' +
+      '<div class="pj-contact-head"><h2 id="pj-contact-title">طلب تواصل</h2><button class="pj-contact-close" type="button" data-pj-contact-close aria-label="إغلاق">×</button></div>' +
+      '<p>اكتب سبب التواصل ووسيلة الرجوع لك. الطلب يراجعه اللاعب أو ولي أمره أولًا.</p>' +
+      '<div class="pj-contact-field"><label for="pj-contact-method">وسيلة التواصل</label><select id="pj-contact-method"><option value="phone">رقم الجوال</option><option value="email">البريد الإلكتروني</option></select><input id="pj-contact-value" type="text" inputmode="tel" autocomplete="off" maxlength="120" placeholder="05… أو name@example.com"></div>' +
+      '<div class="pj-contact-field"><label for="pj-contact-reason">سبب التواصل</label><textarea id="pj-contact-reason" maxlength="400" placeholder="تجربة أداء، متابعة، انضمام…"></textarea></div>' +
+      '<button class="pj-contact-submit" type="button" data-pj-contact-submit>إرسال الطلب</button><small class="pj-contact-privacy">لن تظهر وسيلة تواصلك في الملف العام.</small></section></div>';
+  }
+  function contactErrorMessage(error) {
+    var message = String(error && error.message || '');
+    if (message.indexOf('CONTACT_LOGIN_REQUIRED') >= 0) return 'سجّل الدخول أولًا.';
+    if (/CONTACT_ROLE_REQUIRED|CONTACT_SCOUT_UNVERIFIED|CONTACT_ACADEMY_UNVERIFIED/.test(message)) return 'الإرسال للكشاف أو الأكاديمية الموثّقة فقط.';
+    if (message.indexOf('CONTACT_REQUEST_PENDING') >= 0) return 'لديك طلب قائم لهذا اللاعب.';
+    if (message.indexOf('CONTACT_RATE_LIMIT') >= 0) return 'وصلت الحد اليومي لطلبات التواصل.';
+    if (message.indexOf('CONTACT_ROUTE_UNAVAILABLE') >= 0) return 'لا يوجد ولي أمر أو أكاديمية موثّقة لاستلام الطلب.';
+    if (message.indexOf('CONTACT_PROFILE_UNAVAILABLE') >= 0) return 'ملف اللاعب غير متاح للتواصل.';
+    if (/CONTACT_EMAIL_INVALID|CONTACT_PHONE_INVALID|CONTACT_METHOD_INVALID/.test(message)) return 'تحقق من وسيلة التواصل.';
+    if (message.indexOf('CONTACT_REASON_INVALID') >= 0) return 'اكتب سببًا من 5 إلى 400 حرف.';
+    return 'تعذر إرسال الطلب. حاول مرة أخرى.';
+  }
+  async function contactInbox(userId) {
+    if (!userId) return '';
+    var rows = await safe('player-contact-inbox-' + userId, sb.from('approval_requests').select('id,payload,created_at').eq('assigned_to_user_id', userId).eq('request_type', 'contact').eq('status', 'pending').order('created_at', { ascending: false }).limit(8));
+    if (!rows || !rows.length) return '';
+    contactStyles();
+    return '<section class="pj-contact-inbox"><h3>طلبات التواصل <span class="pj-contact-role">' + e(rows.length) + '</span></h3>' + rows.map(function (row) {
+      var data = row.payload || {};
+      var role = data.requester_role === 'scout' ? 'كشاف' : 'أكاديمية';
+      var method = data.contact_method === 'email' ? 'البريد' : 'الجوال';
+      return '<article class="pj-contact-request"><div class="pj-contact-request-head"><b>' + e(data.requester_name || role) + '</b><span class="pj-contact-role">' + e(role) + '</span></div>' +
+        (data.requester_organization ? '<small>' + e(data.requester_organization) + '</small>' : '') +
+        '<p>' + e(data.reason || 'طلب تواصل بخصوص ملف اللاعب.') + '</p><div class="pj-contact-method">' + e(method + ': ' + (data.contact_value || '')) + '</div>' +
+        '<label class="pj-contact-share">وسيلة تواصل تشاركها معه (اختياري)<input type="text" maxlength="120" data-pj-share-contact="' + e(row.id) + '" placeholder="رقم جوال أو بريد"></label>' +
+        '<div class="pj-contact-decision"><button class="pj-contact-approve" type="button" data-pj-contact-decision="approved" data-request-id="' + e(row.id) + '">أوافق</button><button class="pj-contact-reject" type="button" data-pj-contact-decision="rejected" data-request-id="' + e(row.id) + '">رفض</button></div></article>';
+    }).join('') + '</section>';
+  }
+  async function decideContactRequest(requestId, status) {
+    if (!ME || !ME.id || !requestId || !['approved', 'rejected'].includes(status)) return;
+    var card = Array.prototype.find.call(document.querySelectorAll('[data-request-id]'), function (node) { return node.getAttribute('data-request-id') === requestId; });
+    var shareInput = Array.prototype.find.call(document.querySelectorAll('[data-pj-share-contact]'), function (node) { return node.getAttribute('data-pj-share-contact') === requestId; });
+    var shared = status === 'approved' && shareInput ? String(shareInput.value || '').trim().slice(0, 120) : '';
+    var query = sb.from('approval_requests').select('id,requested_by_user_id,payload').eq('id', requestId).eq('assigned_to_user_id', ME.id).eq('request_type', 'contact').eq('status', 'pending').maybeSingle();
+    var result = await query;
+    if (result.error || !result.data) return shareNotice('تعذر العثور على الطلب. حدّث الصفحة وحاول مجددًا.');
+    var update = await sb.from('approval_requests').update({ status: status, decision_note: shared ? 'وسيلة تواصل مشاركة: ' + shared : null }).eq('id', requestId).eq('assigned_to_user_id', ME.id).eq('status', 'pending').select('id').maybeSingle();
+    if (update.error || !update.data) return shareNotice('تعذر تحديث الطلب.');
+    var payload = result.data.payload || {};
+    var body = status === 'approved'
+      ? (shared ? 'وافق ولي الأمر على طلبك. وسيلة التواصل: ' + shared : 'تمت الموافقة على طلب التواصل. سيجري التواصل معك عبر الوسيلة التي أرسلتها.')
+      : 'لم تتم الموافقة على طلب التواصل.';
+    var notice = await sb.from('notifications').insert({ user_id: result.data.requested_by_user_id, kind: status === 'approved' ? 'contact_approved' : 'contact_rejected', title: status === 'approved' ? 'تمت الموافقة على التواصل' : 'تحديث طلب التواصل', body: body, notification_type: 'contact_decision', data: { approval_request_id: requestId, player_name: payload.player_name || '' } });
+    if (notice.error) console.warn('Contact decision notification', notice.error);
+    shareNotice(status === 'approved' ? 'تمت الموافقة على الطلب.' : 'تم رفض الطلب.');
+    if (card) card.closest('.pj-contact-request').remove();
+  }
+  window.PJContact = {
+    open: function (playerId) {
+      if (!ME || !ME.id) { shareNotice('سجّل الدخول بحساب كشاف أو أكاديمية موثّق.'); if (typeof P.go === 'function') P.go('auth'); return; }
+      if (!['scout', 'academy'].includes(ME.role)) { shareNotice('التواصل للكشافين والأكاديميات الموثّقة فقط.'); return; }
+      var modal = document.getElementById('pj-contact-modal');
+      if (!modal || !playerId) return;
+      modal.setAttribute('data-target-player-id', playerId);
+      modal.classList.add('is-open'); modal.setAttribute('aria-hidden', 'false'); document.body.style.overflow = 'hidden';
+    },
+    close: function () {
+      var modal = document.getElementById('pj-contact-modal');
+      if (modal) { modal.classList.remove('is-open'); modal.setAttribute('aria-hidden', 'true'); }
+      document.body.style.overflow = '';
+    },
+    submit: async function () {
+      var modal = document.getElementById('pj-contact-modal');
+      if (!modal || !ME || !ME.id) return;
+      var button = modal.querySelector('[data-pj-contact-submit]');
+      var method = modal.querySelector('#pj-contact-method').value;
+      var contact = modal.querySelector('#pj-contact-value').value.trim();
+      var reason = modal.querySelector('#pj-contact-reason').value.trim();
+      if (!contact || !reason) return shareNotice('أكمل وسيلة التواصل وسبب الطلب.');
+      button.disabled = true;
+      var result;
+      try {
+        result = await sb.rpc('submit_profile_contact_request', { p_target_profile_id: modal.getAttribute('data-target-player-id'), p_reason: reason, p_contact_method: method, p_contact_value: contact });
+      } catch (error) {
+        button.disabled = false;
+        return shareNotice('تعذر الإرسال. حاول مرة أخرى.');
+      }
+      button.disabled = false;
+      if (result.error) return shareNotice(contactErrorMessage(result.error));
+      window.PJContact.close();
+      modal.querySelector('#pj-contact-value').value = ''; modal.querySelector('#pj-contact-reason').value = '';
+      shareNotice('وصل طلبك للموافقة.');
+    },
+    decide: decideContactRequest
+  };
   var baseShare = P.share;
   if (typeof baseShare === 'function') P.share = async function (name) {
     var target = norm(name || (ME && ME.name));
@@ -387,9 +524,10 @@
     try {
       var player = Object.assign({}, cardCapture && cardCapture.player || ME, { identity_position: cardCapture && cardCapture.position || (ME && (ME.position_code || ME.pos_en || 'RB')), identity_org: cardCapture && cardCapture.org || (ME && (ME.org || 'أكاديمية النخبة')) });
       var history = await loadHistory(player, cardCapture);
+      var inbox = player && ME && ME.id && ME.role === 'player' ? await contactInbox(ME.id) : '';
       var mount = '<div class="pj-mount">' + journeyView(player, history, true) + '</div>';
       var shareNote = maySharePublic(player) ? '' : '<p class="pj-share-note">رمز الهوية يفتح الملف عند نشره للعامة؛ إعداد الظهور هو الذي يحدد إتاحة الصفحة.</p>';
-      return markup.replace('</main>', shareNote + mount + '</main>');
+      return markup.replace('</main>', shareNote + inbox + mount + '</main>');
     } catch (error) {
       console.warn('PlayIn365 player journey', error);
       return markup;
@@ -397,6 +535,42 @@
   };
   P.bind('myCard', P.myCard);
   P.bind('publicView', P.myCard);
+
+  var baseGuardianPage = T.guardian;
+  if (typeof baseGuardianPage === 'function') T.guardian = async function () {
+    var markup = await baseGuardianPage.apply(this, arguments);
+    var inbox = await contactInbox(ME && ME.id);
+    return markup.replace('</main>', inbox + '</main>');
+  };
+
+  document.addEventListener('click', function (event) {
+    var target = event.target;
+    var openButton = target.closest && target.closest('[data-pj-contact-open]');
+    if (openButton) { window.PJContact.open(openButton.getAttribute('data-target-id')); return; }
+    var closeButton = target.closest && target.closest('[data-pj-contact-close]');
+    if (closeButton) { window.PJContact.close(); return; }
+    var submitButton = target.closest && target.closest('[data-pj-contact-submit]');
+    if (submitButton) { window.PJContact.submit(); return; }
+    var decisionButton = target.closest && target.closest('[data-pj-contact-decision]');
+    if (decisionButton) {
+      decisionButton.disabled = true;
+      Promise.resolve(window.PJContact.decide(decisionButton.getAttribute('data-request-id'), decisionButton.getAttribute('data-pj-contact-decision')))
+        .catch(function () { shareNotice('تعذر تحديث الطلب. حاول مرة أخرى.'); })
+        .finally(function () { if (decisionButton.isConnected) decisionButton.disabled = false; });
+      return;
+    }
+    var modal = target.closest && target.closest('#pj-contact-modal');
+    if (modal && target === modal) window.PJContact.close();
+  });
+
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape') window.PJContact.close();
+  });
+  document.addEventListener('change', function (event) {
+    if (!event.target || event.target.id !== 'pj-contact-method') return;
+    var field = document.getElementById('pj-contact-value');
+    if (field) field.setAttribute('inputmode', event.target.value === 'phone' ? 'tel' : 'email');
+  });
 
   document.addEventListener('click', function (event) {
     var copyButton = event.target.closest && event.target.closest('.pi-id-actions button');
@@ -432,7 +606,7 @@
   async function renderPublicProfile(name) {
     var who = String(name || '').trim();
     if (!who) return '<main><div class="card">لم يُحدّد اللاعب.</div></main>';
-    var records = await safe('journey-profile', sb.from('profiles').select('name,role,org,pos,age,shirt,athlete_id,avatar_url,handle,display_name,city,profile_visibility').eq('name', who).eq('role', 'player').eq('profile_visibility', 'public').limit(1));
+    var records = await safe('journey-profile', sb.from('profiles').select('id,name,role,org,pos,age,shirt,athlete_id,avatar_url,handle,display_name,city,profile_visibility').eq('name', who).eq('role', 'player').eq('profile_visibility', 'public').limit(1));
     var source = records[0];
     if (!source) return '<div class="pi-id-page"><header class="pz5-top">' + P.brand() + '</header><main class="pi-id-main"><div class="pj-not-found"><span>' + icon('academy') + '</span><b>الهوية غير متاحة</b><small>تأكد من الرابط ومن تفعيل نشر الهوية للعامة.</small></div></main></div>';
     var player = Object.assign({}, source, {
@@ -448,7 +622,7 @@
     var card = '';
     try { ME = player; card = P.identityCard(history.events, history.joins, history.badges); }
     finally { ME = previous; }
-    return '<div class="pi-id-page pj-public-page">' + P.top("history.back()") + '<main class="pi-id-main"><div class="pj-public-heading"><span class="pj-label">PLAYER PROFILE</span><h1>ملف اللاعب</h1><p>الهوية، الإنجازات، والمشاركات.</p></div>' + card + '<div class="pi-id-actions"><button class="primary" onclick="window.PZ.share(\'' + e(player.name) + '\')">شارك الهوية ↗</button></div><div class="pj-mount">' + journeyView(player, history, false) + '</div></main></div>';
+    return '<div class="pi-id-page pj-public-page">' + P.top("history.back()") + '<main class="pi-id-main"><div class="pj-public-heading"><span class="pj-label">PLAYER PROFILE</span><h1>ملف اللاعب</h1><p>الهوية، الإنجازات، والمشاركات.</p></div>' + card + '<div class="pi-id-actions pj-public-actions"><button class="primary" onclick="window.PZ.share(\'' + e(player.name) + '\')">شارك الهوية ↗</button><button class="pj-contact-trigger" type="button" data-pj-contact-open data-target-id="' + e(player.id) + '">طلب تواصل</button></div>' + contactModalMarkup(player) + '<div class="pj-mount">' + journeyView(player, history, false) + '</div></main></div>';
   }
 
   var originalPublicProfile = P.publicProfile;
