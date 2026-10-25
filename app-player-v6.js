@@ -37,7 +37,7 @@ PZ.identityCard=function(ev,joins,badges){
   var signals=badges.slice(0,3).concat(stats).slice(0,3);
   var code=e(ME.athlete_id||ME.handle||'—');
   var src=e(playerSrc(ME));
-  var age=e(ME.age_group||ME.category||(ME.age?'U'+ME.age:(demoMode?'U14':'—'))),shirt=e(ME.jersey_number||ME.shirt_number||ME.shirt||(demoMode?'18':'—')),position=e(ME.position_code||ME.pos_en||ME.pos||(demoMode?'RB':'—')),foot=e(ME.preferred_foot||ME.foot||(demoMode?'Right foot':'—'));
+  var age=demoMode?'U14':e(ME.age_group||ME.category||(ME.age?'U'+ME.age:'—')),shirt=demoMode?'18':e(ME.jersey_number||ME.shirt_number||ME.shirt||'—'),position=demoMode?'RB':e(ME.position_code||ME.pos_en||ME.pos||'—'),foot=demoMode?'Right foot':e(ME.preferred_foot||ME.foot||'—');
   var badgeMeta=function(row,empty){return !row?empty:(row.demo?'تجريبي · توثيق محاكى':(row.verified_by||row.verified_at||row.is_verified===true?'موثّق':'بانتظار التوثيق'))};
   var signalIcon=function(row,index){return row&&['⚽','✦','◷'].indexOf(row.kind)>=0?row.kind:(['⚽','✦','◷'][index])};
   var identityUrl=location.origin+location.pathname+'?player='+encodeURIComponent(ME.name||'اللاعب')+(demoMode?'&demo=1':'');
