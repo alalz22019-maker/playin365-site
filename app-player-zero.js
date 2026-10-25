@@ -3,7 +3,7 @@
 'use strict';
 if(typeof window==='undefined')return;
 const PZ=window.PZ={version:'2026.10.23-zero-1'};
-PZ.isPreviewDemo=function(){try{return location.hostname.endsWith('.vercel.app')&&new URLSearchParams(location.search).get('demo')==='1'}catch(_){return false}};
+PZ.isPreviewDemo=function(){try{return location.hostname.endsWith('.vercel.app')&&location.hostname.indexOf('-git-codex-player-ac-')>=0&&new URLSearchParams(location.search).get('demo')==='1'}catch(_){return false}};
 PZ.previewRiyadhDate=function(){var p={};new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Riyadh',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date()).forEach(function(x){p[x.type]=x.value});return p.year+'-'+p.month+'-'+p.day};
 const ROUTES=['feed','home','profile','publicView','myCard','records','rating','ratingDetail','cabinet','opps','calendar','wallet','health','messages','viewLog','privacy','explore','find','pitch','news','market','memberships','settings','notifications','coachBrief','matchView'];
 const OLD={};ROUTES.forEach(function(n){OLD[n]=T[n]||null});
@@ -31,7 +31,7 @@ PZ.icon=function(name,cls){
   opps:'<circle cx="10" cy="12" r="5"/><path d="m14 8 5-5m0 0v4m0-4h-4M8 12h4m-2-2v4"/>',
   services:'<rect x="4" y="4" width="6" height="6" rx="1.2"/><rect x="14" y="4" width="6" height="6" rx="1.2"/><rect x="4" y="14" width="6" height="6" rx="1.2"/><rect x="14" y="14" width="6" height="6" rx="1.2"/>',
   records:'<path d="M4 19V5m0 14h16"/><path d="m7 15 3-4 3 2 5-6"/><circle cx="7" cy="15" r=".8"/><circle cx="10" cy="11" r=".8"/><circle cx="13" cy="13" r=".8"/><circle cx="18" cy="7" r=".8"/>',
-  profile:'<path d="M12 3.5c3.2 3.8 5 6.2 5 8.6a5 5 0 0 1-10 0c0-2.4 1.8-4.8 5-8.6Z"/><circle cx="12" cy="10.5" r="1.6"/><path d="M9.5 15c.8-1.3 1.7-2 2.5-2s1.7.7 2.5 2"/>',
+  profile:'<circle cx="12" cy="7.5" r="3.5"/><path d="M5 21v-2a7 7 0 0 1 14 0v2"/>',
   rating:'<path d="M5 16a7 7 0 1 1 14 0"/><path d="m12 12 4-3"/><circle cx="12" cy="12" r="1"/><path d="M7 18h10"/>',
   trophy:'<path d="M8 4h8v4a4 4 0 0 1-8 0Z"/><path d="M8 6H5v1a3 3 0 0 0 3 3m8-4h3v1a3 3 0 0 1-3 3M12 12v4m-3 4h6m-5-4h4"/>',
   wallet:'<rect x="4" y="6" width="16" height="13" rx="3"/><path d="M7 6V4m10 2V4M4 10h16m-5 4h3"/>',
