@@ -24,7 +24,7 @@ function badge(icon,title,meta){
 PZ.identityCard=function(ev,joins,badges){
   ev=ev||[];joins=joins||[];badges=badges||[];
   var demoMode=false;
-  try{demoMode=location.hostname.endsWith('.vercel.app')&&new URLSearchParams(location.search).get('demo')==='1'}catch(_){}
+  try{demoMode=typeof PZ.isPreviewDemo==='function'&&PZ.isPreviewDemo()}catch(_){}
   var profileVerified=demoMode||ME.verified===true||ME.is_verified===true||ME.verification_status==='verified';
   var identityLabel=demoMode?'موثّق تجريبي':(profileVerified?'موثّق':'هوية اللاعب');
   var code=ME.athlete_id||ME.handle||'—';
