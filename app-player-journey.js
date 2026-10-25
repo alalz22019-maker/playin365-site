@@ -73,15 +73,15 @@
     contactStyles();
     return '<div class="pj-contact-shade" id="pj-contact-modal" aria-hidden="true" data-target-player-id="' + e(player.id) + '"><section class="pj-contact-dialog" role="dialog" aria-modal="true" aria-labelledby="pj-contact-title">' +
       '<div class="pj-contact-head"><h2 id="pj-contact-title">طلب تواصل</h2><button class="pj-contact-close" type="button" data-pj-contact-close aria-label="إغلاق">×</button></div>' +
-      '<p>اكتب سبب التواصل ووسيلة الرجوع لك. الطلب يراجعه اللاعب أو ولي أمره أولًا.</p>' +
+      '<p>للكشافين والمنتخبات والأندية والرعاة والجهات الرياضية الموثّقة. يراجع اللاعب أو ولي أمره الطلب قبل تبادل وسائل التواصل.</p>' +
       '<div class="pj-contact-field"><label for="pj-contact-method">وسيلة التواصل</label><select id="pj-contact-method"><option value="phone">رقم الجوال</option><option value="email">البريد الإلكتروني</option></select><input id="pj-contact-value" type="text" inputmode="tel" autocomplete="off" maxlength="120" placeholder="05… أو name@example.com"></div>' +
-      '<div class="pj-contact-field"><label for="pj-contact-reason">سبب التواصل</label><textarea id="pj-contact-reason" maxlength="400" placeholder="تجربة أداء، متابعة، انضمام…"></textarea></div>' +
+      '<div class="pj-contact-field"><label for="pj-contact-reason">سبب التواصل</label><textarea id="pj-contact-reason" maxlength="400" placeholder="استقطاب، منتخب، رعاية، تجربة أداء…"></textarea></div>' +
       '<button class="pj-contact-submit" type="button" data-pj-contact-submit>إرسال الطلب</button><small class="pj-contact-privacy">لن تظهر وسيلة تواصلك في الملف العام.</small></section></div>';
   }
   function contactErrorMessage(error) {
     var message = String(error && error.message || '');
     if (message.indexOf('CONTACT_LOGIN_REQUIRED') >= 0) return 'سجّل الدخول أولًا.';
-    if (/CONTACT_ROLE_REQUIRED|CONTACT_SCOUT_UNVERIFIED|CONTACT_ACADEMY_UNVERIFIED/.test(message)) return 'الإرسال للكشاف أو الأكاديمية الموثّقة فقط.';
+    if (/CONTACT_ROLE_REQUIRED|CONTACT_SCOUT_UNVERIFIED|CONTACT_ACADEMY_UNVERIFIED/.test(message)) return 'التواصل متاح للجهات الرياضية الموثّقة فقط.';
     if (message.indexOf('CONTACT_REQUEST_PENDING') >= 0) return 'لديك طلب قائم لهذا اللاعب.';
     if (message.indexOf('CONTACT_RATE_LIMIT') >= 0) return 'وصلت الحد اليومي لطلبات التواصل.';
     if (message.indexOf('CONTACT_ROUTE_UNAVAILABLE') >= 0) return 'لا يوجد ولي أمر أو أكاديمية موثّقة لاستلام الطلب.';
@@ -97,7 +97,8 @@
     contactStyles();
     return '<section class="pj-contact-inbox"><h3>طلبات التواصل <span class="pj-contact-role">' + e(rows.length) + '</span></h3>' + rows.map(function (row) {
       var data = row.payload || {};
-      var role = data.requester_role === 'scout' ? 'كشاف' : 'أكاديمية';
+      var roleLabels = { scout: 'كشاف', academy: 'أكاديمية', club: 'نادي', national_team: 'منتخب', federation: 'اتحاد أو رابطة', sponsor: 'راعٍ', agent: 'وكيل لاعبين', commercial: 'جهة تجارية', investor: 'مستثمر', marketing_agency: 'وكالة تسويق', media: 'إعلام رياضي', tournament_organizer: 'منظّم بطولات', coach: 'مدرب', head_coach: 'مدرب أول', assistant_coach: 'مدرب مساعد', technical_staff: 'طاقم فني', medical: 'جهة طبية', doctor: 'طبيب', physiotherapist: 'أخصائي علاج طبيعي', performance: 'محلل أداء', performance_analyst: 'محلل أداء', sports_analyst: 'محلل رياضي', technical_analyst: 'محلل فني', equipment_provider: 'مزود معدات', sports_technology_provider: 'مزود تقنية رياضية', strength_conditioning: 'إعداد بدني', government_sports_entity: 'جهة رياضية حكومية' };
+      var role = data.requester_role_label || roleLabels[data.requester_role] || 'جهة رياضية';
       var method = data.contact_method === 'email' ? 'البريد' : 'الجوال';
       return '<article class="pj-contact-request"><div class="pj-contact-request-head"><b>' + e(data.requester_name || role) + '</b><span class="pj-contact-role">' + e(role) + '</span></div>' +
         (data.requester_organization ? '<small>' + e(data.requester_organization) + '</small>' : '') +
@@ -127,8 +128,7 @@
   }
   window.PJContact = {
     open: function (playerId) {
-      if (!ME || !ME.id) { shareNotice('سجّل الدخول بحساب كشاف أو أكاديمية موثّق.'); if (typeof P.go === 'function') P.go('auth'); return; }
-      if (!['scout', 'academy'].includes(ME.role)) { shareNotice('التواصل للكشافين والأكاديميات الموثّقة فقط.'); return; }
+      if (!ME || !ME.id) { shareNotice('سجّل الدخول لإرسال طلب التواصل.'); if (typeof P.go === 'function') P.go('auth'); return; }
       var modal = document.getElementById('pj-contact-modal');
       if (!modal || !playerId) return;
       modal.setAttribute('data-target-player-id', playerId);
