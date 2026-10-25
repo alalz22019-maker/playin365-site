@@ -577,7 +577,7 @@
     }
     cardCapture = { events: events || [], joins: joins || [], badges: badges || [], position: player && (player.position_code || player.pos_en || player.pos || ''), org: player && (player.org || ''), player: player };
     var previous = ME;
-    try { if (previewDemoMode() && player) ME = player; return baseIdentityCard.call(this, events, joins, badges); }
+    try { if (previewDemoMode() && player) ME = player; return baseIdentityCard.call(this, events, joins, (badges || []).slice(0, 2)); }
     finally { ME = previous; }
   };
 
