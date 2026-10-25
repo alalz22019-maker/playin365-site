@@ -15,7 +15,7 @@
   function norm(value) { return String(value || '').trim().toLowerCase(); }
   function hasProof(row) { return !!(row && (row.verified_by || row.verified_at || row.signed_by || row.proof || row.is_verified === true)); }
   function previewDemoMode() {
-    try { return location.hostname.endsWith('.vercel.app') && new URLSearchParams(location.search).get('demo') === '1'; }
+    try { return location.hostname.endsWith('.vercel.app') && location.hostname.indexOf('-git-codex-player-ac-') >= 0 && new URLSearchParams(location.search).get('demo') === '1'; }
     catch (_) { return false; }
   }
   function demoDate(monthOffset, day) {
@@ -528,7 +528,7 @@
     var years = [...new Set(items.map(function (item) { return item.year; }).filter(Boolean))].sort();
     var yearRange = years.length ? years[0] + (years.length > 1 ? ' — ' + years[years.length - 1] : '') : 'PLAYER ARC';
     var arcSeal = previewDemoMode() ? 'معاينة تجريبية' : (player.verified === true || player.is_verified === true || player.verification_status === 'verified' ? 'موثّق' : 'مسار اللاعب');
-    return '<section class="pj-journey" aria-label="ملف اللاعب"><header class="pj-heading"><div><span class="pj-label">PLAYER PROFILE · ' + e(yearRange) + '</span><h2>ملف اللاعب</h2><p>المسيرة، المشاركات، والإنجازات المسجلة.</p></div><span class="pj-arc-seal"><i></i> ' + arcSeal + '</span></header>'+ 
+    return '<section class="pj-journey" aria-label="المسيرة"><header class="pj-heading"><div><span class="pj-label">PLAYER PROFILE · ' + e(yearRange) + '</span><h2>المسيرة</h2><p>المشاركات والإنجازات المسجلة.</p></div><span class="pj-arc-seal"><i></i> ' + arcSeal + '</span></header>'+ 
       playerCityFeature(player)+academyRoute(player, data)+seasonPulse(items)+
       '<section class="pj-story-section pj-atlas"><div class="pj-section-title"><div><span class="pj-label">SEASONS · MONTHS · RECORDS</span><h3>سجل اللاعب</h3><p>اختر السنة لعرض السجل.</p></div><span class="pj-title-glyph purple">' + icon('arrow') + '</span></div>' + seasonAtlas(items) + '</section>'+
       '<section class="pj-story-section"><div class="pj-section-title"><div><span class="pj-label">TOURNAMENTS</span><h3>البطولات</h3><p>مشاركات اللاعب المسجلة.</p></div><span class="pj-title-glyph gold">' + icon('trophy') + '</span></div>' + tournamentTrail(data) + '</section>'+
@@ -693,7 +693,7 @@
     try { ME = player; card = P.identityCard(history.events, history.joins, history.badges); }
     finally { ME = previous; }
     var demoNotice = previewDemoMode() ? '<aside class="pj-demo-banner" role="status"><span>PREVIEW</span><b>بيانات تجريبية</b><small>سجل عرض فقط · لا يُحفظ في قاعدة البيانات</small></aside>' : '';
-    return '<div class="pi-id-page pj-public-page">' + P.top("history.back()") + '<main class="pi-id-main">' + demoNotice + '<div class="pj-public-heading"><span class="pj-label">PLAYER PROFILE</span><h1>ملف اللاعب</h1><p>الهوية، الإنجازات، والمشاركات.</p></div>' + card + '<div class="pi-id-actions pj-public-actions"><button class="primary" onclick="window.PZ.share(\'' + e(player.name) + '\')">شارك الهوية ↗</button><button class="pj-contact-trigger" type="button" data-pj-contact-open data-target-id="' + e(player.id) + '">طلب تواصل</button></div>' + contactModalMarkup(player) + '<div class="pj-mount">' + journeyView(player, history, false) + '</div></main></div>';
+    return '<div class="pi-id-page pj-public-page">' + P.top("history.back()") + '<main class="pi-id-main">' + demoNotice + '<div class="pj-public-heading"><span class="pj-label">PLAYER IDENTITY</span><h1>هوية اللاعب</h1><p>البطاقة، المسيرة، والإنجازات.</p></div>' + card + '<div class="pi-id-actions pj-public-actions"><button class="primary" onclick="window.PZ.share(\'' + e(player.name) + '\')">شارك الهوية ↗</button><button class="pj-contact-trigger" type="button" data-pj-contact-open data-target-id="' + e(player.id) + '">طلب تواصل</button></div>' + contactModalMarkup(player) + '<div class="pj-mount">' + journeyView(player, history, false) + '</div></main></div>';
   }
 
   var originalPublicProfile = P.publicProfile;
