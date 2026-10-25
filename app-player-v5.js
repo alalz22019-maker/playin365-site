@@ -5,7 +5,7 @@ var esc=PZ.e||function(x){return String(x==null?'':x).replace(/[&<>"']/g,functio
 var v=function(x,f){return esc(x==null||x===''?(f||'—'):x)};
 var qr=function(){var u=location.origin+location.pathname+'?player='+encodeURIComponent(ME.name||'اللاعب');return 'https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=8&data='+encodeURIComponent(u)};
 var num=function(x){return x==null||x===''?'—':x};
-function isPreviewDemo(){try{return location.hostname.endsWith('.vercel.app')&&new URLSearchParams(location.search).get('demo')==='1'}catch(_){return false}}
+function isPreviewDemo(){try{return location.hostname.endsWith('.vercel.app')&&location.hostname.indexOf('-git-codex-player-ac-')>=0&&new URLSearchParams(location.search).get('demo')==='1'}catch(_){return false}}
 function demoBanner(){return isPreviewDemo()?'<aside class="pz5-demo-banner" role="status"><span>PREVIEW</span><b>بيانات تجريبية</b><small>للاختبار فقط · لا تمثل مباريات أو تفاعلات حقيقية</small></aside>':''}
 function demoPack(today){
  var matchId='demo-player-match-'+today;
