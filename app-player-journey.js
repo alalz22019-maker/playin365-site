@@ -43,7 +43,7 @@
   function maySharePublic(player) {
     // A QR code is an identity link, not an age-gated feature. Visibility is
     // governed by the profile's own public/private setting, not the player's age.
-    return !!(player && player.role === 'player' && player.profile_visibility === 'public');
+    return !!(player && player.role === 'player' && (player.profile_visibility === 'public' || previewDemoMode()));
   }
   function shareNotice(message) {
     if (typeof toast === 'function') toast(message);
@@ -119,7 +119,7 @@
   }
   async function contactInbox(userId) {
     if (!userId) return '';
-    var rows = await safe('player-contact-inbox-' + userId, sb.from('approval_requests').select('id,payload,created_at').eq('assigned_to_user_id', userId).eq('request_type', 'contact').eq('status', 'pending').order('created_at', { ascending: false }).limit(8));
+    var rows = previewDemoMode() ? [{ id: 'preview-contact-1', payload: { requester_name: 'كشاف تجريبي', requester_role: 'scout', requester_organization: 'جهة استقطاب تجريبية', reason: 'طلب تقييم اللاعب بعد مشاركته في بطولة تجريبية.', contact_method: 'email', contact_value: 'scout@example.test' }, created_at: new Date().toISOString() }] : await safe('player-contact-inbox-' + userId, sb.from('approval_requests').select('id,payload,created_at').eq('assigned_to_user_id', userId).eq('request_type', 'contact').eq('status', 'pending').order('created_at', { ascending: false }).limit(8));
     if (!rows || !rows.length) return '';
     contactStyles();
     return '<section class="pj-contact-inbox"><h3>طلبات التواصل <span class="pj-contact-role">' + e(rows.length) + '</span></h3>' + rows.map(function (row) {
@@ -203,9 +203,14 @@
     }
     shareNotice('تم اختبار الطلب — لم يُرسل ولم يُحفظ.');
   };
-  window.PJContact.decide = async function () {
+  window.PJContact.decide = async function (requestId, status) {
     if (!previewDemoMode()) return baseContactDecide.apply(this, arguments);
-    shareNotice('هذه معاينة؛ لم يتغير أي طلب حقيقي.');
+    var node = Array.prototype.find.call(document.querySelectorAll('[data-request-id]'), function (item) { return item.getAttribute('data-request-id') === requestId; });
+    var request = node && node.closest('.pj-contact-request');
+    var inbox = request && request.closest('.pj-contact-inbox');
+    if (request) request.remove();
+    if (inbox && !inbox.querySelector('.pj-contact-request')) inbox.remove();
+    shareNotice(status === 'approved' ? 'تمت الموافقة على الطلب التجريبي؛ لم يُرسل شيء.' : 'رُفض الطلب التجريبي؛ لم يُرسل شيء.');
   };
   var baseShare = P.share;
   if (typeof baseShare === 'function') P.share = async function (name) {
@@ -669,8 +674,9 @@
   async function renderPublicProfile(name) {
     var who = String(name || '').trim();
     if (!who) return '<main><div class="card">لم يُحدّد اللاعب.</div></main>';
-    var records = await safe('journey-profile', sb.from('profiles').select('id,name,role,org,pos,age,shirt,athlete_id,avatar_url,handle,display_name,city,profile_visibility').eq('name', who).eq('role', 'player').eq('profile_visibility', 'public').limit(1));
+    var records = previewDemoMode() ? [] : await safe('journey-profile', sb.from('profiles').select('id,name,role,org,pos,age,shirt,athlete_id,avatar_url,handle,display_name,city,profile_visibility').eq('name', who).eq('role', 'player').eq('profile_visibility', 'public').limit(1));
     var source = records[0];
+    if (!source && previewDemoMode() && ME && ME.role === 'player' && norm(ME.name) === norm(who)) source = Object.assign({}, ME, { profile_visibility: 'public' });
     if (!source) return '<div class="pi-id-page"><header class="pz5-top">' + P.brand() + '</header><main class="pi-id-main"><div class="pj-not-found"><span>' + icon('academy') + '</span><b>الهوية غير متاحة</b><small>تأكد من الرابط ومن تفعيل نشر الهوية للعامة.</small></div></main></div>';
     var player = Object.assign({}, source, {
       display_name: source.display_name || source.name,
