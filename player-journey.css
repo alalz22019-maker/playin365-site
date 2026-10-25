@@ -336,3 +336,32 @@
 .pj-share-note{margin:7px 1px 0;padding:7px 10px;border-inline-start:2px solid #f4c51c;background:linear-gradient(90deg,rgba(245,197,24,.08),transparent);color:#e4d9a0;font:700 9px/1.7 Cairo,sans-serif}
 @media(max-width:420px){.pj-pulse{margin-inline:-2px;padding-inline:3px}.pj-pulse-head h3{font-size:17px}.pj-pulse-head p{font-size:8px}.pj-pulse-key{font-size:7px}.pj-pulse-graph{height:133px}}
 @media(prefers-reduced-motion:reduce){.pj-pulse-line{filter:none}}
+
+/* City is a location signal, not an invented academy transfer. */
+.pj-city-anchor{position:relative;display:grid;grid-template-columns:58px minmax(0,1fr) auto;align-items:center;gap:12px;overflow:hidden;margin:14px -2px 10px;padding:15px 14px;border:1px solid rgba(73,221,255,.35);border-radius:25px 25px 25px 8px;background:radial-gradient(ellipse at 2% 50%,rgba(0,166,214,.19),transparent 39%),linear-gradient(112deg,rgba(8,35,75,.94),rgba(9,24,54,.98) 66%,rgba(20,20,67,.85));box-shadow:inset 0 1px rgba(255,255,255,.06),0 11px 32px rgba(0,0,0,.17)}
+.pj-city-anchor:after{content:"";position:absolute;inset-inline-end:-48px;top:-66px;width:168px;height:168px;border:1px solid rgba(78,189,255,.18);border-radius:50%;box-shadow:0 0 0 13px rgba(46,160,255,.035),0 0 0 29px rgba(83,99,255,.035);pointer-events:none}
+.pj-city-signal{position:relative;z-index:1;display:grid;place-items:center;width:54px;height:54px;border:1px solid rgba(255,220,92,.76);border-radius:50% 50% 50% 13px;background:linear-gradient(145deg,#f3d85b,#bd8a12);color:#101b38;box-shadow:0 0 0 6px rgba(245,197,24,.08),0 0 24px rgba(245,197,24,.2)}
+.pj-city-signal svg{width:24px;height:24px;stroke-width:2}
+.pj-city-signal i{position:absolute;inset:-7px;border:1px solid rgba(86,216,255,.35);border-radius:inherit;animation:pj-city-ping 2.7s ease-out infinite}
+@keyframes pj-city-ping{0%{transform:scale(.82);opacity:.7}100%{transform:scale(1.34);opacity:0}}
+.pj-city-copy,.pj-city-seal{position:relative;z-index:1}
+.pj-city-copy{display:flex;flex-direction:column;align-items:flex-start;gap:1px}
+.pj-city-copy .pj-label{font-size:8px;letter-spacing:1.8px}
+.pj-city-copy b{color:#fff;font:900 clamp(22px,6vw,29px)/1.2 Cairo,sans-serif;letter-spacing:-.5px;text-shadow:0 0 22px rgba(66,196,255,.2)}
+.pj-city-copy small{color:#a9bdd8;font:600 9px/1.6 Cairo,sans-serif}
+.pj-city-seal{padding:6px 9px;border:1px solid rgba(93,179,232,.23);border-radius:999px;background:rgba(35,114,174,.12);color:#a9dff4;font:700 8px Cairo;white-space:nowrap}
+.pj-route-top h3{margin:5px 0 0;color:#f4f8ff;font:900 16px/1.4 Cairo,sans-serif}
+.pj-route-count{color:#a9dff4;font:700 8px Cairo}
+.pj-route-caption{max-width:520px;color:#a8b8d0;line-height:1.9}
+.pj-pulse-graph{overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scrollbar-width:thin;scrollbar-color:rgba(85,220,242,.35) transparent}
+.pj-pulse-graph::-webkit-scrollbar{height:4px}
+.pj-pulse-graph::-webkit-scrollbar-thumb{border-radius:8px;background:rgba(85,220,242,.35)}
+.pj-pulse-graph svg{width:auto;min-width:100%;height:132px;overflow:visible}
+.pj-pulse-point .pj-pulse-halo{fill:rgba(71,205,255,.18);stroke:none}
+.pj-pulse-point text{font-size:8.5px}
+.pj-pulse-foot{position:relative;z-index:1;margin:0;color:#889bb9;font:600 8px/1.8 Cairo,sans-serif}
+.pj-time-gap{position:relative;display:flex;align-items:center;min-height:var(--pj-gap-height,20px);margin-block:-2px;color:#7287a7}
+.pj-time-gap:before{content:"";position:absolute;inset-block:0;inset-inline-start:-12px;border-inline-start:1px dashed rgba(91,171,235,.28)}
+.pj-time-gap small{position:relative;z-index:1;padding:2px 7px;border:1px solid rgba(102,152,208,.13);border-radius:999px;background:rgba(9,24,51,.82);color:#8395b2;font:600 7.5px Cairo}
+.pj-time-gap[hidden]{display:none}
+@media(max-width:420px){.pj-city-anchor{grid-template-columns:46px minmax(0,1fr);gap:9px;padding:12px 10px}.pj-city-signal{width:43px;height:43px}.pj-city-signal svg{width:20px;height:20px}.pj-city-copy .pj-label{font-size:7px}.pj-city-copy b{font-size:23px}.pj-city-seal{grid-column:2;justify-self:start;margin-top:-2px;padding:3px 7px;font-size:7px}.pj-route-top h3{font-size:14px}.pj-time-gap small{font-size:7px}}

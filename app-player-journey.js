@@ -15,10 +15,9 @@
   function norm(value) { return String(value || '').trim().toLowerCase(); }
   function hasProof(row) { return !!(row && (row.verified_by || row.verified_at || row.signed_by || row.proof || row.is_verified === true)); }
   function maySharePublic(player) {
-    if (!player || player.role !== 'player' || player.profile_visibility !== 'public') return false;
-    var age = Number(player.age);
-    if (age >= 18) return true;
-    return age > 0 && age < 18 && !!player.guardian_consent_at && /^(public|public_profile)$/i.test(String(player.guardian_scope || '').trim());
+    // A QR code is an identity link, not an age-gated feature. Visibility is
+    // governed by the profile's own public/private setting, not the player's age.
+    return !!(player && player.role === 'player' && player.profile_visibility === 'public');
   }
   function shareNotice(message) {
     if (typeof toast === 'function') toast(message);
@@ -31,7 +30,7 @@
   if (typeof baseShare === 'function') P.share = async function (name) {
     var target = norm(name || (ME && ME.name));
     if (ME && target === norm(ME.name) && !maySharePublic(ME)) {
-      shareNotice('فعّل الظهور العام أولًا، ويلزم اعتماد ولي الأمر للاعب دون 18 سنة.');
+      shareNotice('الهوية غير منشورة للعامة بعد.');
       return;
     }
     return baseShare.apply(this, arguments);
@@ -57,6 +56,7 @@
       goal: '<circle cx="12" cy="12" r="8.5"/><path d="m8.7 6.6 3.3-2 3.3 2 1.2 3.8-2.8 2.1-3.4-.1-2.7-2.1 1.1-3.7Zm.1 3.7-3.9.4m9.6-.3 4.1-.5m-7.4 2.6-.4 4.8m-2.5-3 2.5-1.8 2.9 1.8 2.1 4.4"/>',
       assist: '<path d="M5 17 18 5M9 5h9v9"/><circle cx="6" cy="18" r="2"/>',
       match: '<path d="M4 5h16v14H4z"/><path d="M12 5v14m0-10a3 3 0 0 0 0 6m-8-3h2m12 0h2"/>',
+      pin: '<path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/>',
       star: '<path d="m12 3 2.7 5.6 6.2.9-4.5 4.4 1.1 6.2-5.5-2.9-5.5 2.9 1.1-6.2L3 9.5l6.2-.9L12 3Z"/>',
       arrow: '<path d="M5 12h14m-6-6 6 6-6 6"/>',
       boot: '<path d="M4 15c2.7.5 4.6-.7 5.3-3.6l.8-3.1 4.4 1.2 1 4.2 4.2 1.6c1.3.5 1.8 1.2 1.8 2.4V20H4v-5Z"/><path d="m10.5 8.8 3-1.1"/>'
@@ -144,33 +144,31 @@
   function monthTimeline(items) {
     var grouped = {};
     items.forEach(function (item) {
-      var key = (item.year || 'journey') + '|' + (item.month || (item.year ? 'الموسم' : '')); 
-      (grouped[key] || (grouped[key] = { year: item.year, month: item.month || (item.year ? 'محطة الموسم' : 'مسار اللاعب'), items: [] })).items.push(item);
+      var month = monthNames.indexOf(item.month) >= 0 ? item.month : '';
+      var key = (item.year || 'journey') + '|' + (month || (item.year ? 'season' : 'journey'));
+      (grouped[key] || (grouped[key] = { year: item.year, month: month || (item.year ? 'خلال الموسم' : 'مسار اللاعب'), items: [] })).items.push(item);
     });
     return Object.keys(grouped).map(function (key) { return grouped[key]; }).sort(function (a, b) {
       return Number(b.year || 0) - Number(a.year || 0) || (monthNames.indexOf(b.month) - monthNames.indexOf(a.month));
     });
   }
   function academyStations(player, data) {
-    var stations = data.career.filter(hasProof).map(function (row) {
+    var stations = data.career.filter(function (row) { return hasProof(row) && row.org; }).map(function (row) {
       return { name: row.org, year: yearOf(row.from_year || row.to_year), meta: [row.group_name, row.title].filter(Boolean).join(' · '), icon: 'academy' };
     });
-    data.alumni.filter(hasProof).forEach(function (row) {
+    data.alumni.filter(function (row) { return hasProof(row) && row.dest; }).forEach(function (row) {
       stations.push({ name: row.dest, year: yearOf(row.dest_year), meta: 'انتقال موثّق', icon: 'arrow' });
     });
     var identityOrg = player.identity_org || player.org;
-    if (identityOrg) stations.push({ name: identityOrg, year: '', meta: player.org ? 'المحطة الحالية' : 'الجهة المعروضة في الهوية', icon: 'academy', current: true });
+    if (identityOrg) stations.push({ name: identityOrg, year: '', meta: 'الأكاديمية الحالية المسجلة', icon: 'academy', current: true });
     var unique = [];
-    stations.forEach(function (station) { if (!unique.some(function (s) { return norm(s.name) === norm(station.name); })) unique.push(station); });
+    stations.forEach(function (station) {
+      var existing = unique.find(function (s) { return norm(s.name) === norm(station.name); });
+      if (!existing) unique.push(station);
+      else if (station.current) { existing.current = true; existing.meta = station.meta; existing.year = ''; }
+    });
     unique.sort(function (a, b) { return Number(a.year || 9999) - Number(b.year || 9999); });
     return unique;
-  }
-  function academyRail(player, data) {
-    var unique = academyStations(player, data);
-    if (!unique.length) return '<div class="pj-empty-trail"><span class="pj-empty-mark">' + icon('academy') + '</span><div><b>المسار يبدأ من أول محطة موثّقة</b><small>تظهر انتقالات اللاعب هنا بعد اعتمادها من الأكاديمية، دون إدخال محطات غير مؤكدة.</small></div></div>';
-    return '<div class="pj-stations" role="list">' + unique.map(function (station, index) {
-      return '<div class="pj-station ' + (station.current ? 'is-current' : '') + '" role="listitem"><span class="pj-station-connector" aria-hidden="true"></span><span class="pj-station-mark">' + icon(station.icon) + '</span><div class="pj-station-copy"><small>' + (station.current ? 'الجهة المسجلة' : station.year ? e(station.year) : 'محطة موثقة') + '</small><b>' + e(station.name) + '</b><span>' + e(station.meta || 'أكاديمية موثقة') + '</span></div><span class="pj-station-seal">' + (station.current ? 'من الملف' : 'موثّق') + '</span></div>';
-    }).join('') + '</div>';
   }
   function foldMatchMoments(items) {
     var moments = [], byMatch = {};
@@ -186,6 +184,9 @@
         moment.title = item.title;
         moment.meta = item.matchTitle || item.meta || 'مشاركة موثّقة';
         moment.verified = true;
+      } else if (item.type === 'match' && item.verified) {
+        moment.verified = true;
+        moment.meta = item.meta || moment.meta;
       } else if (item.type === 'goal') {
         var minute = (item.meta || '').match(/\d+['′]/);
         moment.goals.push({ minute: minute ? minute[0] : '', verified: item.verified });
@@ -205,55 +206,84 @@
     if (item.goals && item.goals.some(function (x) { return x.minute; })) signals.push('<small class="pj-minute-list">' + e(item.goals.map(function (x) { return x.minute; }).filter(Boolean).join(' · ')) + '</small>');
     return '<article class="pj-event pj-event-' + e(item.type) + '"><span class="pj-event-icon">' + icon(item.icon) + '</span><div class="pj-event-copy"><b>' + e(item.title) + '</b>' + (item.meta ? '<small>' + e(item.meta) + '</small>' : '') + (signals.length ? '<span class="pj-event-signals">' + signals.join('') + '</span>' : '') + '</div><span class="pj-event-proof" title="' + proof + '">' + (item.verified ? '✓' : '•') + '</span></article>';
   }
+  function verifiedMomentCount(group) {
+    return group.items.reduce(function (sum, item) {
+      var value = 0;
+      if (item.verified && ['match', 'goal', 'assist', 'award', 'academy', 'move'].includes(item.type)) value++;
+      if (item.goals) value += item.goals.filter(function (event) { return event.verified; }).length;
+      if (item.assists) value += item.assists.filter(function (event) { return event.verified; }).length;
+      return sum + value;
+    }, 0);
+  }
+  function monthStamp(group) {
+    var month = monthNames.indexOf(group.month);
+    return group.year && month >= 0 ? Number(group.year) * 12 + month : null;
+  }
   function seasonPulse(items) {
-    var groups = monthTimeline(foldMatchMoments(items)).filter(function (group) { return !!group.year; }).slice(0, 6).reverse();
+    var groups = monthTimeline(foldMatchMoments(items)).filter(function (group) {
+      return monthStamp(group) !== null && verifiedMomentCount(group) > 0;
+    }).map(function (group) {
+      return { label: group.month, year: group.year, stamp: monthStamp(group), value: verifiedMomentCount(group) };
+    }).sort(function (a, b) { return a.stamp - b.stamp; });
     if (!groups.length) return '';
-    var points = groups.map(function (group) {
-      var count = group.items.reduce(function (sum, item) {
-        var value = 0;
-        if (item.type === 'match' && item.verified) value++;
-        if (item.type === 'goal' && item.verified) value++;
-        if (item.type === 'assist' && item.verified) value++;
-        if (item.type === 'award' && item.verified) value++;
-        if ((item.type === 'academy' || item.type === 'move') && item.verified) value++;
-        if (item.goals) value += item.goals.filter(function (event) { return event.verified; }).length;
-        if (item.assists) value += item.assists.filter(function (event) { return event.verified; }).length;
-        return sum + value;
-      }, 0);
-      return { label: group.month, year: group.year, value: count };
-    });
+
+    // Keep a useful editorial window, but space points by calendar time. A
+    // quiet interval becomes a longer gap; it is never drawn as a zero score.
+    var latest = groups[groups.length - 1].stamp;
+    var points = groups.filter(function (point) { return point.stamp >= latest - 35; });
+    var span = points[points.length - 1].stamp - points[0].stamp;
+    var width = span ? Math.max(360, 40 + span * 42) : 360;
+    var slot = span ? (width - 40) / span : 42;
+    var left = span ? 20 : width / 2, bottom = 95, top = 18;
     var max = Math.max.apply(null, points.map(function (point) { return point.value; }).concat([1]));
-    var width = 360, top = 19, bottom = 93, left = 19, right = 341;
-    var step = points.length === 1 ? 0 : (right - left) / (points.length - 1);
-    points.forEach(function (point, index) {
-      point.x = points.length === 1 ? width / 2 : left + step * index;
-      point.y = bottom - (point.value / max) * (bottom - top - 8);
+    points.forEach(function (point) {
+      point.x = span ? left + (point.stamp - points[0].stamp) * slot : width / 2;
+      point.y = bottom - (Math.sqrt(point.value) / Math.sqrt(max)) * (bottom - top - 7);
+      point.r = 4 + Math.min(5, Math.sqrt(point.value) * 1.35);
     });
     var path = points.map(function (point, index) { return (index ? 'L' : 'M') + point.x.toFixed(1) + ' ' + point.y.toFixed(1); }).join(' ');
     var area = path + ' L' + points[points.length - 1].x.toFixed(1) + ' ' + bottom + ' L' + points[0].x.toFixed(1) + ' ' + bottom + ' Z';
     var marks = points.map(function (point) {
-      return '<g class="pj-pulse-point"><line x1="' + point.x.toFixed(1) + '" y1="' + point.y.toFixed(1) + '" x2="' + point.x.toFixed(1) + '" y2="' + bottom + '"/><circle cx="' + point.x.toFixed(1) + '" cy="' + point.y.toFixed(1) + '" r="4"/><text x="' + point.x.toFixed(1) + '" y="' + (bottom + 17) + '" text-anchor="middle">' + e(point.label) + '</text><text class="pj-pulse-year" x="' + point.x.toFixed(1) + '" y="' + (bottom + 29) + '" text-anchor="middle">' + e(point.year) + '</text><text class="pj-pulse-value" x="' + point.x.toFixed(1) + '" y="' + Math.max(11, point.y - 11).toFixed(1) + '" text-anchor="middle">' + e(point.value) + '</text></g>';
+      var title = point.label + ' ' + point.year + ' · ' + point.value + ' لحظات موثقة';
+      return '<g class="pj-pulse-point" aria-label="' + e(title) + '"><title>' + e(title) + '</title><line x1="' + point.x.toFixed(1) + '" y1="' + point.y.toFixed(1) + '" x2="' + point.x.toFixed(1) + '" y2="' + bottom + '"/><circle class="pj-pulse-halo" cx="' + point.x.toFixed(1) + '" cy="' + point.y.toFixed(1) + '" r="' + (point.r + 5).toFixed(1) + '"/><circle cx="' + point.x.toFixed(1) + '" cy="' + point.y.toFixed(1) + '" r="' + point.r.toFixed(1) + '"/><text x="' + point.x.toFixed(1) + '" y="' + (bottom + 17) + '" text-anchor="middle">' + e(point.label) + '</text><text class="pj-pulse-year" x="' + point.x.toFixed(1) + '" y="' + (bottom + 29) + '" text-anchor="middle">' + e(point.year) + '</text></g>';
     }).join('');
-    return '<section class="pj-pulse" aria-label="نبض أحداث اللاعب الموثقة"><div class="pj-pulse-head"><div><span class="pj-label">ON-FIELD MOMENTS</span><h3>نبض المسيرة</h3><p>كل ارتفاع هنا ناتج عن لحظة موثّقة في سجل اللاعب، لا تقييمًا افتراضيًا.</p></div><span class="pj-pulse-key"><i></i> لحظات موثقة</span></div><div class="pj-pulse-graph"><svg viewBox="0 0 360 132" role="img" aria-label="توزيع اللحظات الموثقة حسب الشهر"><defs><linearGradient id="pjPulseArea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#48d9ff" stop-opacity=".3"/><stop offset="1" stop-color="#4436d8" stop-opacity="0"/></linearGradient></defs><path class="pj-pulse-grid" d="M16 23h328M16 57h328M16 93h328"/><path class="pj-pulse-area" d="' + area + '"/><path class="pj-pulse-line" d="' + path + '"/>' + marks + '</svg></div></section>';
+    var svgWidth = Math.round(width);
+    return '<section class="pj-pulse" aria-label="نبض أحداث اللاعب الموثقة"><div class="pj-pulse-head"><div><span class="pj-label">MOMENTS · MONTH BY MONTH</span><h3>نبض المسيرة</h3><p>حجم العلامة يعكس كثافة اللحظات الموثقة، والمسافة تعكس الزمن بين السجلات — لا تقييمًا افتراضيًا.</p></div><span class="pj-pulse-key"><i></i> شهر موثّق</span></div><div class="pj-pulse-graph" tabindex="0" aria-label="مخطط زمني قابل للتمرير أفقيًا"><svg width="' + svgWidth + '" height="132" viewBox="0 0 ' + svgWidth + ' 132" role="img" aria-label="توزيع الأحداث المسجلة حسب الشهر"><defs><linearGradient id="pjPulseArea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#48d9ff" stop-opacity=".3"/><stop offset="1" stop-color="#4436d8" stop-opacity="0"/></linearGradient></defs><path class="pj-pulse-grid" d="M16 23h' + (svgWidth - 32) + 'M16 59h' + (svgWidth - 32) + 'M16 95h' + (svgWidth - 32) + '"/><path class="pj-pulse-area" d="' + area + '"/><path class="pj-pulse-line" d="' + path + '"/>' + marks + '</svg></div><p class="pj-pulse-foot">الإنجازات المسجلة على مستوى الموسم تبقى في خط الرحلة، ولا تُنسب إلى شهر غير محدد.</p></section>';
   }
   function seasonAtlas(items) {
     var groups = monthTimeline(foldMatchMoments(items));
-    if (!groups.length) return '<div class="pj-empty-trail"><span class="pj-empty-mark">' + icon('star') + '</span><div><b>لا توجد محطات منشورة بعد</b><small>عندما تُسجّل المباريات والإنجازات أو تعتمد الأكاديمية انتقالًا، ستظهر هنا كرحلة مرتبة حسب الموسم والشهر.</small></div></div>';
+    if (!groups.length) return '<div class="pj-empty-trail"><span class="pj-empty-mark">' + icon('star') + '</span><div><b>المسيرة تنتظر أول لحظة مسجلة</b><small>تظهر المشاركات والإنجازات في شهرها المسجل، أما الإنجاز السنوي غير محدد الشهر فيبقى ضمن موسمه.</small></div></div>';
     var years = [...new Set(groups.map(function (g) { return g.year; }).filter(Boolean))];
-    return '<div class="pj-atlas-head"><span class="pj-atlas-line"></span><div class="pj-year-orbit" role="tablist" aria-label="تصفية الرحلة حسب السنة"><button class="pj-year-node is-selected" role="tab" type="button" data-pj-year="all" aria-selected="true" aria-pressed="true"><i>الكل</i><small>المسيرة</small></button>' + years.map(function (year) { return '<button class="pj-year-node" role="tab" type="button" data-pj-year="' + e(year) + '" aria-selected="false" aria-pressed="false"><i>' + e(year) + '</i><small>الموسم</small></button>'; }).join('') + '</div></div><div class="pj-month-stream">' + groups.map(function (group) {
-      return '<section class="pj-month-group" data-pj-group-year="' + e(group.year || 'غير مؤرخ') + '"><div class="pj-month-marker"><span></span><b>' + e(group.month) + '</b>' + (group.year ? '<small>' + e(group.year) + '</small>' : '') + '</div><div class="pj-month-events">' + group.items.map(eventRow).join('') + '</div></section>';
-    }).join('') + '</div>';
+    var stream = '';
+    groups.forEach(function (group, index) {
+      stream += '<section class="pj-month-group" data-pj-group-year="' + e(group.year || 'غير مؤرخ') + '"><div class="pj-month-marker"><span></span><b>' + e(group.month) + '</b>' + (group.year ? '<small>' + e(group.year) + '</small>' : '') + '</div><div class="pj-month-events">' + group.items.map(eventRow).join('') + '</div></section>';
+      var older = groups[index + 1];
+      var newerStamp = monthStamp(group), olderStamp = older && monthStamp(older);
+      var emptyMonths = newerStamp !== null && olderStamp !== null ? newerStamp - olderStamp - 1 : 0;
+      if (older && emptyMonths > 0) {
+        var gapHeight = Math.min(62, 12 + emptyMonths * 8);
+        stream += '<div class="pj-time-gap" data-pj-gap-year="' + e(group.year || 'غير مؤرخ') + '" style="--pj-gap-height:' + gapHeight + 'px" title="الفاصل الزمني بين السجلات لا يعني غياب النشاط"><i></i><small>فاصل زمني بين السجلات</small></div>';
+      }
+    });
+    return '<div class="pj-atlas-head"><span class="pj-atlas-line"></span><div class="pj-year-orbit" role="tablist" aria-label="تصفية الرحلة حسب السنة"><button class="pj-year-node is-selected" role="tab" type="button" data-pj-year="all" aria-selected="true" aria-pressed="true"><i>الكل</i><small>المسيرة</small></button>' + years.map(function (year) { return '<button class="pj-year-node" role="tab" type="button" data-pj-year="' + e(year) + '" aria-selected="false" aria-pressed="false"><i>' + e(year) + '</i><small>الموسم</small></button>'; }).join('') + '</div></div><div class="pj-month-stream">' + stream + '</div>';
   }
   function academyRoute(player, data) {
     var stations = academyStations(player, data).slice(-5);
+    var hasHistory = data.career.some(function (row) { return hasProof(row) && row.org; }) || data.alumni.some(function (row) { return hasProof(row) && row.dest; });
+    if (!hasHistory) return '';
     var dots = stations.length ? stations.map(function (station, i) {
-      var label = station.year || (station.current ? 'الآن' : 'موثّق');
+      var label = station.year || (station.current ? 'الحالية' : 'موثّق');
       return '<span class="pj-route-dot ' + (station.current ? 'live' : '') + '" style="--step:' + i + ';--offset:' + (i % 2 ? '10px' : '-10px') + '"><i>' + e(label) + '</i><small>' + e(station.name) + '</small></span>';
     }).join('') : '<span class="pj-route-origin">أول محطة موثّقة تظهر بعد اعتمادها</span>';
-    var count = data.career.filter(hasProof).length + data.alumni.filter(hasProof).length;
-    var hasHistory = count > 0;
-    var identityOrg = player.identity_org || player.org;
-    return '<section class="pj-route"><div class="pj-route-top"><span class="pj-label">ACADEMY ROUTE</span><span class="pj-route-count">' + (count ? e(count) + ' <small>محطات معتمدة</small>' : '<small class="pj-route-status">المحطة الحالية</small>') + '</span></div><div class="pj-route-art ' + (hasHistory ? '' : 'is-current-only') + '"><svg viewBox="0 0 440 118" preserveAspectRatio="none" aria-hidden="true"><path class="pj-route-pitch" d="M0 10h440v98H0zM220 10v98m0-65a16 16 0 1 0 0 32 16 16 0 0 0 0-32M0 39h54v40H0m440-40h-54v40h54"/><path class="pj-route-path" d="M15 83 C78 83 74 34 139 43 S204 87 251 58 S333 28 425 35"/></svg><div class="pj-route-dots">' + dots + '</div></div><p class="pj-route-caption">' + (identityOrg ? (player.org ? 'المحطة الحالية من الملف · ' : 'الجهة المعروضة في الهوية · ') + e(identityOrg) + (hasHistory ? ' — الانتقالات موثقة' : ' — يظهر الانتقال هنا بعد اعتماده') : 'مسار الأكاديميات يُبنى من محطات موثّقة فقط') + '</p></section>';
+    var path = stations.length > 1 ? '<path class="pj-route-path" d="M15 83 C78 83 74 34 139 43 S204 87 251 58 S333 28 425 35"/>' : '';
+    var title = stations.length > 1 ? 'محطات أكاديمية موثّقة' : 'محطة أكاديمية موثّقة';
+    return '<section class="pj-route"><div class="pj-route-top"><div><span class="pj-label">ACADEMY HISTORY · VERIFIED</span><h3>' + title + '</h3></div><span class="pj-route-count">سجل المسيرة</span></div><div class="pj-route-art"><svg viewBox="0 0 440 118" preserveAspectRatio="none" aria-hidden="true"><path class="pj-route-pitch" d="M0 10h440v98H0zM220 10v98m0-65a16 16 0 1 0 0 32 16 16 0 0 0 0-32M0 39h54v40H0m440-40h-54v40h54"/>' + path + '</svg><div class="pj-route-dots">' + dots + '</div></div><p class="pj-route-caption">تظهر هنا السجلات التي اعتمدتها الجهة فقط؛ لا نضيف انتقالًا أو محطة من التخمين.</p></section>';
+  }
+  function playerCityFeature(player) {
+    var city = String(player.identity_city || player.city || player.home_city || player.region || '').trim();
+    if (!city) return '';
+    if (/^(riyadh|ar[ -]?riyadh|الرياض)$/i.test(city)) city = 'الرياض';
+    return '<section class="pj-city-anchor" aria-label="مدينة اللاعب المسجلة"><span class="pj-city-signal">' + icon('pin') + '<i></i></span><div class="pj-city-copy"><span class="pj-label">PLAYER BASE · CITY</span><b>' + e(city) + '</b><small>مدينة اللاعب المسجلة في ملفه</small></div><span class="pj-city-seal">معلومة مكانية</span></section>';
   }
   function isTournament(match) {
     var name = norm(match.comp || match.competition_name || match.tournament_name || match.title || match.name || '');
@@ -303,10 +333,10 @@
     var identityPosition = player.identity_position || player.position_code || player.pos_en || 'RB';
     var years = [...new Set(items.map(function (item) { return item.year; }).filter(Boolean))].sort();
     var yearRange = years.length ? years[0] + (years.length > 1 ? ' — ' + years[years.length - 1] : '') : 'PLAYER ARC';
-    return '<section class="pj-journey" aria-label="رحلة اللاعب"><header class="pj-heading"><div><span class="pj-label">THE PLAYER ARC · ' + e(yearRange) + '</span><h2>من هنا… تبدأ الحكاية</h2><p>مسار اللاعب على أرض الملعب: جهاته، مواسمه، لحظاته، وكل إنجاز له شاهد.</p></div><span class="pj-arc-seal"><i></i> سجل موثّق</span></header>'+ 
-      academyRoute(player, data)+seasonPulse(items)+
+    return '<section class="pj-journey" aria-label="رحلة اللاعب"><header class="pj-heading"><div><span class="pj-label">THE PLAYER ARC · ' + e(yearRange) + '</span><h2>من هنا… تبدأ الحكاية</h2><p>مدينة اللاعب، محطاته الرياضية، مواسمه، واللحظات التي لها سجل.</p></div><span class="pj-arc-seal"><i></i> سجل موثّق</span></header>'+ 
+      playerCityFeature(player)+academyRoute(player, data)+seasonPulse(items)+
       '<section class="pj-story-section pj-atlas"><div class="pj-section-title"><div><span class="pj-label">SEASONS · MONTHS · MOMENTS</span><h3>رحلة اللاعب عبر الزمن</h3><p>اختر موسمًا، ثم تتبّع محطاته شهرًا بشهر.</p></div><span class="pj-title-glyph purple">' + icon('arrow') + '</span></div>' + seasonAtlas(items) + '</section>'+
-      '<section class="pj-story-section pj-proof-deck"><div class="pj-proof-column"><div class="pj-section-title"><div><span class="pj-label">CLUB TO CLUB</span><h3>من أكاديمية إلى أخرى</h3></div><span class="pj-title-glyph">' + icon('academy') + '</span></div>' + academyRail(player, data) + '</div><div class="pj-proof-column"><div class="pj-section-title"><div><span class="pj-label">TOURNAMENT FOOTPRINT</span><h3>بصمته في البطولات</h3></div><span class="pj-title-glyph gold">' + icon('trophy') + '</span></div>' + tournamentTrail(data) + '</div></section>'+
+      '<section class="pj-story-section"><div class="pj-section-title"><div><span class="pj-label">TOURNAMENT FOOTPRINT</span><h3>بصمته في البطولات</h3><p>مشاركات مرتبطة بمباريات مكتملة وسجل حضور.</p></div><span class="pj-title-glyph gold">' + icon('trophy') + '</span></div>' + tournamentTrail(data) + '</section>'+
       '<section class="pj-story-section pj-proof-deck pj-proof-deck-honors"><div class="pj-proof-column"><div class="pj-section-title"><div><span class="pj-label">PROOF OF PROGRESS</span><h3>إنجازات لها شاهد</h3></div><span class="pj-title-glyph gold">' + icon('star') + '</span></div>' + honors(data) + '</div><div class="pj-proof-column"><div class="pj-section-title"><div><span class="pj-label">TACTICAL FOOTPRINT</span><h3>مكانه في الملعب</h3></div><span class="pj-title-glyph cyan">' + icon('match') + '</span></div>' + roleMap(Object.assign({}, player, { identity_position: identityPosition })) + '</div></section>'+
       '<section class="pj-story-section"><div class="pj-section-title"><div><span class="pj-label">MATCH EVIDENCE</span><h3>لقطات من أرض الملعب</h3></div><span class="pj-title-glyph cyan">' + icon('match') + '</span></div>' + clipReel(data) + '</section>'+
       '<footer class="pj-footnote"><span>PLAYIN365 · PLAYER STORY</span><small>' + (owner ? 'أنت تتحكم بما يظهر في هذا الملف.' : 'المعروض هنا مقتصر على البيانات المنشورة والموثّقة.') + '</small></footer></section>';
@@ -356,7 +386,7 @@
       var player = Object.assign({}, cardCapture && cardCapture.player || ME, { identity_position: cardCapture && cardCapture.position || (ME && (ME.position_code || ME.pos_en || 'RB')), identity_org: cardCapture && cardCapture.org || (ME && (ME.org || 'أكاديمية النخبة')) });
       var history = await loadHistory(player, cardCapture);
       var mount = '<div class="pj-mount">' + journeyView(player, history, true) + '</div>';
-      var shareNote = maySharePublic(player) ? '' : '<p class="pj-share-note">المشاركة للزوار غير مفعّلة؛ يلزم نشر الهوية وموافقة ولي الأمر للاعب دون 18 سنة.</p>';
+      var shareNote = maySharePublic(player) ? '' : '<p class="pj-share-note">رمز الهوية يفتح الملف عند نشره للعامة؛ إعداد الظهور هو الذي يحدد إتاحة الصفحة.</p>';
       return markup.replace('</main>', shareNote + mount + '</main>');
     } catch (error) {
       console.warn('PlayIn365 player journey', error);
@@ -371,7 +401,7 @@
     if (copyButton && copyButton.textContent.trim() === 'انسخ رابط الهوية') {
       event.preventDefault();
       event.stopImmediatePropagation();
-      if (!maySharePublic(ME)) return shareNotice('فعّل الظهور العام أولًا، ويلزم اعتماد ولي الأمر للاعب دون 18 سنة.');
+      if (!maySharePublic(ME)) return shareNotice('الهوية غير منشورة للعامة بعد.');
       var playerName = String(ME.name || '').trim();
       var shareUrl = location.origin + location.pathname + '?player=' + encodeURIComponent(playerName);
       if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(shareUrl).then(function () { shareNotice('تم نسخ رابط الهوية العامة.'); }).catch(function () { shareNotice('تعذر نسخ الرابط من هذا المتصفح.'); });
@@ -392,12 +422,15 @@
     atlas.querySelectorAll('[data-pj-group-year]').forEach(function (group) {
       group.hidden = year !== 'all' && group.getAttribute('data-pj-group-year') !== year;
     });
+    atlas.querySelectorAll('[data-pj-gap-year]').forEach(function (gap) {
+      gap.hidden = year !== 'all' && gap.getAttribute('data-pj-gap-year') !== year;
+    });
   });
 
   async function renderPublicProfile(name) {
     var who = String(name || '').trim();
     if (!who) return '<main><div class="card">لم يُحدّد اللاعب.</div></main>';
-    var records = await safe('journey-profile', sb.from('profiles').select('name,role,org,pos,age,shirt,athlete_id,avatar_url,handle,display_name,profile_visibility').eq('name', who).eq('role', 'player').eq('profile_visibility', 'public').limit(1));
+    var records = await safe('journey-profile', sb.from('profiles').select('name,role,org,pos,age,shirt,athlete_id,avatar_url,handle,display_name,city,profile_visibility').eq('name', who).eq('role', 'player').eq('profile_visibility', 'public').limit(1));
     var source = records[0];
     if (!source) return '<div class="pi-id-page"><header class="pz5-top">' + P.brand() + '</header><main class="pi-id-main"><div class="pj-not-found"><span>' + icon('academy') + '</span><b>الهوية غير متاحة</b><small>تأكد من الرابط ومن تفعيل نشر الهوية للعامة.</small></div></main></div>';
     var player = Object.assign({}, source, {
