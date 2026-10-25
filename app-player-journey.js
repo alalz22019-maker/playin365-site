@@ -17,9 +17,11 @@
   function isAttended(row) { return !!(row && (row.attended === true || row.attended === 'true' || row.attended === 1)); }
   function yearOf(value) {
     if (!value) return '';
-    var match = String(value).match(/(?:19|20)\d{2}/);
+    var digits = String(value).replace(/[٠-٩]/g, function (d) { return String('٠١٢٣٤٥٦٧٨٩'.indexOf(d)); }).replace(/[۰-۹]/g, function (d) { return String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)); });
+    var match = digits.match(/(?:19|20)\d{2}/);
     return match ? match[0] : '';
   }
+  function matchDate(match) { return match && (match.match_date || match.scheduled_at || match.kickoff_at || match.date || match.starts_at) || ''; }
   function dateParts(value) {
     if (!value) return { year: '', month: '', stamp: '' };
     var date = new Date(value);
@@ -90,15 +92,20 @@
     data.matches.forEach(function (match) {
       var attended = data.joins.some(function (join) { return isAttended(join) && String(join.match_id) === String(match.id); });
       if (!attended || !isCompleted(match)) return;
-      var d = dateParts(match.created_at || match.match_date || match.date);
+      var officialDate = matchDate(match);
+      var d = dateParts(officialDate || (!yearOf(match.comp) ? match.created_at : ''));
       var title = match.comp || match.title || match.name || 'مشاركة رسمية';
-      items.push({ year: d.year, month: d.month, date: d.stamp, type: 'tournament', icon: 'match', title: title, meta: match.title && match.comp ? match.title : 'مشاركة موثّقة', verified: true });
+      items.push({ year: d.year || yearOf(match.comp), month: d.month, date: d.stamp, type: 'tournament', icon: 'match', title: title, meta: match.title && match.comp ? match.title : 'مشاركة موثّقة', verified: true });
     });
     data.events.forEach(function (event) {
       var kind = readableType(event.type);
       if (!kind) return;
-      var d = dateParts(event.created_at || event.matches && event.matches.created_at);
+      var match = event.matches || null;
+      var officialDate = matchDate(match);
+      var d = dateParts(officialDate || (!yearOf(match && match.comp) ? event.created_at || match && match.created_at : ''));
+      var seasonYear = yearOf(match && match.comp);
       items.push({ year: d.year, month: d.month, date: d.stamp, type: kind.kind, icon: kind.icon, title: kind.label, meta: [event.matches && (event.matches.title || event.matches.comp), event.minute ? event.minute + '′' : ''].filter(Boolean).join(' · '), verified: !!event.recorded_by });
+      if (!d.year && seasonYear) items[items.length - 1].year = seasonYear;
     });
     return items.filter(function (item) { return item.year || item.title; }).sort(function (a, b) {
       var ta = a.date ? Date.parse(a.date) : Number(a.year || 0) * 10000;
@@ -155,10 +162,10 @@
       if (!attended || !isCompleted(match)) return;
       var name = match.comp || match.title;
       if (!name) return;
-      comps[name] = comps[name] || { name: name, appearances: 0, last: match.created_at || match.match_date || match.date };
+      comps[name] = comps[name] || { name: name, appearances: 0, last: matchDate(match) || yearOf(name) };
       comps[name].appearances++;
-      var current = comps[name].last, next = match.created_at || match.match_date || match.date;
-      if (next && (!current || Date.parse(next) > Date.parse(current))) comps[name].last = next;
+      var current = comps[name].last, next = matchDate(match) || yearOf(name);
+      if (next && (!current || (Date.parse(next) || Number(yearOf(next))) > (Date.parse(current) || Number(yearOf(current)))) ) comps[name].last = next;
     });
     var list = Object.keys(comps).map(function (key) { return comps[key]; }).sort(function (a, b) { return Date.parse(b.last || 0) - Date.parse(a.last || 0); });
     if (!list.length) return '<div class="pj-tournament-empty"><span class="pj-cup-ghost">' + icon('trophy') + '</span><p>مشاركته التالية ستضيف أول علامة على خط البطولات.</p></div>';
@@ -270,12 +277,12 @@
   var originalPublicProfile = P.publicProfile;
   P.publicProfile = function () {
     var target = PARAM && String(PARAM).trim();
-    if (target && (!ME || target !== ME.name)) return renderPublicProfile(target);
+    if (target) return renderPublicProfile(target);
     return originalPublicProfile.apply(this, arguments);
   };
   T.profile = async function () {
     var target = PARAM && String(PARAM).trim();
-    if (target && (!ME || target !== ME.name)) return renderPublicProfile(target);
+    if (target) return renderPublicProfile(target);
     return baseProfileRoute.apply(this, arguments);
   };
   T.publicView = async function () {
