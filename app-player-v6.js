@@ -57,7 +57,7 @@ PZ.identityCard=function(ev,joins,badges){
 };
 
 PZ.myCard=async function(){
-  var d=await Promise.all([
+  var d=(PZ.isPreviewDemo&&PZ.isPreviewDemo())?[[],[],[]]:await Promise.all([
     PZ.safe('events',sb.from('match_events').select('*').eq('who',ME.name).limit(120)),
     PZ.safe('joins',sb.from('match_joins').select('*').eq('player_name',ME.name)),
     PZ.safe('badges',sb.from('pi_badges').select('*').eq('person',ME.name).limit(8))
