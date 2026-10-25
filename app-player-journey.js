@@ -13,7 +13,29 @@
   function e(value) { return P.e(value == null ? '' : value); }
   function safe(name, query) { return P.safe(name, query); }
   function norm(value) { return String(value || '').trim().toLowerCase(); }
-  function hasProof(row) { return !!(row && (row.verified_by || row.verified_at || row.is_verified === true)); }
+  function hasProof(row) { return !!(row && (row.verified_by || row.verified_at || row.signed_by || row.proof || row.is_verified === true)); }
+  function maySharePublic(player) {
+    if (!player || player.role !== 'player' || player.profile_visibility !== 'public') return false;
+    var age = Number(player.age);
+    if (age >= 18) return true;
+    return age > 0 && age < 18 && !!player.guardian_consent_at && /^(public|public_profile)$/i.test(String(player.guardian_scope || '').trim());
+  }
+  function shareNotice(message) {
+    if (typeof toast === 'function') toast(message);
+    else {
+      var note = document.querySelector('.pj-share-note');
+      if (note) note.textContent = message;
+    }
+  }
+  var baseShare = P.share;
+  if (typeof baseShare === 'function') P.share = async function (name) {
+    var target = norm(name || (ME && ME.name));
+    if (ME && target === norm(ME.name) && !maySharePublic(ME)) {
+      shareNotice('فعّل الظهور العام أولًا، ويلزم اعتماد ولي الأمر للاعب دون 18 سنة.');
+      return;
+    }
+    return baseShare.apply(this, arguments);
+  };
   function isAttended(row) { return !!(row && (row.attended === true || row.attended === 'true' || row.attended === 1)); }
   function yearOf(value) {
     if (!value) return '';
@@ -85,7 +107,7 @@
       items.push({ year: yearOf(row.dest_year || row.created_at), month: '', date: '', type: 'move', icon: 'arrow', title: row.dest || 'محطة جديدة', meta: ['انتقال موثّق', row.group_name].filter(Boolean).join(' · '), verified: true });
     });
     data.badges.forEach(function (row) {
-      var d = dateParts(row.created_at || row.awarded_at);
+      var d = dateParts(row.earned_at || row.created_at || row.awarded_at);
       items.push({ year: yearOf(row.year) || d.year, month: row.year && !row.created_at && !row.awarded_at ? '' : d.month, date: d.stamp, type: 'award', icon: 'trophy', title: row.title || row.badge_key || 'إنجاز', meta: row.proof || row.signed_by || (hasProof(row) ? 'اعتماد الجهة' : 'إنجاز مضاف للملف'), verified: hasProof(row) });
     });
     data.certs.filter(function (row) { return row.title; }).forEach(function (row) {
@@ -183,6 +205,37 @@
     if (item.goals && item.goals.some(function (x) { return x.minute; })) signals.push('<small class="pj-minute-list">' + e(item.goals.map(function (x) { return x.minute; }).filter(Boolean).join(' · ')) + '</small>');
     return '<article class="pj-event pj-event-' + e(item.type) + '"><span class="pj-event-icon">' + icon(item.icon) + '</span><div class="pj-event-copy"><b>' + e(item.title) + '</b>' + (item.meta ? '<small>' + e(item.meta) + '</small>' : '') + (signals.length ? '<span class="pj-event-signals">' + signals.join('') + '</span>' : '') + '</div><span class="pj-event-proof" title="' + proof + '">' + (item.verified ? '✓' : '•') + '</span></article>';
   }
+  function seasonPulse(items) {
+    var groups = monthTimeline(foldMatchMoments(items)).filter(function (group) { return !!group.year; }).slice(0, 6).reverse();
+    if (!groups.length) return '';
+    var points = groups.map(function (group) {
+      var count = group.items.reduce(function (sum, item) {
+        var value = 0;
+        if (item.type === 'match' && item.verified) value++;
+        if (item.type === 'goal' && item.verified) value++;
+        if (item.type === 'assist' && item.verified) value++;
+        if (item.type === 'award' && item.verified) value++;
+        if ((item.type === 'academy' || item.type === 'move') && item.verified) value++;
+        if (item.goals) value += item.goals.filter(function (event) { return event.verified; }).length;
+        if (item.assists) value += item.assists.filter(function (event) { return event.verified; }).length;
+        return sum + value;
+      }, 0);
+      return { label: group.month, year: group.year, value: count };
+    });
+    var max = Math.max.apply(null, points.map(function (point) { return point.value; }).concat([1]));
+    var width = 360, top = 19, bottom = 93, left = 19, right = 341;
+    var step = points.length === 1 ? 0 : (right - left) / (points.length - 1);
+    points.forEach(function (point, index) {
+      point.x = points.length === 1 ? width / 2 : left + step * index;
+      point.y = bottom - (point.value / max) * (bottom - top - 8);
+    });
+    var path = points.map(function (point, index) { return (index ? 'L' : 'M') + point.x.toFixed(1) + ' ' + point.y.toFixed(1); }).join(' ');
+    var area = path + ' L' + points[points.length - 1].x.toFixed(1) + ' ' + bottom + ' L' + points[0].x.toFixed(1) + ' ' + bottom + ' Z';
+    var marks = points.map(function (point) {
+      return '<g class="pj-pulse-point"><line x1="' + point.x.toFixed(1) + '" y1="' + point.y.toFixed(1) + '" x2="' + point.x.toFixed(1) + '" y2="' + bottom + '"/><circle cx="' + point.x.toFixed(1) + '" cy="' + point.y.toFixed(1) + '" r="4"/><text x="' + point.x.toFixed(1) + '" y="' + (bottom + 17) + '" text-anchor="middle">' + e(point.label) + '</text><text class="pj-pulse-year" x="' + point.x.toFixed(1) + '" y="' + (bottom + 29) + '" text-anchor="middle">' + e(point.year) + '</text><text class="pj-pulse-value" x="' + point.x.toFixed(1) + '" y="' + Math.max(11, point.y - 11).toFixed(1) + '" text-anchor="middle">' + e(point.value) + '</text></g>';
+    }).join('');
+    return '<section class="pj-pulse" aria-label="نبض أحداث اللاعب الموثقة"><div class="pj-pulse-head"><div><span class="pj-label">ON-FIELD MOMENTS</span><h3>نبض المسيرة</h3><p>كل ارتفاع هنا ناتج عن لحظة موثّقة في سجل اللاعب، لا تقييمًا افتراضيًا.</p></div><span class="pj-pulse-key"><i></i> لحظات موثقة</span></div><div class="pj-pulse-graph"><svg viewBox="0 0 360 132" role="img" aria-label="توزيع اللحظات الموثقة حسب الشهر"><defs><linearGradient id="pjPulseArea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#48d9ff" stop-opacity=".3"/><stop offset="1" stop-color="#4436d8" stop-opacity="0"/></linearGradient></defs><path class="pj-pulse-grid" d="M16 23h328M16 57h328M16 93h328"/><path class="pj-pulse-area" d="' + area + '"/><path class="pj-pulse-line" d="' + path + '"/>' + marks + '</svg></div></section>';
+  }
   function seasonAtlas(items) {
     var groups = monthTimeline(foldMatchMoments(items));
     if (!groups.length) return '<div class="pj-empty-trail"><span class="pj-empty-mark">' + icon('star') + '</span><div><b>لا توجد محطات منشورة بعد</b><small>عندما تُسجّل المباريات والإنجازات أو تعتمد الأكاديمية انتقالًا، ستظهر هنا كرحلة مرتبة حسب الموسم والشهر.</small></div></div>';
@@ -251,7 +304,7 @@
     var years = [...new Set(items.map(function (item) { return item.year; }).filter(Boolean))].sort();
     var yearRange = years.length ? years[0] + (years.length > 1 ? ' — ' + years[years.length - 1] : '') : 'PLAYER ARC';
     return '<section class="pj-journey" aria-label="رحلة اللاعب"><header class="pj-heading"><div><span class="pj-label">THE PLAYER ARC · ' + e(yearRange) + '</span><h2>من هنا… تبدأ الحكاية</h2><p>مسار اللاعب على أرض الملعب: جهاته، مواسمه، لحظاته، وكل إنجاز له شاهد.</p></div><span class="pj-arc-seal"><i></i> سجل موثّق</span></header>'+ 
-      academyRoute(player, data)+
+      academyRoute(player, data)+seasonPulse(items)+
       '<section class="pj-story-section pj-atlas"><div class="pj-section-title"><div><span class="pj-label">SEASONS · MONTHS · MOMENTS</span><h3>رحلة اللاعب عبر الزمن</h3><p>اختر موسمًا، ثم تتبّع محطاته شهرًا بشهر.</p></div><span class="pj-title-glyph purple">' + icon('arrow') + '</span></div>' + seasonAtlas(items) + '</section>'+
       '<section class="pj-story-section pj-proof-deck"><div class="pj-proof-column"><div class="pj-section-title"><div><span class="pj-label">CLUB TO CLUB</span><h3>من أكاديمية إلى أخرى</h3></div><span class="pj-title-glyph">' + icon('academy') + '</span></div>' + academyRail(player, data) + '</div><div class="pj-proof-column"><div class="pj-section-title"><div><span class="pj-label">TOURNAMENT FOOTPRINT</span><h3>بصمته في البطولات</h3></div><span class="pj-title-glyph gold">' + icon('trophy') + '</span></div>' + tournamentTrail(data) + '</div></section>'+
       '<section class="pj-story-section pj-proof-deck pj-proof-deck-honors"><div class="pj-proof-column"><div class="pj-section-title"><div><span class="pj-label">PROOF OF PROGRESS</span><h3>إنجازات لها شاهد</h3></div><span class="pj-title-glyph gold">' + icon('star') + '</span></div>' + honors(data) + '</div><div class="pj-proof-column"><div class="pj-section-title"><div><span class="pj-label">TACTICAL FOOTPRINT</span><h3>مكانه في الملعب</h3></div><span class="pj-title-glyph cyan">' + icon('match') + '</span></div>' + roleMap(Object.assign({}, player, { identity_position: identityPosition })) + '</div></section>'+
@@ -264,20 +317,21 @@
     (records || []).forEach(function (match) { matches[String(match.id)] = match; });
     return Object.keys(matches).map(function (key) { return matches[key]; });
   }
-  async function loadHistory(player, preloaded) {
+  async function loadHistory(player, preloaded, publicMode) {
     var who = player.name;
     var results = await Promise.all([
-      preloaded ? Promise.resolve(preloaded.events || []) : safe('journey-events', sb.from('match_events').select('*').eq('who', who).order('created_at', { ascending: true }).limit(200)),
-      preloaded ? Promise.resolve(preloaded.joins || []) : safe('journey-joins', sb.from('match_joins').select('*').eq('player_name', who).limit(300)),
-      preloaded ? Promise.resolve(preloaded.badges || []) : safe('journey-badges', sb.from('pi_badges').select('*').eq('person', who).limit(60)),
-      safe('journey-career', sb.from('pi_career').select('*').eq('person', who).order('from_year', { ascending: true }).limit(60)),
-      safe('journey-certs', sb.from('pi_certs').select('*').eq('person', who).order('year', { ascending: true }).limit(40)),
-      safe('journey-alumni', sb.from('pi_alumni').select('*').eq('player_name', who).order('dest_year', { ascending: true }).limit(40)),
-      safe('journey-media', sb.from('pi_media').select('*').eq('subject', who).limit(40))
+      preloaded ? Promise.resolve(preloaded.events || []) : safe('journey-events', sb.from('match_events').select(publicMode ? 'id,match_id,minute,type,who,created_at' : '*').eq('who', who).order('created_at', { ascending: true }).limit(200)),
+      preloaded ? Promise.resolve(preloaded.joins || []) : safe('journey-joins', sb.from('match_joins').select(publicMode ? 'match_id,player_name,attended' : '*').eq('player_name', who).limit(300)),
+      preloaded ? Promise.resolve(preloaded.badges || []) : safe('journey-badges', sb.from('pi_badges').select(publicMode ? 'badge_key,title,earned_at,signed_by,match_id,match_title' : '*').eq('person', who).limit(60)),
+      safe('journey-career', sb.from('pi_career').select(publicMode ? 'org,title,group_name,from_year,to_year,verified_by,verified_at,created_at' : '*').eq('person', who).order('from_year', { ascending: true }).limit(60)),
+      safe('journey-certs', sb.from('pi_certs').select(publicMode ? 'title,issuer,level,year,verified_by,verified_at,created_at' : '*').eq('person', who).order('year', { ascending: true }).limit(40)),
+      safe('journey-alumni', sb.from('pi_alumni').select(publicMode ? 'player_name,dest,group_name,dest_year,verified_by,verified_at,created_at' : '*').eq('player_name', who).order('dest_year', { ascending: true }).limit(40)),
+      publicMode ? Promise.resolve([]) : safe('journey-media', sb.from('pi_media').select('*').eq('subject', who).limit(40))
     ]);
     var events = results[0] || [], joins = results[1] || [], ids = [...new Set(events.map(function (event) { return event.match_id; }).concat(joins.map(function (join) { return join.match_id; })).filter(Boolean))].slice(0, 100);
     var matches = [];
-    if (ids.length) matches = await safe('journey-matches', sb.from('matches').select('*').in('id', ids));
+    if (ids.length) matches = await safe('journey-matches', sb.from('matches').select(publicMode ? 'id,title,comp,venue,match_date,match_time,status,score_a,score_b,team_a,team_b,kickoff_at,starts_at' : '*').in('id', ids));
+    if (publicMode) events.forEach(function (event) { event.is_verified = true; });
     matches = completedMatches(events, joins, matches);
     var matchById = {};
     matches.forEach(function (match) { matchById[String(match.id)] = match; });
@@ -298,7 +352,8 @@
       var player = Object.assign({}, cardCapture && cardCapture.player || ME, { identity_position: cardCapture && cardCapture.position || (ME && (ME.position_code || ME.pos_en || 'RB')), identity_org: cardCapture && cardCapture.org || (ME && (ME.org || 'أكاديمية النخبة')) });
       var history = await loadHistory(player, cardCapture);
       var mount = '<div class="pj-mount">' + journeyView(player, history, true) + '</div>';
-      return markup.replace('</main>', mount + '</main>');
+      var shareNote = maySharePublic(player) ? '' : '<p class="pj-share-note">المشاركة للزوار غير مفعّلة؛ يلزم نشر الهوية وموافقة ولي الأمر للاعب دون 18 سنة.</p>';
+      return markup.replace('</main>', shareNote + mount + '</main>');
     } catch (error) {
       console.warn('PlayIn365 player journey', error);
       return markup;
@@ -308,6 +363,17 @@
   P.bind('publicView', P.myCard);
 
   document.addEventListener('click', function (event) {
+    var copyButton = event.target.closest && event.target.closest('.pi-id-actions button');
+    if (copyButton && copyButton.textContent.trim() === 'انسخ رابط الهوية') {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      if (!maySharePublic(ME)) return shareNotice('فعّل الظهور العام أولًا، ويلزم اعتماد ولي الأمر للاعب دون 18 سنة.');
+      var playerName = String(ME.name || '').trim();
+      var shareUrl = location.origin + location.pathname + '?player=' + encodeURIComponent(playerName);
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(shareUrl).then(function () { shareNotice('تم نسخ رابط الهوية العامة.'); }).catch(function () { shareNotice('تعذر نسخ الرابط من هذا المتصفح.'); });
+      else shareNotice('النسخ غير متاح في هذا المتصفح.');
+      return;
+    }
     var button = event.target.closest && event.target.closest('[data-pj-year]');
     if (!button) return;
     var atlas = button.closest('.pj-atlas');
@@ -327,17 +393,18 @@
   async function renderPublicProfile(name) {
     var who = String(name || '').trim();
     if (!who) return '<main><div class="card">لم يُحدّد اللاعب.</div></main>';
-    var records = await safe('journey-profile', sb.from('profiles').select('*').eq('name', who).limit(1));
+    var records = await safe('journey-profile', sb.from('profiles').select('name,role,org,pos,age,shirt,athlete_id,avatar_url,handle,display_name,profile_visibility').eq('name', who).eq('role', 'player').eq('profile_visibility', 'public').limit(1));
     var source = records[0];
-    if (!source || source.role && source.role !== 'player') return '<div class="pi-id-page"><header class="pz5-top">' + P.brand() + '</header><main class="pi-id-main"><div class="pj-not-found"><span>' + icon('academy') + '</span><b>الهوية غير متاحة</b><small>قد يكون الرابط غير صحيح أو أن اللاعب لم ينشر ملفه.</small></div></main></div>';
+    if (!source) return '<div class="pi-id-page"><header class="pz5-top">' + P.brand() + '</header><main class="pi-id-main"><div class="pj-not-found"><span>' + icon('academy') + '</span><b>الهوية غير متاحة</b><small>تأكد من الرابط ومن تفعيل نشر الهوية للعامة.</small></div></main></div>';
     var player = Object.assign({}, source, {
-      age_group: source.age_group || source.category || (source.age ? 'U' + source.age : ''),
-      jersey_number: source.jersey_number || source.shirt_number,
-      position_code: source.position_code || source.pos_en || source.position || source.pos,
-      identity_position: source.position_code || source.pos_en || 'RB',
-      identity_org: source.org || 'أكاديمية النخبة'
+      display_name: source.display_name || source.name,
+      age_group: source.age_group || (source.age ? 'U' + source.age : ''),
+      jersey_number: source.jersey_number || source.shirt,
+      position_code: source.position_code || source.pos,
+      identity_position: source.position_code || source.pos || '',
+      identity_org: source.org || ''
     });
-    var history = await loadHistory(player);
+    var history = await loadHistory(player, null, true);
     var previous = ME;
     var card = '';
     try { ME = player; card = P.identityCard(history.events, history.joins, history.badges); }
