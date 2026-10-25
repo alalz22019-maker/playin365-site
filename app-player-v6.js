@@ -38,7 +38,7 @@ PZ.identityCard=function(ev,joins,badges){
   var code=e(ME.athlete_id||ME.handle||'—');
   var src=e(playerSrc(ME));
   var age=demoMode?'U14':e(ME.age_group||ME.category||(ME.age?'U'+ME.age:'—')),shirt=demoMode?'18':e(ME.jersey_number||ME.shirt_number||ME.shirt||'—'),position=demoMode?'RB':e(ME.position_code||ME.pos_en||ME.pos||'—'),foot=demoMode?'Right foot':e(ME.preferred_foot||ME.foot||'—');
-  var badgeMeta=function(row,empty){return !row?empty:(row.demo?'تجريبي · توثيق محاكى':(row.verified_by||row.verified_at||row.is_verified===true?'موثّق':'بانتظار التوثيق'))};
+  var badgeMeta=function(row,empty){return !row?empty:((demoMode||row.demo)?'تجريبي · توثيق محاكى':(row.verified_by||row.verified_at||row.signed_by||row.proof||row.is_verified===true?'موثّق':'بانتظار التوثيق'))};
   var signalIcon=function(row,index){return row&&['⚽','✦','◷'].indexOf(row.kind)>=0?row.kind:(['⚽','✦','◷'][index])};
   var identityUrl=location.origin+location.pathname+'?player='+encodeURIComponent(ME.name||'اللاعب')+(demoMode?'&demo=1':'');
   var signalList=signals.length?signals.map(function(row,index){return badge(signalIcon(row,index),e(row.title||'إنجاز أو رقم مسجل'),e(badgeMeta(row,'')))}).join(''):'<div class="pi-id-empty">لا توجد إنجازات أو أرقام مسجلة بعد.</div>';
