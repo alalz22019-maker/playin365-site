@@ -3,6 +3,12 @@
 
 /* ═══════════ 4b · تعليمات الحصة ═══════════ */
 CO.bkey = () => "pi_brief_" + (ME&&ME.id);
+CO.bdateKey = () => "pi_brief_date_" + (ME&&ME.id);
+CO.btimeKey = () => "pi_brief_time_" + (ME&&ME.id);
+CO.briefDate = () => { try { const v=localStorage.getItem(CO.bdateKey())||""; return /^\\d{4}-\\d{2}-\\d{2}$/.test(v)?v:CO.today(); } catch(e) { return CO.today(); } };
+CO.briefTime = () => { try { const v=localStorage.getItem(CO.btimeKey())||""; return /^\\d{2}:\\d{2}$/.test(v)?v:"18:00"; } catch(e) { return "18:00"; } };
+window.coBriefDate = v => { if(/^\\d{4}-\\d{2}-\\d{2}$/.test(String(v||"")))try{localStorage.setItem(CO.bdateKey(),v)}catch(e){} };
+window.coBriefTime = v => { if(/^\\d{2}:\\d{2}$/.test(String(v||"")))try{localStorage.setItem(CO.btimeKey(),v)}catch(e){} };
 CO.brief = () => { try { return JSON.parse(localStorage.getItem(CO.bkey())||"{}"); } catch(e){ return {}; } };
 CO.setBrief = o => { try{ localStorage.setItem(CO.bkey(), JSON.stringify(Object.assign(CO.brief(), o))); }catch(e){} };
 CO.KIT = [["ماء قبل الحصة","water"],["واقي الساق","shin"],["حذاء عشب طبيعي","boots"],["ملابس تبديل","kit"]];
@@ -10,28 +16,41 @@ window.coScope = s => { CO.setBrief({scope:s, to:null}); render(); };
 window.coTo    = n => { CO.setBrief({to:n}); render(); };
 window.coKit   = k => { const b=CO.brief(), on=b.kit||[]; CO.setBrief({kit: on.includes(k)?on.filter(x=>x!==k):[...on,k]}); render(); };
 window.coMsg   = v => CO.setBrief({msg:v});
-window.coSend  = async () => {
-  const b = CO.brief(), msg = String(b.msg||"").trim();
-  if(!msg) return toast("اكتب رسالتك أولًا", 1);
-  const roster = await CO.roster();
-  const names = b.scope === "one" ? (b.to ? [b.to] : []) : roster.map(p => p.name);
-  if(!names.length) return toast(b.scope==="one"?"اختر اللاعب":"لا لاعبين في كشفك بعد", 1);
-  const kit = (b.kit||[]).map(k => (CO.KIT.find(x=>x[1]===k)||[])[0]).filter(Boolean);
-  const sub = [`سجّلها ${ME.name} — مدرب`, kit.length?("يُرفق: "+kit.join(" · ")):""].filter(Boolean).join(" · ");
-  const rows = names.map(n => ({
-    player_name:n, kind:"training", title:"تعليمات المدرب — "+(msg.length>60?msg.slice(0,60)+"…":msg),
-    subtitle:sub, at_time:"18:00", on_date:CO.today(), org:ME.org||"", needs_confirm:false, created_by:ME.name
-  }));
-  const {error} = await sb.from("calendar_items").insert(rows);
-  if(error) return toast("تعذّر الإرسال: "+error.message, 1);
-  await trans(`أرسل تعليمات الحصة لـ${names.length} ${names.length===1?"لاعبًا":"لاعبًا"}`);
-  CO.setBrief({msg:""});
-  toast(`وصلت ${names.length===1?"اللاعب":"لـ"+names.length+" لاعبًا"} — موقّعة باسمك`);
-  render();
+window.coSend = async () => {
+  if(CO._briefSending)return toast("يجري الإرسال الآن",1);
+  const b=CO.brief(), msg=String(b.msg||"").trim();
+  if(!msg)return toast("اكتب رسالتك أولًا",1);
+  const roster=await CO.roster();
+  const names=[...new Set((b.scope==="one"?(b.to?[b.to]:[]):roster.map(p=>p.name)).map(n=>String(n||"").trim()).filter(Boolean))];
+  if(!names.length)return toast(b.scope==="one"?"اختر اللاعب":"لا لاعبين في الفئة المختارة",1);
+  const plannedDate=CO.briefDate(),plannedTime=CO.briefTime();
+  if(plannedDate<CO.today())return toast("اختر اليوم أو موعدًا لاحقًا",1);
+  const kit=(b.kit||[]).map(k=>(CO.KIT.find(x=>x[1]===k)||[])[0]).filter(Boolean);
+  const sub=["سجّلها "+ME.name+" — مدرب",kit.length?("يُرفق: "+kit.join(" · ")):""].filter(Boolean).join(" · ");
+  const title="تعليمات المدرب — "+(msg.length>60?msg.slice(0,60)+"…":msg);
+  const scope=b.scope==="one"?"للاعب "+names[0]:"لـ"+names.length+" لاعبًا";
+  const summary="راجع الإرسال قبل التأكيد\n"+scope+"\nالموعد: "+plannedDate+" · "+plannedTime+(kit.length?"\nالمرفقات: "+kit.join("، "):"")+"\n\n"+msg+"\n\nهل تريد الإرسال؟";
+  CO._briefSending=true;
+  try{
+    const prior=await q("c",sb.from("calendar_items").select("player_name,title,on_date,created_by").eq("created_by",ME.name).eq("on_date",plannedDate).eq("kind","training").ilike("title","تعليمات المدرب —%").limit(500));
+    const already=new Set(prior.filter(x=>x.title===title&&String(x.on_date||"").slice(0,10)===plannedDate).map(x=>x.player_name));
+    const recipients=names.filter(n=>!already.has(n));
+    if(!recipients.length)return toast("سبق إرسال هذه التعليمات إلى الجميع في هذا الموعد",1);
+    const skipped=names.length-recipients.length;
+    const finalSummary=summary.replace("\n\nهل تريد الإرسال؟",(skipped?"\nأُرسلت سابقًا إلى "+skipped+"؛ لن تُكرر لهم.":"")+"\n\nهل تريد الإرسال للمتبقين؟");
+    if(!confirm(finalSummary))return;
+    const rows=recipients.map(n=>({player_name:n,kind:"training",title,subtitle:sub,at_time:plannedTime,on_date:plannedDate,org:ME.org||"",needs_confirm:false,created_by:ME.name}));
+    const {error}=await sb.from("calendar_items").insert(rows);
+    if(error)return toast("تعذّر الإرسال: "+error.message,1);
+    await trans("أرسل تعليمات الحصة لـ"+recipients.length+" لاعبًا");
+    CO.setBrief({msg:""});
+    toast("وصلت التعليمات لـ"+recipients.length+" لاعبًا"+(skipped?" · دون تكرار":"")+" — باسمك");
+    render();
+  }finally{CO._briefSending=false;}
 };
 T.brief = async () => {
   const roster = await CO.roster();
-  const b = CO.brief(), scope = b.scope || "all", kit = b.kit || [];
+  const b = CO.brief(), scope = b.scope || "all", kit = b.kit || [], plannedDate=CO.briefDate(), plannedTime=CO.briefTime();
   const cal = await q("c", sb.from("calendar_items").select("*").eq("created_by",ME.name).ilike("title","%تعليمات المدرب%").order("on_date",{ascending:false}).limit(3));
   const CH_ = [["للجميع","all"],["لاعب محدّد","one"]];
 
@@ -50,7 +69,7 @@ T.brief = async () => {
           ${CO.ic("⚽","#efedff","#4636e3","50% 50% 8px 50%")}
           <div style="flex:1;min-width:0"><span style="display:block;font-size:10px;color:#b9b0f5;font-weight:900">إلى</span>
             <b style="display:block;font-size:15px;font-weight:900">${scope==="one"?(b.to?esc(b.to):"اختر لاعبًا"):`كشفك${CO.grp()!=="all"?` · <span class="ltr">${CO.grp()}</span>`:""} · <span class="ltr">${roster.length||CO.dash}</span> ${roster.length===1?"لاعب":"لاعبًا"}`}</b>
-            <span style="display:block;font-size:10.5px;color:#c6cade;font-weight:700;margin-top:2px">${ME.org?esc(ME.org)+" · ":""}اليوم</span></div>
+            <span style="display:block;font-size:10.5px;color:#c6cade;font-weight:700;margin-top:2px">${ME.org?esc(ME.org)+" · ":""}${plannedDate} · ${plannedTime}</span></div>
         </div>
         <div style="display:flex;gap:6px;margin-top:12px;flex-wrap:wrap">
           ${CH_.map(([lb,v])=>`<button onclick="coScope('${v}')" style="background:${scope===v?"#faf8f3":"rgba(255,255,255,.1)"};color:${scope===v?"#151a2e":"#faf8f3"};border:1px solid ${scope===v?"#faf8f3":"rgba(255,255,255,.22)"};border-radius:999px;padding:5px 11px;font:900 10px Cairo;cursor:pointer">${lb}</button>`).join("")}
@@ -63,6 +82,14 @@ T.brief = async () => {
           ${CO.av(p.name,40,{url:p.avatar_url,dark:true,r:"50% 50% 10px 50%"})}
           <span style="font-size:9px;font-weight:900;color:${b.to===p.name?"#4636e3":"#5b6078"}">${esc(String(p.name).split(" ")[0])}</span></button>`).join("")}</div>`
       :CO.empty("لا لاعبين في كشفك بعد")}`):""}
+
+    ${CO.card(`<div style="display:flex;justify-content:space-between;align-items:baseline">${CO.h("موعد وصول التعليمات")}<span style="font-size:10px;color:#8a8fa5;font-weight:800">اختر اليوم والوقت</span></div>
+      <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:8px;margin-top:10px">
+        <label style="font-size:10px;font-weight:900;color:#5b6078">التاريخ
+          <input type="date" value="${plannedDate}" min="${CO.today()}" onchange="coBriefDate(this.value)" style="display:block;width:100%;margin-top:5px;border:1px solid #e9e4d8;border-radius:11px;padding:9px 8px;font:800 11px Cairo;background:#faf8f3;color:#151a2e"></label>
+        <label style="font-size:10px;font-weight:900;color:#5b6078">الوقت
+          <input type="time" value="${plannedTime}" onchange="coBriefTime(this.value)" style="display:block;width:100%;margin-top:5px;border:1px solid #e9e4d8;border-radius:11px;padding:9px 8px;font:800 11px Cairo;background:#faf8f3;color:#151a2e"></label>
+      </div>`)}
 
     ${CO.card(`${CO.h("رسالتك")}
       <textarea oninput="coMsg(this.value)" placeholder="مثال: حصة اليوم شدّتها عالية. ناموا جيدًا وتعالوا شاربين لترًا قبلها بساعة." style="width:100%;margin-top:8px;border:1px solid #e9e4d8;border-radius:12px;padding:12px;font:700 12px Cairo;line-height:1.95;min-height:96px;background:#faf8f3;color:#151a2e;resize:vertical;text-wrap:pretty">${CO.esn(b.msg||"")}</textarea>
@@ -95,21 +122,27 @@ window.coPick = n => { CO.setRate({who:n}); render(); };
 window.coAxis = (k,v) => { const r=CO.rate(); CO.setRate({vals:Object.assign(r.vals||{}, {[k]:+v})}); render(); };
 window.coNote = v => CO.setRate({note:v});
 window.coSign = async () => {
-  const r = CO.rate(), who = r.who, vals = r.vals || {};
-  if(!who) return toast("اختر اللاعب أولًا", 1);
-  if(CO.AXES.some(([k]) => !vals[k])) return toast("أكمل المحاور الأربعة", 1);
-  const avg = (CO.AXES.reduce((s,[k]) => s+vals[k], 0) / CO.AXES.length).toFixed(1);
-  const body = CO.AXES.map(([k,ar]) => `${ar} ${vals[k]}`).join(" · ") + (String(r.note||"").trim() ? " — " + String(r.note).trim() : "");
-  const {error} = await sb.from("calendar_items").insert({
-    player_name:who, kind:"training", title:`تقييم المدرب · ${avg} من 10`,
-    subtitle:`${body} — وقّعه ${ME.name} — مدرب`, at_time:"20:00", on_date:CO.today(),
-    org:ME.org||"", needs_confirm:false, created_by:ME.name
-  });
-  if(error) return toast("تعذّر: "+error.message, 1);
-  await trans(`قيّم ${who} — ${avg} من 10 بتوقيعه`);
-  CO.setRate({who:null, vals:{}, note:""});
-  toast("وقّعتَ التقييم — دخل سجل اللاعب باسمك");
-  render();
+  if(CO._ratingSaving)return toast("يجري حفظ التقييم الآن",1);
+  const r=CO.rate(),who=r.who,vals=r.vals||{};
+  if(!who)return toast("اختر اللاعب أولًا",1);
+  if(CO.AXES.some(([k])=>!vals[k]))return toast("أكمل المحاور الأربعة",1);
+  const avg=(CO.AXES.reduce((s,[k])=>s+vals[k],0)/CO.AXES.length).toFixed(1);
+  const details=CO.AXES.map(([k,ar])=>ar+" "+vals[k]+"/10").join(" · ");
+  const body=details+(String(r.note||"").trim()?" — "+String(r.note).trim():"");
+  const title="تقييم المدرب · "+avg+" من 10";
+  CO._ratingSaving=true;
+  try{
+    const prior=await q("c",sb.from("calendar_items").select("player_name,title,on_date,created_by").eq("created_by",ME.name).eq("player_name",who).eq("on_date",CO.today()).ilike("title","تقييم المدرب ·%").limit(100));
+    if(prior.some(x=>x.player_name===who&&x.title===title&&String(x.on_date||"").slice(0,10)===CO.today()))return toast("سُجّل التقييم نفسه اليوم؛ لن نضيف نسخة مكررة",1);
+    const summary="مراجعة التقييم قبل التوقيع\nاللاعب: "+who+"\nالمتوسط: "+avg+" من 10\n"+details+(String(r.note||"").trim()?"\nالملاحظة: "+String(r.note).trim():"")+"\n\nسيصل التقييم إلى اللاعب وولي أمره. هل تعتمد الإرسال؟";
+    if(!confirm(summary))return;
+    const {error}=await sb.from("calendar_items").insert({player_name:who,kind:"training",title,subtitle:body+" — وقّعه "+ME.name+" — مدرب",at_time:"20:00",on_date:CO.today(),org:ME.org||"",needs_confirm:false,created_by:ME.name});
+    if(error)return toast("تعذّر: "+error.message,1);
+    await trans("قيّم "+who+" — "+avg+" من 10 بتوقيعه");
+    CO.setRate({who:null,vals:{},note:""});
+    toast("وقّعتَ التقييم — دخل سجل اللاعب باسمك");
+    render();
+  }finally{CO._ratingSaving=false;}
 };
 T.rate = async () => {
   const roster = await CO.roster();
@@ -165,7 +198,7 @@ T.rate = async () => {
         <span class="ltr" style="font-size:9.5px;color:#8a8fa5;font-weight:800;flex:none">${esc(String(p.on_date||"").slice(0,10))}</span></div>`).join("")}`):""}
     `:CO.empty("اختر لاعبًا لتبدأ التقييم")}
 
-    ${CO.note("تقييمك رأي فنّي موقّع باسمك — لا يُعتمد ولا يُعترض عليه، ويُصحَّح باسمك في سجل الشفافية. ولا يمسّ الأرقام التي وقّعها حكم أو منظم.")}
+    ${CO.note("تقييمك رأي فنّي موقّع باسمك — يُراجع قبل التوقيع ويصل إلى اللاعب وولي أمره وحدهما.")}
   </main>`;
 };
 
