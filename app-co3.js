@@ -150,30 +150,22 @@ T.coachHome = async () => {
     ${WM()}
     <button onclick="go('coachMe')" style="position:relative;background:none;border:0;padding:0;cursor:pointer;flex:none">${CO.av(ME.name,44,{dark:true,r:"50% 50% 10px 50%"})}</button>
   </div>
-  <div style="text-align:center;padding:10px 18px 0">
-    <b style="display:block;font-size:26px;font-weight:900;line-height:1.3">مساحة المدرب</b>
-    <span style="display:block;font-size:12.5px;font-weight:800;color:#4636e3;margin-top:2px">هلا كابتن ${esc((ME.name||"").split(" ")[0])} 👋</span>
-    <span style="display:block;font-size:10.5px;color:#8a8fa5;font-weight:700;margin-top:2px">فريقك اليوم — من يحضر ومن يحتاجك</span>
-  </div>
+  <div class="coach-page-heading"><div><span class="coach-page-eyebrow">PLAYIN365 · COACH</span><b>مساحة المدرب</b></div><span class="coach-day-chip"><i></i> اليوم</span></div>
   <main style="flex:1;padding:16px 18px 118px;display:flex;flex-direction:column;gap:12px">
-    ${Object.keys(groupCounts).length?CO.card(`<div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><b style="font-size:12px;font-weight:900">الفئة الحالية</b><span style="font-size:10px;color:#8a8fa5;font-weight:800">${chosenGroup==="all"?"كل الفئات":CO.esn(chosenGroup)} · <span class="ltr">${roster.length}</span></span></div><div style="display:flex;gap:6px;overflow-x:auto;margin-top:9px;padding-bottom:3px"><button onclick="coGrp('all')" aria-label="عرض كل الفئات" style="flex:none;background:${chosenGroup==="all"?"#151a2e":"#fff"};color:${chosenGroup==="all"?"#fff":"#5b6078"};border:1px solid #e9e4d8;border-radius:999px;padding:7px 11px;font:900 10px Cairo;cursor:pointer">الكل · <span class="ltr">${allRoster.length}</span></button>${Object.entries(groupCounts).sort().map(([g,n])=>`<button onclick="coGrp('${CO.esn(g)}')" aria-label="الفئة ${CO.esn(g)}" style="flex:none;background:${chosenGroup===g?"#151a2e":"#fff"};color:${chosenGroup===g?"#fff":"#5b6078"};border:1px solid #e9e4d8;border-radius:999px;padding:7px 11px;font:900 10px Cairo;cursor:pointer">${CO.esn(g)} · <span class="ltr">${n}</span></button>`).join("")}</div>`):""}
-    <div style="position:relative;border-radius:22px;overflow:hidden;background:#151a2e;min-height:236px;display:flex">${CO.disc()}
-      <div style="position:relative;padding:18px;display:flex;flex-direction:column;gap:8px;width:64%">
-        <span style="color:#b9b0f5;font-size:10.5px;font-weight:900">⚽ ${today?(String(today.on_date||"").slice(0,10)===CO.today()?"حصة اليوم":"الحصة القادمة"):"يومك"}${CO.grp()!=="all"?` · <span class="ltr">${CO.grp()}</span>`:""}</span>
-        <b style="display:block;font-size:20px;font-weight:900;color:#faf8f3;line-height:1.3">${esc(today?today.title:"لا حصة مثبّتة اليوم")}</b>
-        <span style="display:block;font-size:11px;color:#c6cade;font-weight:700;line-height:1.9">
-          ${today?`◔ <span class="ltr">${esc(today.at_time||CO.dash)}</span><br>◎ ${esc(today.place||today.org||org||CO.dash)}<br><span style="color:#8f9bff">أكّد <span class="ltr">${conf||CO.dash}</span> من <span class="ltr">${roster.length||CO.dash}</span></span>`
-            :`تقويمك فارغ اليوم — ابنِ حصتك من بنك التمارين وانشرها فتدخل تقاويم لاعبيك باسمك`}</span>
-        <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap">
-          <button onclick="go('${today?"session":"drills"}')" style="background:#4636e3;color:#fff;border:0;border-radius:14px;padding:10px 14px;font:900 11.5px Cairo;cursor:pointer;box-shadow:0 8px 18px rgba(70,54,227,.3)">${today?"افتح الحصة":"ابنِ حصة"}</button>
-          <button onclick="go('brief')" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#faf8f3;border-radius:14px;padding:10px 12px;font:900 11.5px Cairo;cursor:pointer">أرسل تعليمات</button>
-        </div>
+    ${Object.keys(groupCounts).length?CO.card(`<div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><b style="font-size:12px;font-weight:900">الفئة الحالية</b><span style="font-size:10px;color:#8a8fa5;font-weight:800">${chosenGroup==="all"?"كل الفئات":CO.esn(chosenGroup)} · <span class="ltr">${roster.length}</span></span></div><div class="coach-cohort-selector" style="display:flex;gap:6px;overflow-x:auto;margin-top:9px;padding-bottom:3px"><button onclick="coGrp('all')" aria-label="عرض كل الفئات" style="flex:none;background:${chosenGroup==="all"?"#151a2e":"#fff"};color:${chosenGroup==="all"?"#fff":"#5b6078"};border:1px solid #e9e4d8;border-radius:999px;padding:7px 11px;font:900 10px Cairo;cursor:pointer">الكل · <span class="ltr">${allRoster.length}</span></button>${Object.entries(groupCounts).sort().map(([g,n])=>`<button onclick="coGrp('${CO.esn(g)}')" aria-label="الفئة ${CO.esn(g)}" style="flex:none;background:${chosenGroup===g?"#151a2e":"#fff"};color:${chosenGroup===g?"#fff":"#5b6078"};border:1px solid #e9e4d8;border-radius:999px;padding:7px 11px;font:900 10px Cairo;cursor:pointer">${CO.esn(g)} · <span class="ltr">${n}</span></button>`).join("")}</div>`):""}
+    
+    <section class="coach-command-hero" aria-label="ملخص يوم المدرب">
+      <div class="coach-command-head"><span class="coach-command-label">COACH COMMAND CENTER <i>• TODAY</i></span><span class="coach-session-state">${today?(String(today.on_date||"").slice(0,10)===CO.today()?"حصة اليوم":"الحصة القادمة"):"مساحة الفريق"}</span></div>
+      <div class="coach-command-main">
+        <div class="coach-command-copy"><span class="coach-eyebrow">${esc(org||"فريقك")}</span><h1 id="coach-command-title">هلا كابتن ${esc((ME.name||"").split(" ")[0])}<br><span>فريقك في الصورة</span></h1><p>الحصة، الحضور، وجاهزية لاعبيك — في لقطة واحدة.</p></div>
+        <div class="coach-attendance-ring" style="--coach-progress:${roster.length?Math.round(conf/roster.length*100):0}%" role="img" aria-label="تأكيد حضور ${conf} من ${roster.length}"><div><strong class="ltr">${roster.length?conf+"/"+roster.length:CO.dash}</strong><span>حضور اليوم</span><small>${roster.length?Math.round(conf/roster.length*100):0}% من الفريق</small></div></div>
       </div>
-      <div style="position:absolute;inset-inline-end:16px;bottom:16px;width:92px;height:92px;border-radius:50%;display:grid;place-items:center;background:#151a2e;box-shadow:0 0 0 6px #4636e3,inset 0 2px 10px rgba(21,26,46,.08)">
-        <div style="text-align:center"><b class="ltr" style="display:block;font-size:${roster.length?"22px":"26px"};font-weight:700;color:#faf8f3">${roster.length?conf+"/"+roster.length:CO.dash}</b><span style="display:block;font-size:9px;color:#c6cade;font-weight:800">أكّدوا</span></div></div>
-    </div>
+      <div class="coach-session-banner"><span class="coach-session-symbol">⚽</span><div class="coach-session-details"><small>NEXT SESSION</small><strong>${esc(today?today.title:"لا حصة مثبتة اليوم")}</strong><span>◷ <b class="ltr">${today?esc(today.at_time||CO.dash):"—"}</b> · ◎ ${esc(today?(today.place||today.org||org||CO.dash):(org||CO.dash))}</span></div></div>
+      <div class="coach-hero-actions"><button class="coach-primary-action" onclick="go('${today?"session":"drills"}')">${today?"افتح الحصة":"ابنِ حصة"} <span>↗</span></button><button class="coach-secondary-action" onclick="go('brief')">✦ أرسل تعليمات</button></div>
+      <div class="coach-hero-metrics"><div><small>ROSTER</small><strong>${roster.length||CO.dash}</strong><span>لاعب</span></div><div><small>READY</small><strong>${ready||CO.dash}</strong><span>متاح</span></div><div><small>FOCUS</small><strong>${flags.length}</strong><span>للمتابعة</span></div></div>
+    </section>
 
-    <div style="display:grid;grid-template-columns:1fr;gap:10px">
+    <div class="coach-health-grid" style="display:grid;grid-template-columns:1fr;gap:10px">
       <div style="background:#fff;border:1px solid #e9e4d8;border-radius:20px;overflow:hidden;display:flex;flex-direction:column">
         <div style="background:#151a2e;color:#faf8f3;padding:9px 14px;font-size:12px;font-weight:900;text-align:center">جاهزية الفريق</div>
         <div style="padding:10px 14px 12px;flex:1">
@@ -197,8 +189,8 @@ T.coachHome = async () => {
         <span style="display:block;font-size:10.5px;color:#8a8fa5;font-weight:700;margin-top:2px">أدخله فترتبط بها — ويصير كشفها كشفك</span></div>
       <span style="color:#4636e3">←</span></button>`:""}
     ${CO.h("اختصارات سريعة")}
-    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px">
-      ${SC.map(([g,t,s,v,bg,ink])=>`<button onclick="go('${v}')" style="background:#fff;border:1px solid #e9e4d8;border-radius:20px;padding:14px 8px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;color:#151a2e;cursor:pointer;font-family:Cairo">
+    <div class="coach-quick-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px">
+      ${SC.map(([g,t,s,v,bg,ink])=>`<button class="coach-quick-tile" onclick="go('${v}')" style="background:#fff;border:1px solid #e9e4d8;border-radius:20px;padding:14px 8px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;color:#151a2e;cursor:pointer;font-family:Cairo">
         <span style="width:40px;height:40px;border-radius:50% 50% 8px 50%;display:grid;place-items:center;font-size:17px;background:${bg};color:${ink}">${g}</span>
         <b style="font-size:12px;font-weight:900">${t}</b><span style="font-size:9.5px;color:#8a8fa5;font-weight:800">${s}</span></button>`).join("")}
     </div>

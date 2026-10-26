@@ -115,50 +115,107 @@ body.r-coach .ic{border-radius:50% 50% 6px 50%}
 body.r-coach .nav .fab{border-radius:50% 50% 14px 50%}
 body.r-coach #avx{border-radius:50% 50% 10px 50% !important}
 @keyframes pls{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.8)}}
-/* PlayIn365 approved brand palette — coach pages */
-body.r-coach{background:#f1f5f6;color:#26374D}
-body.r-coach a{color:#00A6D6}
-body.r-coach .shell{background:#f8fafb;box-shadow:0 0 46px rgba(38,55,77,.08)}
-body.r-coach .hd{background:rgba(248,250,251,.95);border-bottom-color:#dce5e8;color:#26374D}
-body.r-coach .card,body.r-coach .stat{background:#fff;border-color:#dce5e8;color:#26374D}
-body.r-coach .stage{background:#26374D;color:#fff}
-body.r-coach .stage::before{background:#00A6D6;opacity:.24}
-body.r-coach .btn{background:#105350;color:#fff;box-shadow:0 7px 16px rgba(16,83,80,.17)}
-body.r-coach .btn.gold{background:#D5B642;color:#26374D}
-body.r-coach .btn.dark{background:#26374D;color:#D5B642}
-body.r-coach .btn.ghost{background:#fff;border-color:#dce5e8;color:#105350;box-shadow:none}
-body.r-coach .btn.ghost:hover{border-color:#00A6D6;color:#105350}
-body.r-coach .fld input,body.r-coach .fld select{border-color:#dce5e8;color:#26374D}
-body.r-coach .fld input:focus,body.r-coach .fld select:focus{border-color:#00A6D6;box-shadow:0 0 0 4px rgba(0,166,214,.14)}
-body.r-coach .ic{background:#e6f4f7;color:#105350}
-body.r-coach .nav{background:#fff;border-top-color:#dce5e8}
-body.r-coach .nav button.on{color:#105350}
-body.r-coach .nav button.on i{background:#e6f4f7}
-body.r-coach .nav .fab{background:#105350;color:#fff;box-shadow:0 9px 20px rgba(16,83,80,.2)}
-body.r-coach .note{background:#fbf7e8;border-color:#e8dba7;color:#66561f}
-body.r-coach .dnote{background:#26374D;color:#e6f4f7}
-body.r-coach .skel{background:#edf2f3;animation:none}
-body.r-coach .toast{background:#105350;box-shadow:0 12px 26px rgba(38,55,77,.18)}
-body.r-coach .toast.err{background:#a83b25}
-body.r-coach .chip.warn{background:#fbf7e8;border-color:#e8dba7;color:#66561f}
-body.r-coach .chip.ok{background:#e9f3ee;color:#105350}
-body.r-coach .chip.live{background:#e6f4f7;color:#007c9f}
-body.r-coach .btn:focus-visible,body.r-coach .nav button:focus-visible{outline:3px solid #00A6D6;outline-offset:3px}
 
-/* Recolor inline coach components to the same approved palette */
-body.r-coach [style*="background:#4636e3"],body.r-coach [style*="background: #4636e3"],body.r-coach [style*="background-color:#4636e3"]{background:#105350!important}
-body.r-coach [style*="color:#4636e3"]{color:#105350!important}
-body.r-coach [style*="background:#151a2e"],body.r-coach [style*="background: #151a2e"]{background:#26374D!important}
-body.r-coach [style*="color:#151a2e"]{color:#26374D!important}
-body.r-coach [style*="background:#efedff"],body.r-coach [style*="background: #efedff"]{background:#e6f4f7!important}
-body.r-coach [style*="color:#b9b0f5"]{color:#c4eff7!important}
+/* PlayIn365 Coach — night match-day identity */
+body.r-coach{background:#050711;color:#f2f5ff}
+body.r-coach::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;background:radial-gradient(ellipse at 10% 5%,rgba(35,91,165,.22),transparent 38%),radial-gradient(ellipse at 90% 38%,rgba(100,58,220,.17),transparent 40%),linear-gradient(180deg,#050711,#080d19 64%,#050711)}
+body.r-coach .shell{position:relative;background:linear-gradient(180deg,#080b17,#090d1b);border-inline:1px solid rgba(77,111,166,.18);box-shadow:0 0 60px rgba(0,0,0,.45)}
+body.r-coach .hd{background:rgba(7,10,21,.92);backdrop-filter:blur(18px);border-bottom-color:rgba(90,119,169,.2);color:#f4f6ff}
+body.r-coach main{background:transparent;gap:15px}
+body.r-coach .card,body.r-coach .stat{background:linear-gradient(155deg,#121b33,#0a1020)!important;border-color:rgba(91,125,183,.24)!important;color:#edf2ff!important;box-shadow:0 16px 38px rgba(0,0,0,.24)}
+body.r-coach .stage{background:radial-gradient(ellipse at 6% 100%,rgba(0,166,214,.2),transparent 48%),radial-gradient(ellipse at 95% 0%,rgba(110,73,250,.2),transparent 48%),linear-gradient(145deg,#101a33,#080d1b 72%);border:1px solid rgba(84,135,201,.36);box-shadow:0 18px 42px rgba(0,0,0,.28)}
+body.r-coach .stage::before{background:radial-gradient(ellipse at 30% 40%,rgba(113,77,255,.42),rgba(0,166,214,.16) 48%,transparent 72%);opacity:.58}
+body.r-coach .btn{background:linear-gradient(135deg,#7654ff,#5637d6);color:#fff;border:1px solid rgba(177,157,255,.2);box-shadow:0 9px 22px rgba(103,70,229,.28)}
+body.r-coach .btn.gold{background:#D5B642;color:#151a2e}
+body.r-coach .btn.dark{background:#111b32;color:#f1d65a;border:1px solid rgba(96,136,197,.3)}
+body.r-coach .btn.ghost{background:rgba(15,23,43,.86);border-color:rgba(107,132,181,.35);color:#d9e6fb;box-shadow:none}
+body.r-coach .fld input,body.r-coach .fld select{background:#0b1325;border-color:#263958;color:#eef3ff}
+body.r-coach .fld input:focus,body.r-coach .fld select:focus{border-color:#00A6D6;box-shadow:0 0 0 4px rgba(0,166,214,.16)}
+body.r-coach .muted{color:#91a0bd}body.r-coach .h2{color:#f1f4ff}body.r-coach .lrow{border-color:rgba(108,135,181,.18)}
+body.r-coach .ic{background:rgba(104,75,225,.16);color:#a994ff;border:1px solid rgba(129,106,255,.2)}
+body.r-coach .nav{inset-inline:unset;left:50%;transform:translateX(-50%);bottom:12px;width:min(500px,calc(100% - 24px));background:rgba(8,10,22,.94);backdrop-filter:blur(18px);border:1px solid rgba(111,88,195,.34);border-radius:28px;box-shadow:0 18px 46px rgba(0,0,0,.55);padding:9px 12px calc(9px + env(safe-area-inset-bottom))}
+body.r-coach .nav button{color:#9299b6}body.r-coach .nav button.on{color:#fff}
+body.r-coach .nav button.on i,body.r-coach .nav .fab{background:linear-gradient(135deg,#855fff,#603ce0);color:#fff;box-shadow:0 0 24px rgba(120,78,255,.45)}
+body.r-coach .note{background:rgba(199,162,49,.09);border-color:rgba(213,182,66,.36);color:#f0d979}
+body.r-coach .dnote{background:linear-gradient(145deg,#111c35,#080d1c);border:1px solid rgba(79,133,202,.26);color:#cfddf5}
+body.r-coach .toast{background:linear-gradient(135deg,#6243db,#3d2aa5);box-shadow:0 12px 28px rgba(0,0,0,.4)}
+body.r-coach .chip.ok{background:rgba(43,202,162,.12);color:#69e0bf;border:1px solid rgba(73,218,178,.22)}
+body.r-coach .chip.warn{background:rgba(213,182,66,.12);border-color:rgba(213,182,66,.3);color:#f0d979}
+body.r-coach .btn:focus-visible,body.r-coach .nav button:focus-visible{outline:3px solid #70d9fa;outline-offset:3px}
+body.r-coach .coach-page-heading{display:flex;align-items:end;justify-content:space-between;padding:4px 2px 0}
+body.r-coach .coach-page-heading>div{display:flex;flex-direction:column;gap:2px}
+body.r-coach .coach-page-eyebrow,body.r-coach .coach-eyebrow{font:700 9px 'Space Grotesk',sans-serif;letter-spacing:2.4px;color:#8b75ff}
+body.r-coach .coach-page-heading b{font-size:21px;font-weight:900;color:#f3f5ff}
+body.r-coach .coach-day-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(82,207,185,.3);background:rgba(41,181,160,.08);border-radius:999px;padding:6px 10px;color:#72dfc8;font-size:9px;font-weight:900}
+body.r-coach .coach-day-chip i{width:6px;height:6px;border-radius:50%;background:#58dfbc;box-shadow:0 0 10px #58dfbc}
+body.r-coach .coach-cohort-selector{scrollbar-width:none}body.r-coach .coach-cohort-selector::-webkit-scrollbar{display:none}
+body.r-coach .coach-cohort-selector button{background:#10182d!important;color:#b6c3dc!important;border-color:#273657!important}
+body.r-coach .coach-cohort-selector button[style*="background:#151a2e"]{background:linear-gradient(135deg,#7553ff,#5937d8)!important;color:#fff!important;border-color:#967dff!important;box-shadow:0 0 18px rgba(113,79,232,.25)}
+body.r-coach .coach-command-hero{position:relative;isolation:isolate;overflow:hidden;border-radius:28px;padding:19px 18px 15px;border:1px solid rgba(91,150,220,.48);background:radial-gradient(ellipse at 0% 100%,rgba(0,166,214,.25),transparent 42%),radial-gradient(ellipse at 95% 4%,rgba(108,72,237,.25),transparent 42%),linear-gradient(145deg,#111d38,#090f20 58%,#111027);box-shadow:0 22px 52px rgba(0,0,0,.38),inset 0 1px 0 rgba(151,197,255,.13)}
+body.r-coach .coach-command-hero:before{content:"";position:absolute;inset:0;z-index:-1;opacity:.2;pointer-events:none;background:linear-gradient(90deg,transparent 49.8%,rgba(127,190,238,.54) 50%,transparent 50.25%),radial-gradient(ellipse at 50% 38%,transparent 0 28%,rgba(119,158,212,.6) 28.2% 28.5%,transparent 28.8%),linear-gradient(0deg,transparent 67%,rgba(119,158,212,.22) 67.2%,transparent 67.5%)}
+body.r-coach .coach-command-hero:after{content:"";position:absolute;z-index:-1;width:250px;height:250px;top:-145px;inset-inline-end:-88px;border:1px solid rgba(134,107,255,.32);border-radius:50%;box-shadow:0 0 0 25px rgba(116,82,255,.04),0 0 0 58px rgba(46,150,215,.045)}
+body.r-coach .coach-command-head{display:flex;align-items:center;justify-content:space-between;gap:8px;position:relative}
+body.r-coach .coach-command-label{display:flex;align-items:center;gap:8px;font:700 9px 'Space Grotesk',sans-serif;letter-spacing:1.7px;color:#80dafa}
+body.r-coach .coach-command-label i{font-style:normal;color:#72dfc8}
+body.r-coach .coach-session-state{font-size:9px;font-weight:900;color:#f1d65a;border:1px solid rgba(213,182,66,.33);background:rgba(213,182,66,.08);border-radius:999px;padding:5px 9px}
+body.r-coach .coach-command-main{display:grid;grid-template-columns:minmax(0,1fr) 108px;align-items:center;gap:10px;position:relative;margin:24px 0 19px}
+body.r-coach .coach-command-copy h1{font-size:clamp(25px,7vw,34px);font-weight:900;line-height:1.22;margin:8px 0;color:#f5f7ff}
+body.r-coach .coach-command-copy h1 span{color:#f0d45b;text-shadow:0 0 24px rgba(239,205,68,.18)}
+body.r-coach .coach-command-copy p{font-size:10.5px;color:#aebbd4;font-weight:700;line-height:1.8;margin:7px 0 0}
+body.r-coach .coach-attendance-ring{--coach-progress:0%;position:relative;width:108px;height:108px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(#805dff var(--coach-progress),rgba(95,119,162,.2) 0);filter:drop-shadow(0 0 16px rgba(117,82,248,.32))}
+body.r-coach .coach-attendance-ring:before{content:"";position:absolute;inset:7px;border-radius:50%;background:#0a1020;border:1px solid rgba(145,119,255,.3);box-shadow:inset 0 0 18px rgba(80,65,172,.12)}
+body.r-coach .coach-attendance-ring>div{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center}
+body.r-coach .coach-attendance-ring strong{font:700 20px 'Space Grotesk',sans-serif;color:#f3f5ff}
+body.r-coach .coach-attendance-ring span{font-size:8px;font-weight:900;color:#c6d3ed}
+body.r-coach .coach-attendance-ring small{font:700 7px 'Space Grotesk',sans-serif;color:#80dafa}
+body.r-coach .coach-session-banner{position:relative;display:flex;align-items:center;gap:11px;padding:12px;border:1px solid rgba(103,142,201,.25);border-radius:18px;background:rgba(6,11,23,.58);box-shadow:inset 0 1px 0 rgba(255,255,255,.035)}
+body.r-coach .coach-session-symbol{width:42px;height:42px;display:grid;place-items:center;border-radius:14px;background:linear-gradient(145deg,rgba(116,81,248,.23),rgba(0,166,214,.13));border:1px solid rgba(117,121,238,.32);color:#d7c8ff;font-size:18px;flex:none}
+body.r-coach .coach-session-details{display:flex;flex-direction:column;gap:3px;min-width:0}
+body.r-coach .coach-session-details small{font:700 8px 'Space Grotesk',sans-serif;letter-spacing:1.4px;color:#8b75ff}
+body.r-coach .coach-session-details strong{font-size:12px;line-height:1.5;color:#f2f5ff}
+body.r-coach .coach-session-details span{font-size:9px;color:#9eacc7;font-weight:700}
+body.r-coach .coach-hero-actions{display:flex;gap:8px;margin-top:11px}
+body.r-coach .coach-hero-actions button{min-height:42px;border-radius:13px;padding:9px 13px;font:900 10.5px Cairo;cursor:pointer}
+body.r-coach .coach-primary-action{flex:1;border:1px solid rgba(180,160,255,.3);background:linear-gradient(135deg,#7c59ff,#5636d6);color:#fff;box-shadow:0 9px 20px rgba(107,71,226,.28)}
+body.r-coach .coach-secondary-action{border:1px solid rgba(101,132,187,.34);background:rgba(19,29,52,.74);color:#dce7fa}
+body.r-coach .coach-hero-metrics{position:relative;display:grid;grid-template-columns:repeat(3,1fr);margin-top:13px;padding-top:12px;border-top:1px solid rgba(116,146,191,.2)}
+body.r-coach .coach-hero-metrics>div{display:flex;flex-direction:column;align-items:center;gap:2px}
+body.r-coach .coach-hero-metrics>div+div{border-inline-start:1px solid rgba(116,146,191,.18)}
+body.r-coach .coach-hero-metrics small{font:700 7px 'Space Grotesk',sans-serif;letter-spacing:1.15px;color:#7182a3}
+body.r-coach .coach-hero-metrics strong{font:700 17px 'Space Grotesk',sans-serif;color:#f4f6ff}
+body.r-coach .coach-hero-metrics span{font-size:8px;color:#9aa9c4;font-weight:800}
+body.r-coach .coach-health-grid{display:grid!important;grid-template-columns:1fr;gap:10px}
+body.r-coach .coach-health-grid>div{border:1px solid rgba(91,125,183,.24)!important;border-radius:22px!important;overflow:hidden;box-shadow:0 15px 36px rgba(0,0,0,.18)}
+body.r-coach .coach-quick-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+body.r-coach .coach-quick-tile{min-height:118px;border-radius:20px!important;padding:14px 9px!important;background:linear-gradient(155deg,#121c35,#0a1020)!important;border:1px solid rgba(92,125,181,.28)!important;color:#eef3ff!important;box-shadow:0 14px 30px rgba(0,0,0,.2);transition:transform .2s,border-color .2s,box-shadow .2s}
+body.r-coach .coach-quick-tile:active{transform:scale(.98);border-color:rgba(124,93,255,.62)!important;box-shadow:0 0 22px rgba(109,75,230,.18)}
+body.r-coach .coach-quick-tile b{font-size:12px;color:#f2f4ff}
+body.r-coach .coach-quick-tile span:last-child{color:#91a0bd!important}
+body.r-coach .coach-quick-tile span:first-child{width:44px!important;height:44px!important;border-radius:15px!important}
+body.r-coach .coach-page-heading,body.r-coach .coach-command-hero,body.r-coach .coach-health-grid,body.r-coach .coach-quick-grid{animation:coach-rise .42s ease both}
+@keyframes coach-rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:390px){body.r-coach .coach-command-main{grid-template-columns:minmax(0,1fr) 94px;gap:7px}body.r-coach .coach-attendance-ring{width:92px;height:92px}body.r-coach .coach-command-copy h1{font-size:25px}}
+body.r-coach [style*="background:#fff"],body.r-coach [style*="background: #fff"],body.r-coach [style*="background:#faf8f3"],body.r-coach [style*="background: #faf8f3"]{background:linear-gradient(155deg,#121b33,#0a1020)!important;color:#ecf1ff}
+body.r-coach [style*="background:#151a2e"],body.r-coach [style*="background: #151a2e"]{background:linear-gradient(145deg,#111a32,#090e1d)!important}
+body.r-coach [style*="background:#4636e3"],body.r-coach [style*="background: #4636e3"]{background:linear-gradient(135deg,#7957ff,#5736d8)!important;color:#fff!important}
+body.r-coach [style*="background:#efedff"],body.r-coach [style*="background: #efedff"]{background:rgba(115,82,246,.17)!important}
+body.r-coach [style*="background:#fff6d6"],body.r-coach [style*="background: #fff6d6"]{background:rgba(213,182,66,.14)!important}
+body.r-coach [style*="background:#eaf5ee"],body.r-coach [style*="background: #eaf5ee"]{background:rgba(44,195,157,.12)!important}
+body.r-coach [style*="background:#fdeee8"],body.r-coach [style*="background: #fdeee8"]{background:rgba(235,116,79,.13)!important}
 body.r-coach [style*="background:#f5c518"],body.r-coach [style*="background: #f5c518"]{background:#D5B642!important}
-body.r-coach [style*="color:#f5c518"]{color:#D5B642!important}
-body.r-coach [style*="linear-gradient(200deg,#4636e3,#7b5cff)"],body.r-coach [style*="linear-gradient(160deg,#4636e3,#2a2260)"]{background:#00A6D6!important;opacity:.24!important}
-body.r-coach [style*="box-shadow:0 0 0 6px #4636e3"]{box-shadow:0 0 0 6px #D5B642!important}
-body.r-coach [style*="box-shadow:0 8px 18px rgba(70,54,227"]{box-shadow:0 7px 16px rgba(16,83,80,.17)!important}
-body.r-coach [fill="#4636e3"]{fill:#105350!important}
-body.r-coach [stroke="#4636e3"]{stroke:#00A6D6!important}
+body.r-coach [style*="color:#4636e3"]{color:#a994ff!important}
+body.r-coach [style*="color:#151a2e"]{color:#e8edfa!important}
+body.r-coach [style*="color:#faf8f3"]{color:#f4f6ff!important}
+body.r-coach [style*="color:#b9b0f5"]{color:#8a78ff!important}
+body.r-coach [style*="color:#c6cade"],body.r-coach [style*="color:#8a8fa5"],body.r-coach [style*="color:#5b6078"],body.r-coach [style*="color:#565d78"]{color:#98a7c3!important}
+body.r-coach [style*="color:#f5c518"]{color:#f1d65a!important}
+body.r-coach [style*="color:#c78c00"]{color:#e4c64c!important}
+body.r-coach [style*="border:1px solid #e9e4d8"],body.r-coach [style*="border:1.5px solid #e9e4d8"],body.r-coach [style*="border:1px solid #e3ded2"]{border-color:rgba(95,129,185,.29)!important}
+body.r-coach [style*="border-bottom:1px solid #f0ece2"],body.r-coach [style*="border-top:1px solid #f0ece2"]{border-color:rgba(96,125,174,.2)!important}
+body.r-coach [style*="linear-gradient(200deg,#4636e3,#7b5cff)"],body.r-coach [style*="linear-gradient(160deg,#4636e3,#2a2260)"]{background:radial-gradient(ellipse at 20% 70%,rgba(0,166,214,.28),transparent 50%),radial-gradient(ellipse at 80% 10%,rgba(119,82,247,.38),transparent 62%)!important;opacity:.58!important}
+body.r-coach [style*="box-shadow:0 0 0 6px #4636e3"]{box-shadow:0 0 0 5px rgba(116,84,255,.86),0 0 24px rgba(116,84,255,.4)!important}
+body.r-coach [style*="box-shadow:0 8px 18px rgba(70,54,227"]{box-shadow:0 8px 20px rgba(107,71,226,.3)!important}
+body.r-coach [fill="#4636e3"]{fill:#845fff!important}body.r-coach [stroke="#4636e3"]{stroke:#70d9fa!important}
 </style>
 <link rel="stylesheet" href="player-zero.css?v=20261026-closeout3"><link rel="stylesheet" href="player-v3.css?v=20261024-player-v3"><link rel="stylesheet" href="player-v4.css?v=20261024-player-v4"><link rel="stylesheet" href="player-v5.css?v=20261026-closeout4"><link rel="stylesheet" href="player-v6.css?v=20261025-approved-card7"><link rel="stylesheet" href="player-journey.css?v=20261026-closeout3"></head><body>
 <template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><rect width="200" height="200" rx="34" fill="#151a2e"/><text x="100" y="118" text-anchor="middle" font-family="Arial" font-weight="700" font-size="56" fill="#f5c518">In</text><circle cx="150" cy="56" r="9" fill="#4636e3"/></svg></template>
