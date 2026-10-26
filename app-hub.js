@@ -199,8 +199,8 @@ HUB.icon = route => {
   const icon = names[route] || "dashboard";
   return `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[icon]||paths.dashboard}</svg>`;
 };
-HUB.tile = ([g,lb,v,bg,ink]) => `<button onclick="go('${v}')" style="background:#fff;border:1px solid #e9e4d8;border-radius:20px;padding:14px 8px;display:flex;flex-direction:column;align-items:center;gap:7px;cursor:pointer;font-family:Cairo;color:#151a2e;text-align:center">
-  <span style="width:40px;height:40px;border-radius:${(typeof ME!=="undefined"&&ME&&ME.role==="coach")?"50% 50% 8px 50%":"50% 50% 50% 8px"};background:${bg||"#efedff"};color:${ink||"#4636e3"};display:grid;place-items:center;flex:none">${HUB.icon(v)}</span>
+HUB.tile = ([g,lb,v,bg,ink]) => `<button onclick="go('${v}')" style="background:#11182d;border:1px solid rgba(112,139,190,.24);border-radius:20px;padding:14px 8px;display:flex;flex-direction:column;align-items:center;gap:7px;cursor:pointer;font-family:Cairo;color:#f1f4ff;text-align:center">
+  <span style="width:40px;height:40px;border-radius:${(typeof ME!=="undefined"&&ME&&ME.role==="coach")?"50% 50% 8px 50%":"50% 50% 50% 8px"};background:rgba(112,80,255,.14);color:#b09aff;display:grid;place-items:center;flex:none">${HUB.icon(v)}</span>
   <b style="font-size:11.5px;font-weight:900;line-height:1.5">${lb}</b></button>`;
 
 
@@ -229,14 +229,14 @@ T.hub = async () => {
         <div style="flex:1;min-width:0">
           <span style="display:block;font-size:10px;color:#f5c518;font-weight:900">دورك الحالي · ${esc(RN)}</span>
           <b style="display:block;font-size:17px;font-weight:900;line-height:1.25;margin-top:2px">${esc((ME.name||"").split(" ")[0])}${ME.org?` <span style="font-size:11px;color:#c6cade;font-weight:700">· ${esc(ME.org)}</span>`:""}</b>
-          <span style="display:block;font-size:10.5px;color:#c6cade;font-weight:700;line-height:1.8;margin-top:4px">ما تملك الوصول إليه — في شاشة واحدة بلا قوائم متداخلة.</span></div>
+          <span style="display:block;font-size:10.5px;color:#c6cade;font-weight:700;line-height:1.8;margin-top:4px">هنا تجد الخدمات المتاحة لحسابك.</span></div>
         <button onclick="go('role')" style="background:#fff;color:#151a2e;border:0;border-radius:999px;padding:8px 12px;font:900 10.5px Cairo;cursor:pointer;flex:none">⇄ غيّر</button>
       </div>
     </div>
     ${HUB.group("لكل الأدوار","SHARED","#4636e3",HUB.SHARED)}
     ${HUB.group("خاص بدورك","ROLE · "+String(r).toUpperCase(),"#c78c00",own)}
     ${HUB.group("كل الخدمات","ALL SURFACES","#243244",HUB.ALL.filter(x=>!seen.has(x[2])))}
-    <div style="background:#fff8df;border:1px solid #f0e2b4;border-radius:16px;padding:13px;font-size:11px;color:#8a6912;font-weight:700;line-height:1.85">ما لا يظهر هنا لا تملك صلاحيته — والصلاحية في القاعدة لا في الشاشة.</div>
+    <div style="background:#fff8df;border:1px solid #f0e2b4;border-radius:16px;padding:13px;font-size:11px;color:#8a6912;font-weight:700;line-height:1.85">تظهر هنا الخدمات المناسبة لحسابك ودورك.</div>
   </main>`;
   if(r==="player"&&window.PZ&&typeof window.PZ.page==="function") return window.PZ.page("hub",markup);
   if(r==="coach") return '<header class="pz5-top"><button aria-label="الرئيسية" title="الرئيسية" onclick="go(&quot;coachHome&quot;)">'+window.PZ.icon('back')+'</button><div class="pz5-brand">Play<span>In</span><sup>365</sup></div><button aria-label="ملفي" title="ملفي" onclick="go(&quot;coachMe&quot;)">'+window.PZ.icon('profile')+'</button></header>'+markup;
@@ -246,7 +246,7 @@ T.hub = async () => {
 (function(){
   Object.assign(TITLES,{hub:"تنقّل سريع"});
   if(typeof PL3!=="undefined"){
-    PL3.TITLE.hub = ["تنقّل سريع","كل سطح تملك الوصول إليه — في شاشة واحدة"];
+    PL3.TITLE.hub = ["تنقّل سريع","خدماتك المتاحة كلها في مكان واحد"];
     PL3.navItems = PL3.navItems.map(it => it[0]==="FAB" ? ["FAB","تنقّل","hub"] : it);
   }
   /* الشريط العام للأدوار الأخرى: الزر الأوسط يفتح المفتاح بدل «أنشئ مباراة» — وإنشاء المباراة يبقى في مجموعة دورك */
