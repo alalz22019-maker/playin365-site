@@ -347,8 +347,8 @@ T.session = async () => {
 
     ${CO.card(`<div style="display:flex;justify-content:space-between;align-items:baseline">${CO.h("خطة الحصة")}<span style="font-size:10px;color:#8a8fa5;font-weight:800"><span class="ltr">${mins}</span> دقيقة</span></div>
       <div style="display:flex;gap:4px;margin-top:12px;height:10px;border-radius:999px;overflow:hidden">
-        ${CO.PLAN.map(p=>`<span style="flex:${p.min};background:${p.tagInk}"></span>`).join("")}</div>
-      <div style="margin-top:6px">${CO.PLAN.map(p=>`<div style="display:flex;gap:11px;align-items:flex-start;padding:9px 0;border-top:1px solid #f0ece2">
+        ${plan.map(p=>`<span style="flex:${p.min};background:${p.tagInk}"></span>`).join("")}</div>
+      <div style="margin-top:6px">${plan.map(p=>`<div style="display:flex;gap:11px;align-items:flex-start;padding:9px 0;border-top:1px solid #f0ece2">
         <b class="ltr" style="font-size:12px;color:#4636e3;flex:none;width:34px">${p.min}′</b>
         <div style="flex:1;min-width:0"><b style="display:block;font-size:12px">${p.t}</b>
           <span style="display:block;font-size:10.5px;color:#8a8fa5;font-weight:700;margin-top:2px">${p.s}</span></div>
