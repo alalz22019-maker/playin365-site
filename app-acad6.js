@@ -223,17 +223,21 @@
   function styleNav6(nav){
     if(!nav)return;
     const props={position:"fixed",left:"50%",right:"auto",bottom:"12px",transform:"translateX(-50%)",width:"min(500px, calc(100% - 24px))",maxWidth:"500px",display:"flex",justifyContent:"space-around",alignItems:"center",background:"rgba(8,10,22,.96)",backdropFilter:"blur(18px)",border:"1px solid rgba(111,88,195,.4)",borderRadius:"28px",boxShadow:"0 18px 46px rgba(0,0,0,.55)",padding:"8px 10px calc(8px + env(safe-area-inset-bottom))"};
-    Object.keys(props).forEach(k=>nav.style.setProperty(k.replace(/[A-Z]/g,m=>"-"+m.toLowerCase()),props[k],"important"));
+    const important=(el,k,v)=>{const key=k.replace(/[A-Z]/g,m=>"-"+m.toLowerCase());if(el.style.getPropertyValue(key)!==v||el.style.getPropertyPriority(key)!=="important")el.style.setProperty(key,v,"important")};
+    Object.keys(props).forEach(k=>important(nav,k,props[k]));
     nav.querySelectorAll("button").forEach(b=>{
       const bp={color:b.classList.contains("on")?"#fff":"#9299b6",font:"800 9.5px Cairo",minWidth:"50px",background:"transparent",border:"0",display:"flex",flexDirection:"column",alignItems:"center",gap:"3px"};
-      Object.keys(bp).forEach(k=>b.style.setProperty(k.replace(/[A-Z]/g,m=>"-"+m.toLowerCase()),bp[k],"important"));
+      Object.keys(bp).forEach(k=>important(b,k,bp[k]));
       b.querySelectorAll("i").forEach(i=>{
         const ip={width:"33px",height:"33px",display:"grid",placeItems:"center",borderRadius:"12px",background:b.classList.contains("on")?"linear-gradient(135deg,#855fff,#603ce0)":"transparent",color:b.classList.contains("on")?"#fff":"#9299b6"};
-        Object.keys(ip).forEach(k=>i.style.setProperty(k.replace(/[A-Z]/g,m=>"-"+m.toLowerCase()),ip[k],"important"));
-        i.querySelectorAll("svg").forEach(s=>{s.style.width="19px";s.style.height="19px";s.style.fill="none";s.style.stroke="currentColor";s.style.strokeWidth="1.8";s.style.strokeLinecap="round";s.style.strokeLinejoin="round";});
+        Object.keys(ip).forEach(k=>important(i,k,ip[k]));
+        i.querySelectorAll("svg").forEach(s=>{important(s,"width","19px");important(s,"height","19px");important(s,"fill","none");important(s,"stroke","currentColor");important(s,"strokeWidth","1.8");important(s,"strokeLinecap","round");important(s,"strokeLinejoin","round")});
       });
     });
   }
+  function syncAcademyNav(){if(!(ME&&ME.role==="academy"))return;document.querySelectorAll("nav.nav").forEach(styleNav6)}
+  const academyNavObserver=new MutationObserver(syncAcademyNav);
+  academyNavObserver.observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["class","style"]});
   const previousRender=window.render;
   window.render=async function(){
     await previousRender.apply(this,arguments);
@@ -248,7 +252,7 @@
         let bar=app.querySelector(".a6-brandbar");if(!bar){bar=document.createElement("header");bar.className="a6-brandbar";app.insertBefore(bar,app.firstChild);}
         const current=VIEW||"acadHome";const home=current==="acad"||current==="acadHome";
         bar.innerHTML=`<button class="a6-header-side" onclick="${home?"go('hub')":"go('acadHome')"}" aria-label="${home?"الخدمات":"رجوع"}">${svg(home?"menu":"back")}</button><div class="a6-brand-mark"><b>Play<span>In</span><small>365</small></b></div><button class="a6-header-avatar" onclick="go('acadProfile')" aria-label="ملف الأكاديمية">ن</button>`;
-        styleNav6(app.querySelector("nav.nav"));
+        syncAcademyNav();
       }
       let fab=document.getElementById("ac6Fab");if(!fab){fab=document.createElement("button");fab.id="ac6Fab";fab.className="ac6-fab";fab.setAttribute("aria-label","اختصارات الأكاديمية");fab.title="اختصارات الأكاديمية";fab.innerHTML=svg("plus");fab.onclick=()=>AC6.openQuick();document.body.appendChild(fab);}
     }catch(e){console.error("Academy shell:",e)}
