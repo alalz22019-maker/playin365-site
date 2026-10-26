@@ -32,7 +32,7 @@ async function loadMe(uid,email){
       if(roleAr[candidate]) demoRole=candidate;
     }
   }catch(e){}
-  ME=data?{...data,role:demoRole||data.role,roleSet:!!demoRole||picked||DEMO_HINT===data.id||(data.role&&data.role!=="player")||(data.org&&data.pos)}:null;
+  ME=data?{...data,role:demoRole||data.role,isSyntheticDemo:!!demoRole,roleSet:!!demoRole||picked||DEMO_HINT===data.id||(data.role&&data.role!=="player")||(data.org&&data.pos)}:null;
 }
 function homeFor(){ return ({player:"feed",coach:"orgMatch",organizer:"orgMatch",referee:"refDuty",academy:"acad",venue:"venue",guardian:"guardian",scout:"scout",admin:"owner",medical:"medical",agent:"deals"})[ME.role]||"home"; }
 async function doSignup(){

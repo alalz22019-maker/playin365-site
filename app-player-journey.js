@@ -14,10 +14,38 @@
   function safe(name, query) { return P.safe(name, query); }
   function norm(value) { return String(value || '').trim().toLowerCase(); }
   function hasProof(row) { return !!(row && (row.verified_by || row.verified_at || row.signed_by || row.proof || row.is_verified === true)); }
+  function previewDemoMode() {
+    try { return location.hostname.endsWith('.vercel.app') && location.hostname.indexOf('-git-codex-player-ac-') >= 0 && new URLSearchParams(location.search).get('demo') === '1'; }
+    catch (_) { return false; }
+  }
+  function demoDate(monthOffset, day) {
+    var parts = {};
+    new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Riyadh', year: 'numeric', month: '2-digit' }).formatToParts(new Date()).forEach(function (part) { parts[part.type] = part.value; });
+    return new Date(Date.UTC(Number(parts.year), Number(parts.month) - 1 + monthOffset, Math.min(day || 12, 28), 12)).toISOString().slice(0, 10);
+  }
+  function demoHistory(player) {
+    var who = player && player.name || 'Player';
+    var events = [], joins = [], badges = [], matches = [], comps = ['دوري الناشئين التجريبي', 'بطولة الرياض التجريبية', 'كأس الأكاديميات التجريبي'];
+    for (var i = 5; i >= 0; i--) {
+      // Leave two quiet months in the sample so the expandable timeline can be reviewed honestly.
+      if (i === 4 || i === 1) continue;
+      var date = demoDate(-i, 6 + (i % 3) * 5), id = 'preview-match-' + i;
+      var match = { id: id, title: 'مباراة تجريبية · الجولة ' + (6 - i), comp: comps[i % comps.length], match_date: date + 'T18:30:00+03:00', status: 'FT', score_a: i % 2 ? 2 : 3, score_b: 1, team_a: player && player.org || 'أكاديمية تجريبية', team_b: 'فريق تجريبي', demo: true };
+      matches.push(match);
+      joins.push({ id: 'preview-join-' + i, match_id: id, player_name: who, attended: true, demo: true });
+      events.push({ id: 'preview-goal-' + i, who: who, match_id: id, type: 'goal', minute: 14 + i * 7, created_at: date + 'T20:00:00+03:00', matches: match, demo: true });
+      if (i % 2 === 0) events.push({ id: 'preview-assist-' + i, who: who, match_id: id, type: 'assist', minute: 61, created_at: date + 'T20:20:00+03:00', matches: match, demo: true });
+    }
+    [-5, -2, 0].forEach(function (offset, index) {
+      var earned = demoDate(offset, 18);
+      badges.push({ id: 'preview-badge-' + index, title: ['إنجاز تجريبي · أول هدف', 'إنجاز تجريبي · لاعب الجولة', 'إنجاز تجريبي · هدف وصناعة في مباراة'][index], earned_at: earned + 'T12:00:00+03:00', demo: true });
+    });
+    return { events: events, joins: joins, badges: badges, career: [], certs: [{ title: 'بطولة اختبار الناشئين — تجريبي', issuer: 'جهة اختبارية · بيانات تجريبية', year: '2026', created_at: demoDate(-2, 20), demo: true }], alumni: [], media: [], matches: matches };
+  }
   function maySharePublic(player) {
     // A QR code is an identity link, not an age-gated feature. Visibility is
     // governed by the profile's own public/private setting, not the player's age.
-    return !!(player && player.role === 'player' && player.profile_visibility === 'public');
+    return !!(player && player.role === 'player' && (player.profile_visibility === 'public' || (previewDemoMode() && player.isSyntheticDemo === true)));
   }
   function shareNotice(message) {
     if (typeof toast === 'function') toast(message);
@@ -93,7 +121,7 @@
   }
   async function contactInbox(userId) {
     if (!userId) return '';
-    var rows = await safe('player-contact-inbox-' + userId, sb.from('approval_requests').select('id,payload,created_at').eq('assigned_to_user_id', userId).eq('request_type', 'contact').eq('status', 'pending').order('created_at', { ascending: false }).limit(8));
+    var rows = previewDemoMode() ? [{ id: 'preview-contact-1', payload: { requester_name: 'كشاف تجريبي', requester_role: 'scout', requester_organization: 'جهة استقطاب تجريبية', reason: 'طلب تقييم اللاعب بعد مشاركته في بطولة تجريبية.', contact_method: 'email', contact_value: 'scout@example.test' }, created_at: new Date().toISOString() }] : await safe('player-contact-inbox-' + userId, sb.from('approval_requests').select('id,payload,created_at').eq('assigned_to_user_id', userId).eq('request_type', 'contact').eq('status', 'pending').order('created_at', { ascending: false }).limit(8));
     if (!rows || !rows.length) return '';
     contactStyles();
     return '<section class="pj-contact-inbox"><h3>طلبات التواصل <span class="pj-contact-role">' + e(rows.length) + '</span></h3>' + rows.map(function (row) {
@@ -164,11 +192,58 @@
     },
     decide: decideContactRequest
   };
+  var baseContactSubmit = window.PJContact.submit;
+  var baseContactDecide = window.PJContact.decide;
+  window.PJContact.submit = async function () {
+    if (!previewDemoMode()) return baseContactSubmit.apply(this, arguments);
+    var modal = document.getElementById('pj-contact-modal');
+    if (modal) {
+      var reason = modal.querySelector('#pj-contact-reason');
+      var contact = modal.querySelector('#pj-contact-value');
+      if (!reason || !reason.value.trim() || !contact || !contact.value.trim()) return shareNotice('أكمل وسيلة التواصل وسبب الطلب.');
+      window.PJContact.close();
+    }
+    shareNotice('تم اختبار الطلب — لم يُرسل ولم يُحفظ.');
+  };
+  window.PJContact.decide = async function (requestId, status) {
+    if (!previewDemoMode()) return baseContactDecide.apply(this, arguments);
+    var node = Array.prototype.find.call(document.querySelectorAll('[data-request-id]'), function (item) { return item.getAttribute('data-request-id') === requestId; });
+    var request = node && node.closest('.pj-contact-request');
+    var inbox = request && request.closest('.pj-contact-inbox');
+    if (request) request.remove();
+    if (inbox && !inbox.querySelector('.pj-contact-request')) inbox.remove();
+    shareNotice(status === 'approved' ? 'تمت الموافقة على الطلب التجريبي؛ لم يُرسل شيء.' : 'رُفض الطلب التجريبي؛ لم يُرسل شيء.');
+  };
   var baseShare = P.share;
   if (typeof baseShare === 'function') P.share = async function (name) {
     var target = norm(name || (ME && ME.name));
     if (ME && target === norm(ME.name) && !maySharePublic(ME)) {
       shareNotice('الهوية غير منشورة للعامة بعد.');
+      return;
+    }
+    if (previewDemoMode()) {
+      var playerName = String(name || (ME && ME.name) || '').trim();
+      var shareUrl = location.origin + location.pathname + '?player=' + encodeURIComponent(playerName) + '&demo=1';
+      try {
+        if (navigator.share) {
+          await navigator.share({ title: 'PlayIn365 — هوية اللاعب التجريبية', url: shareUrl });
+          return;
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(shareUrl);
+          shareNotice('تم نسخ رابط الهوية التجريبية.');
+          return;
+        }
+      } catch (_) {
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(shareUrl);
+            shareNotice('تم نسخ رابط الهوية التجريبية.');
+            return;
+          }
+        } catch (__) {}
+      }
+      shareNotice('تعذرت مشاركة رابط المعاينة من هذا المتصفح.');
       return;
     }
     return baseShare.apply(this, arguments);
@@ -185,7 +260,9 @@
     if (!value) return { year: '', month: '', stamp: '' };
     var date = new Date(value);
     if (isNaN(date.getTime())) return { year: yearOf(value), month: '', stamp: '' };
-    return { year: String(date.getFullYear()), month: monthNames[date.getMonth()], stamp: date.toISOString() };
+    var parts = {};
+    new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Riyadh', year: 'numeric', month: 'numeric' }).formatToParts(date).forEach(function (part) { parts[part.type] = part.value; });
+    return { year: String(parts.year), month: monthNames[Number(parts.month) - 1], stamp: date.toISOString() };
   }
   function icon(name) {
     var paths = {
@@ -249,7 +326,8 @@
       items.push({ year: yearOf(row.year) || d.year, month: row.year && !row.created_at && !row.awarded_at ? '' : d.month, date: d.stamp, type: 'award', icon: 'trophy', title: row.title || row.badge_key || 'إنجاز', meta: row.proof || row.signed_by || (hasProof(row) ? 'اعتماد الجهة' : 'إنجاز مضاف للملف'), verified: hasProof(row) });
     });
     data.certs.filter(function (row) { return row.title; }).forEach(function (row) {
-      items.push({ year: yearOf(row.year || row.created_at), month: '', date: '', type: 'award', icon: 'trophy', title: row.title, meta: [row.issuer, hasProof(row) ? 'اعتماد الجهة' : 'شهادة مضافة'].filter(Boolean).join(' · '), verified: hasProof(row) });
+      var d = dateParts(row.created_at || row.issued_at);
+      items.push({ year: yearOf(row.year) || d.year, month: d.month, date: d.stamp, type: 'award', icon: 'trophy', title: row.title, meta: [row.issuer, hasProof(row) ? 'اعتماد الجهة' : 'شهادة مضافة'].filter(Boolean).join(' · '), verified: hasProof(row) });
     });
     data.matches.forEach(function (match) {
       var attended = data.joins.some(function (join) { return isAttended(join) && String(join.match_id) === String(match.id); });
@@ -257,7 +335,7 @@
       var officialDate = matchDate(match);
       var d = dateParts(officialDate || (!yearOf(match.comp) ? match.created_at : ''));
       var title = match.comp || match.title || match.name || 'مشاركة رسمية';
-      items.push({ year: d.year || yearOf(match.comp), month: d.month, date: d.stamp, type: 'tournament', icon: 'match', title: title, meta: match.title && match.comp ? match.title : 'مشاركة موثّقة', verified: true, matchId: String(match.id), matchTitle: match.title || match.name || '' });
+      items.push({ year: d.year || yearOf(match.comp), month: d.month, date: d.stamp, type: 'tournament', icon: 'match', title: title, meta: match.demo ? 'مشاركة تجريبية' : (match.title && match.comp ? match.title : 'مشاركة موثّقة'), verified: !previewDemoMode() && !match.demo, matchId: String(match.id), matchTitle: match.title || match.name || '' });
     });
     data.events.forEach(function (event) {
       var kind = readableType(event.type);
@@ -266,7 +344,7 @@
       var officialDate = matchDate(match);
       var d = dateParts(officialDate || (!yearOf(match && match.comp) ? event.created_at || match && match.created_at : ''));
       var seasonYear = yearOf(match && match.comp);
-      items.push({ year: d.year, month: d.month, date: d.stamp, type: kind.kind, icon: kind.icon, title: kind.label, meta: [event.matches && (event.matches.title || event.matches.comp), event.minute ? event.minute + '′' : ''].filter(Boolean).join(' · '), verified: !!(event.recorded_by || event._verified_public), matchId: event.match_id ? String(event.match_id) : '', matchTitle: event.matches && (event.matches.title || event.matches.name) || '' });
+      items.push({ year: d.year, month: d.month, date: d.stamp, type: kind.kind, icon: kind.icon, title: kind.label, meta: [event.matches && (event.matches.title || event.matches.comp), event.minute ? event.minute + '′' : ''].filter(Boolean).join(' · '), verified: !previewDemoMode() && !!(event.recorded_by || event._verified_public), matchId: event.match_id ? String(event.match_id) : '', matchTitle: event.matches && (event.matches.title || event.matches.name) || '' });
       if (!d.year && seasonYear) items[items.length - 1].year = seasonYear;
     });
     return items.filter(function (item) { return item.year || item.title; }).sort(function (a, b) {
@@ -315,13 +393,13 @@
       var key = item.year + '|' + item.month + '|' + item.matchId;
       var moment = byMatch[key];
       if (!moment) {
-        moment = byMatch[key] = { year: item.year, month: item.month, date: item.date, type: 'match', icon: 'match', title: item.type === 'tournament' ? item.title : (item.matchTitle || item.title), meta: item.type === 'tournament' ? (item.matchTitle || 'مشاركة موثّقة') : 'لحظة من المباراة', verified: item.type === 'tournament', goals: [], assists: [], matchId: item.matchId };
+        moment = byMatch[key] = { year: item.year, month: item.month, date: item.date, type: 'match', icon: 'match', title: item.type === 'tournament' ? item.title : (item.matchTitle || item.title), meta: item.type === 'tournament' ? (item.matchTitle || 'مشاركة موثّقة') : 'لحظة من المباراة', verified: item.type === 'tournament' && item.verified, goals: [], assists: [], matchId: item.matchId };
         moments.push(moment);
       }
       if (item.type === 'tournament') {
         moment.title = item.title;
-        moment.meta = item.matchTitle || item.meta || 'مشاركة موثّقة';
-        moment.verified = true;
+        moment.meta = item.matchTitle || item.meta || (previewDemoMode() ? 'مشاركة تجريبية' : 'مشاركة موثّقة');
+        moment.verified = !!item.verified;
       } else if (item.type === 'match' && item.verified) {
         moment.verified = true;
         moment.meta = item.meta || moment.meta;
@@ -337,15 +415,20 @@
     return moments;
   }
   function eventRow(item) {
-    var proof = item.type === 'goal' || item.type === 'assist' ? 'مسجّل' : item.verified ? 'موثّق' : 'مضاف';
+    var isDemo = previewDemoMode();
+    var proof = isDemo ? 'سجل تجريبي · غير موثّق' : (item.type === 'goal' || item.type === 'assist' ? 'مسجّل' : item.verified ? 'موثّق' : 'مضاف');
     var signals = [];
     if (item.goals && item.goals.length) signals.push('<span class="pj-signal pj-signal-goal">' + icon('goal') + '<b>' + e(item.goals.length) + ' أهداف</b></span>');
     if (item.assists && item.assists.length) signals.push('<span class="pj-signal pj-signal-assist">' + icon('assist') + '<b>' + e(item.assists.length) + ' صناعة</b></span>');
     if (item.goals && item.goals.some(function (x) { return x.minute; })) signals.push('<small class="pj-minute-list">' + e(item.goals.map(function (x) { return x.minute; }).filter(Boolean).join(' · ')) + '</small>');
-    return '<article class="pj-event pj-event-' + e(item.type) + '"><span class="pj-event-icon">' + icon(item.icon) + '</span><div class="pj-event-copy"><b>' + e(item.title) + '</b>' + (item.meta ? '<small>' + e(item.meta) + '</small>' : '') + (signals.length ? '<span class="pj-event-signals">' + signals.join('') + '</span>' : '') + '</div><span class="pj-event-proof" title="' + proof + '">' + (item.verified ? '✓' : '•') + '</span></article>';
+    return '<article class="pj-event pj-event-' + e(item.type) + '"><span class="pj-event-icon">' + icon(item.icon) + '</span><div class="pj-event-copy"><b>' + e(item.title) + '</b>' + (item.meta ? '<small>' + e(item.meta) + '</small>' : '') + (signals.length ? '<span class="pj-event-signals">' + signals.join('') + '</span>' : '') + '</div><span class="pj-event-proof" title="' + proof + '">' + (isDemo ? 'تجريبي' : item.verified ? '✓' : '•') + '</span></article>';
   }
   function verifiedMomentCount(group) {
     return group.items.reduce(function (sum, item) {
+      if (previewDemoMode()) {
+        var demoValue = ['match', 'goal', 'assist', 'award', 'academy', 'move'].includes(item.type) ? 1 : 0;
+        return sum + demoValue + (item.goals || []).length + (item.assists || []).length;
+      }
       var value = 0;
       if (item.verified && ['match', 'goal', 'assist', 'award', 'academy', 'move'].includes(item.type)) value++;
       if (item.goals) value += item.goals.filter(function (event) { return event.verified; }).length;
@@ -382,7 +465,7 @@
     var path = points.map(function (point, index) { return (index ? 'L' : 'M') + point.x.toFixed(1) + ' ' + point.y.toFixed(1); }).join(' ');
     var area = path + ' L' + points[points.length - 1].x.toFixed(1) + ' ' + bottom + ' L' + points[0].x.toFixed(1) + ' ' + bottom + ' Z';
     var marks = points.map(function (point) {
-      var title = point.label + ' ' + point.year + ' · ' + point.value + ' لحظات موثقة';
+      var title = point.label + ' ' + point.year + ' · ' + point.value + (previewDemoMode() ? ' أحداث تجريبية' : ' لحظات موثقة');
       return '<g class="pj-pulse-point" aria-label="' + e(title) + '"><title>' + e(title) + '</title><line x1="' + point.x.toFixed(1) + '" y1="' + point.y.toFixed(1) + '" x2="' + point.x.toFixed(1) + '" y2="' + bottom + '"/><circle class="pj-pulse-halo" cx="' + point.x.toFixed(1) + '" cy="' + point.y.toFixed(1) + '" r="' + (point.r + 5).toFixed(1) + '"/><circle cx="' + point.x.toFixed(1) + '" cy="' + point.y.toFixed(1) + '" r="' + point.r.toFixed(1) + '"/><text x="' + point.x.toFixed(1) + '" y="' + (bottom + 17) + '" text-anchor="middle">' + e(point.label) + '</text><text class="pj-pulse-year" x="' + point.x.toFixed(1) + '" y="' + (bottom + 29) + '" text-anchor="middle">' + e(point.year) + '</text></g>';
     }).join('');
     var svgWidth = Math.round(width);
@@ -399,23 +482,29 @@
       var newerStamp = monthStamp(group), olderStamp = older && monthStamp(older);
       var emptyMonths = newerStamp !== null && olderStamp !== null ? newerStamp - olderStamp - 1 : 0;
       if (older && emptyMonths > 0) {
-        var gapHeight = Math.min(62, 12 + emptyMonths * 8);
-        stream += '<div class="pj-time-gap" data-pj-gap-year="' + e(group.year || 'غير مؤرخ') + '" style="--pj-gap-height:' + gapHeight + 'px" title="فترة بين السجلات"><i></i><small>فترة بين السجلات</small></div>';
+        for (var quietStamp = newerStamp - 1; quietStamp > olderStamp; quietStamp--) {
+          var quietYear = Math.floor(quietStamp / 12);
+          var quietMonth = monthNames[((quietStamp % 12) + 12) % 12];
+          stream += '<div class="pj-time-gap" data-pj-gap-year="' + e(quietYear) + '" style="--pj-gap-height:20px" title="' + e(quietMonth + ' ' + quietYear + ' دون سجل') + '"><i></i><small>' + e(quietMonth + ' · ' + quietYear + ' · دون سجل') + '</small></div>';
+        }
       }
     });
     return '<div class="pj-atlas-head"><span class="pj-atlas-line"></span><div class="pj-year-orbit" role="tablist" aria-label="تصفية الرحلة حسب السنة"><button class="pj-year-node is-selected" role="tab" type="button" data-pj-year="all" aria-selected="true" aria-pressed="true"><i>الكل</i><small>المسيرة</small></button>' + years.map(function (year) { return '<button class="pj-year-node" role="tab" type="button" data-pj-year="' + e(year) + '" aria-selected="false" aria-pressed="false"><i>' + e(year) + '</i><small>الموسم</small></button>'; }).join('') + '</div></div><div class="pj-month-stream">' + stream + '</div>';
   }
   function academyRoute(player, data) {
     var stations = academyStations(player, data).slice(-5);
-    var hasHistory = data.career.some(function (row) { return hasProof(row) && row.org; }) || data.alumni.some(function (row) { return hasProof(row) && row.dest; });
-    if (!hasHistory) return '';
+    var hasVerifiedHistory = data.career.some(function (row) { return hasProof(row) && row.org; }) || data.alumni.some(function (row) { return hasProof(row) && row.dest; });
+    if (!stations.length) return '';
     var dots = stations.length ? stations.map(function (station, i) {
       var label = station.year || (station.current ? 'الحالية' : 'موثّق');
       return '<span class="pj-route-dot ' + (station.current ? 'live' : '') + '" style="--step:' + i + ';--offset:' + (i % 2 ? '10px' : '-10px') + '"><i>' + e(label) + '</i><small>' + e(station.name) + '</small></span>';
     }).join('') : '<span class="pj-route-origin">أول محطة موثّقة تظهر بعد اعتمادها</span>';
     var path = stations.length > 1 ? '<path class="pj-route-path" d="M15 83 C78 83 74 34 139 43 S204 87 251 58 S333 28 425 35"/>' : '';
-    var title = stations.length > 1 ? 'محطات أكاديمية موثّقة' : 'محطة أكاديمية موثّقة';
-    return '<section class="pj-route"><div class="pj-route-top"><div><span class="pj-label">ACADEMY HISTORY · VERIFIED</span><h3>' + title + '</h3></div><span class="pj-route-count">السجل المعتمد</span></div><div class="pj-route-art"><svg viewBox="0 0 440 118" preserveAspectRatio="none" aria-hidden="true"><path class="pj-route-pitch" d="M0 10h440v98H0zM220 10v98m0-65a16 16 0 1 0 0 32 16 16 0 0 0 0-32M0 39h54v40H0m440-40h-54v40h54"/>' + path + '</svg><div class="pj-route-dots">' + dots + '</div></div><p class="pj-route-caption">المحطات المعروضة معتمدة من الأكاديمية.</p></section>';
+    var title = stations.length > 1 ? 'محطات أكاديمية موثّقة' : 'الأكاديمية الحالية المسجلة';
+    var eyebrow = hasVerifiedHistory ? 'ACADEMY HISTORY · VERIFIED' : 'CURRENT ACADEMY';
+    var countLabel = hasVerifiedHistory ? 'سجل معتمد' : 'المحطة الحالية';
+    var caption = hasVerifiedHistory ? 'المحطات المعروضة معتمدة من الأكاديمية.' : 'اسم الأكاديمية كما هو مسجل في الهوية؛ لا يفترض انتقالًا سابقًا.';
+    return '<section class="pj-route"><div class="pj-route-top"><div><span class="pj-label">' + eyebrow + '</span><h3>' + title + '</h3></div><span class="pj-route-count">' + countLabel + '</span></div><div class="pj-route-art"><svg viewBox="0 0 440 118" preserveAspectRatio="none" aria-hidden="true"><path class="pj-route-pitch" d="M0 10h440v98H0zM220 10v98m0-65a16 16 0 1 0 0 32 16 16 0 0 0 0-32M0 39h54v40H0m440-40h-54v40h54"/>' + path + '</svg><div class="pj-route-dots">' + dots + '</div></div><p class="pj-route-caption">' + caption + '</p></section>';
   }
   function playerCityFeature(player) {
     var city = String(player.identity_city || player.city || player.home_city || player.region || '').trim();
@@ -446,14 +535,16 @@
     var list = Object.keys(comps).map(function (key) { return comps[key]; }).sort(function (a, b) { return Date.parse(b.last || 0) - Date.parse(a.last || 0); });
     if (!list.length) return '<div class="pj-tournament-empty"><span class="pj-cup-ghost">' + icon('trophy') + '</span><p>مشاركته التالية ستضيف أول علامة على خط البطولات.</p></div>';
     return '<div class="pj-cup-rail">' + list.map(function (cup, i) {
-      return '<article class="pj-cup-stop"><span class="pj-cup-wire" aria-hidden="true"></span><span class="pj-cup-emblem ' + (i === 0 ? 'gold' : i === 1 ? 'purple' : '') + '">' + icon('trophy') + '</span><div><b>' + e(cup.name) + '</b><small>' + (cup.appearances > 1 ? e(cup.appearances) + ' مشاركات موثقة' : 'مشاركة موثقة') + (cup.last ? ' · ' + e(yearOf(cup.last)) : '') + '</small></div></article>';
+      return '<article class="pj-cup-stop"><span class="pj-cup-wire" aria-hidden="true"></span><span class="pj-cup-emblem ' + (i === 0 ? 'gold' : i === 1 ? 'purple' : '') + '">' + icon('trophy') + '</span><div><b>' + e(cup.name) + '</b><small>' + (previewDemoMode() ? (cup.appearances > 1 ? e(cup.appearances) + ' مشاركات تجريبية' : 'مشاركة تجريبية') : (cup.appearances > 1 ? e(cup.appearances) + ' مشاركات موثقة' : 'مشاركة موثقة')) + (cup.last ? ' · ' + e(yearOf(cup.last)) : '') + '</small></div></article>';
     }).join('') + '</div>';
   }
   function honors(data) {
     var items = data.badges.concat(data.certs.filter(function (row) { return row.title; }).map(function (row) { return { title: row.title, proof: row.issuer, verified_by: row.verified_by }; })).sort(function (a, b) { return Number(hasProof(b)) - Number(hasProof(a)); }).slice(0, 6);
     if (!items.length) return '<div class="pj-honor-empty"><span class="pj-honor-empty-orbit">' + icon('trophy') + '</span><div><b>لا توجد إنجازات معتمدة بعد</b><small>تظهر هنا بعد اعتمادها من الأكاديمية.</small></div><span class="pj-honor-empty-stars" aria-hidden="true">✦　✧　✦</span></div>';
-    var verified = items.filter(hasProof), unverified = items.filter(function (x) { return !hasProof(x); });
-    return '<div class="pj-honor-field"><div class="pj-honor-feature">' + icon('trophy') + '<small>' + (verified.length ? 'أقوى إشارة موثقة' : 'إنجاز أضافه اللاعب') + '</small><b>' + e((verified[0] || items[0]).title || (verified[0] || items[0]).badge_key || 'إنجاز') + '</b><span>' + e((verified[0] || items[0]).proof || (verified[0] || items[0]).signed_by || (hasProof(verified[0] || items[0]) ? 'اعتماد الجهة' : 'بانتظار توثيق الجهة')) + '</span></div><div class="pj-honor-constellation">' + items.slice(verified.length ? 1 : 0).map(function (item, index) { return '<div class="pj-honor-star ' + (hasProof(item) ? 'verified' : '') + '" style="--star:' + index + '"><span>' + icon('star') + '</span><b>' + e(item.title || item.badge_key || 'إنجاز') + '</b><small>' + (hasProof(item) ? 'موثّق' : 'مضاف') + '</small></div>'; }).join('') + '</div></div>';
+    var demo = previewDemoMode();
+    var verified = demo ? [] : items.filter(hasProof);
+    var featured = verified[0] || items[0];
+    return '<div class="pj-honor-field"><div class="pj-honor-feature">' + icon('trophy') + '<small>' + (demo ? 'أمثلة للعرض · غير معتمدة' : verified.length ? 'أقوى إشارة موثقة' : 'إنجاز أضافه اللاعب') + '</small><b>' + e(featured.title || featured.badge_key || 'إنجاز') + '</b><span>' + e(demo ? 'بيانات اختبار · لا تمثل إنجازًا حقيقيًا' : (featured.proof || featured.signed_by || (hasProof(featured) ? 'اعتماد الجهة' : 'بانتظار توثيق الجهة'))) + '</span></div><div class="pj-honor-constellation">' + items.slice(demo ? 0 : verified.length ? 1 : 0).map(function (item, index) { return '<div class="pj-honor-star ' + (!demo && hasProof(item) ? 'verified' : '') + '" style="--star:' + index + '"><span>' + icon('star') + '</span><b>' + e(item.title || item.badge_key || 'إنجاز') + '</b><small>' + (demo ? 'تجريبي' : hasProof(item) ? 'موثّق' : 'مضاف') + '</small></div>'; }).join('') + '</div></div>';
   }
   function roleMap(player) {
     var pos = getPosition(player);
@@ -470,16 +561,17 @@
   }
   function journeyView(player, data, owner) {
     var items = groupHistory(data);
-    var identityPosition = player.identity_position || player.position_code || player.pos_en || 'RB';
+    var identityPosition = player.identity_position || player.position_code || player.pos_en || player.pos || (previewDemoMode() ? 'RB' : '');
     var years = [...new Set(items.map(function (item) { return item.year; }).filter(Boolean))].sort();
     var yearRange = years.length ? years[0] + (years.length > 1 ? ' — ' + years[years.length - 1] : '') : 'PLAYER ARC';
-    return '<section class="pj-journey" aria-label="ملف اللاعب"><header class="pj-heading"><div><span class="pj-label">PLAYER PROFILE · ' + e(yearRange) + '</span><h2>ملف اللاعب</h2><p>المسيرة، المشاركات، والإنجازات المسجلة.</p></div><span class="pj-arc-seal"><i></i> موثّق</span></header>'+ 
+    var arcSeal = previewDemoMode() ? 'معاينة تجريبية' : (player.verified === true || player.is_verified === true || player.verification_status === 'verified' ? 'موثّق' : 'مسار اللاعب');
+    return '<section class="pj-journey" aria-label="المسيرة"><header class="pj-heading"><div><span class="pj-label">PLAYER PROFILE · ' + e(yearRange) + '</span><h2>المسيرة</h2><p>المشاركات والإنجازات المسجلة.</p></div><span class="pj-arc-seal"><i></i> ' + arcSeal + '</span></header>'+ 
       playerCityFeature(player)+academyRoute(player, data)+seasonPulse(items)+
       '<section class="pj-story-section pj-atlas"><div class="pj-section-title"><div><span class="pj-label">SEASONS · MONTHS · RECORDS</span><h3>سجل اللاعب</h3><p>اختر السنة لعرض السجل.</p></div><span class="pj-title-glyph purple">' + icon('arrow') + '</span></div>' + seasonAtlas(items) + '</section>'+
       '<section class="pj-story-section"><div class="pj-section-title"><div><span class="pj-label">TOURNAMENTS</span><h3>البطولات</h3><p>مشاركات اللاعب المسجلة.</p></div><span class="pj-title-glyph gold">' + icon('trophy') + '</span></div>' + tournamentTrail(data) + '</section>'+
       '<section class="pj-story-section pj-proof-deck pj-proof-deck-honors"><div class="pj-proof-column"><div class="pj-section-title"><div><span class="pj-label">ACHIEVEMENTS</span><h3>الإنجازات</h3></div><span class="pj-title-glyph gold">' + icon('star') + '</span></div>' + honors(data) + '</div><div class="pj-proof-column"><div class="pj-section-title"><div><span class="pj-label">POSITION</span><h3>مركز اللاعب</h3></div><span class="pj-title-glyph cyan">' + icon('match') + '</span></div>' + roleMap(Object.assign({}, player, { identity_position: identityPosition })) + '</div></section>'+
       '<section class="pj-story-section"><div class="pj-section-title"><div><span class="pj-label">MATCH CLIPS</span><h3>لقطات المباريات</h3></div><span class="pj-title-glyph cyan">' + icon('match') + '</span></div>' + clipReel(data) + '</section>'+
-      '<footer class="pj-footnote"><span>PLAYIN365</span><small>' + (owner ? 'تحكم بما يظهر في ملفك.' : 'بيانات منشورة وموثّقة.') + '</small></footer></section>';
+      '<footer class="pj-footnote"><span>PLAYIN365</span><small>' + (owner ? 'تحكم بما يظهر في ملفك.' : (previewDemoMode() ? 'سجل تجريبي · لا يمثل توثيقًا حقيقيًا.' : 'بيانات منشورة وموثّقة.')) + '</small></footer></section>';
   }
   function completedMatches(events, joins, records) {
     var matches = {};
@@ -515,21 +607,30 @@
 
   var cardCapture = null;
   P.identityCard = function (events, joins, badges) {
-    cardCapture = { events: events || [], joins: joins || [], badges: badges || [], position: ME && (ME.position_code || ME.pos_en || 'RB'), org: ME && (ME.org || 'أكاديمية النخبة'), player: ME ? Object.assign({}, ME) : null };
-    return baseIdentityCard.apply(this, arguments);
+    var player = ME ? Object.assign({}, ME) : null;
+    if (previewDemoMode() && player) {
+      player = Object.assign(player, { age_group: 'U14', category: 'U14', age: 14, jersey_number: '18', shirt_number: '18', shirt: '18', position_code: 'RB', pos_en: 'RB', pos: 'RB', preferred_foot: 'Right foot', foot: 'Right foot', org: player.org || 'أكاديمية النخبة — بيانات تجريبية' });
+      var sample = demoHistory(player); events = sample.events; joins = sample.joins; badges = sample.badges;
+    }
+    cardCapture = { events: events || [], joins: joins || [], badges: badges || [], position: player && (player.position_code || player.pos_en || player.pos || ''), org: player && (player.org || ''), player: player };
+    var previous = ME;
+    try { if (previewDemoMode() && player) ME = player; return baseIdentityCard.call(this, events, joins, (badges || []).slice(0, 2)); }
+    finally { ME = previous; }
   };
 
   P.myCard = async function () {
     cardCapture = null;
     var markup = await baseMyCard.apply(this, arguments);
     try {
-      var player = Object.assign({}, cardCapture && cardCapture.player || ME, { identity_position: cardCapture && cardCapture.position || (ME && (ME.position_code || ME.pos_en || 'RB')), identity_org: cardCapture && cardCapture.org || (ME && (ME.org || 'أكاديمية النخبة')) });
-      var history = await loadHistory(player, cardCapture);
+      var player = Object.assign({}, cardCapture && cardCapture.player || ME, { identity_position: cardCapture && cardCapture.position || (ME && (ME.position_code || ME.pos_en || ME.pos || '')), identity_org: cardCapture && cardCapture.org || (ME && (ME.org || '')) });
+      if (previewDemoMode()) player = Object.assign(player, { org: player.org || 'أكاديمية النخبة — بيانات تجريبية', identity_org: player.identity_org || player.org, age_group: player.age_group || (player.age ? 'U' + player.age : 'U14'), jersey_number: player.jersey_number || player.shirt || '18', position_code: player.position_code || player.pos || 'RB' });
+      var history = previewDemoMode() ? demoHistory(player) : await loadHistory(player, cardCapture);
       var inbox = player && ME && ME.id && ME.role === 'player' ? await contactInbox(ME.id) : '';
       var contactPreview = player && player.role === 'player' ? '<div class="pi-id-actions pj-public-actions pj-contact-owner-preview"><button class="pj-contact-trigger" type="button" data-pj-contact-preview>طلب تواصل</button><small class="pj-contact-owner-note">يظهر للجهات الموثّقة عند زيارة ملفك العام.</small></div>' : '';
       var mount = '<div class="pj-mount">' + journeyView(player, history, true) + '</div>';
       var shareNote = maySharePublic(player) ? '' : '<p class="pj-share-note">رمز الهوية يفتح الملف عند نشره للعامة؛ إعداد الظهور هو الذي يحدد إتاحة الصفحة.</p>';
-      return markup.replace('</main>', shareNote + contactPreview + inbox + mount + '</main>');
+      var demoNotice = previewDemoMode() ? '<aside class="pj-demo-banner" role="status"><span>PREVIEW</span><b>بيانات تجريبية</b><small>سجل عرض فقط · لا يُحفظ في قاعدة البيانات</small></aside>' : '';
+      return markup.replace('</main>', demoNotice + shareNote + contactPreview + inbox + mount + '</main>');
     } catch (error) {
       console.warn('PlayIn365 player journey', error);
       return markup;
@@ -583,7 +684,7 @@
       event.stopImmediatePropagation();
       if (!maySharePublic(ME)) return shareNotice('الهوية غير منشورة للعامة بعد.');
       var playerName = String(ME.name || '').trim();
-      var shareUrl = location.origin + location.pathname + '?player=' + encodeURIComponent(playerName);
+      var shareUrl = location.origin + location.pathname + '?player=' + encodeURIComponent(playerName) + (previewDemoMode() ? '&demo=1' : '');
       if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(shareUrl).then(function () { shareNotice('تم نسخ رابط الهوية العامة.'); }).catch(function () { shareNotice('تعذر نسخ الرابط من هذا المتصفح.'); });
       else shareNotice('النسخ غير متاح في هذا المتصفح.');
       return;
@@ -610,9 +711,10 @@
   async function renderPublicProfile(name) {
     var who = String(name || '').trim();
     if (!who) return '<main><div class="card">لم يُحدّد اللاعب.</div></main>';
-    var records = await safe('journey-profile', sb.from('profiles').select('id,name,role,org,pos,age,shirt,athlete_id,avatar_url,handle,display_name,city,profile_visibility').eq('name', who).eq('role', 'player').eq('profile_visibility', 'public').limit(1));
+    var records = previewDemoMode() ? [] : await safe('journey-profile', sb.from('profiles').select('id,name,role,org,pos,age,shirt,athlete_id,avatar_url,handle,display_name,city,profile_visibility').eq('name', who).eq('role', 'player').eq('profile_visibility', 'public').limit(1));
     var source = records[0];
-    if (!source) return '<div class="pi-id-page"><header class="pz5-top">' + P.brand() + '</header><main class="pi-id-main"><div class="pj-not-found"><span>' + icon('academy') + '</span><b>الهوية غير متاحة</b><small>تأكد من الرابط ومن تفعيل نشر الهوية للعامة.</small></div></main></div>';
+    if (!source && previewDemoMode() && ME && ME.role === 'player' && ME.isSyntheticDemo === true && norm(ME.name) === norm(who)) source = Object.assign({}, ME, { profile_visibility: 'public' });
+    if (!source) return '<div class="pi-id-page">' + P.top("window.PZ.back()") + '<main class="pi-id-main"><div class="pj-not-found"><span>' + icon('academy') + '</span><b>الهوية غير متاحة</b><small>تأكد من الرابط ومن تفعيل نشر الهوية للعامة.</small></div></main></div>';
     var player = Object.assign({}, source, {
       display_name: source.display_name || source.name,
       age_group: source.age_group || (source.age ? 'U' + source.age : ''),
@@ -621,12 +723,14 @@
       identity_position: source.position_code || source.pos || '',
       identity_org: source.org || ''
     });
-    var history = await loadHistory(player, null, true);
+    if (previewDemoMode()) player = Object.assign(player, { age_group: 'U14', category: 'U14', age: 14, jersey_number: '18', shirt_number: '18', shirt: '18', position_code: 'RB', pos_en: 'RB', pos: 'RB', identity_position: 'RB', preferred_foot: 'Right foot', foot: 'Right foot', org: player.org || 'أكاديمية النخبة — بيانات تجريبية', identity_org: player.identity_org || player.org });
+    var history = previewDemoMode() ? demoHistory(player) : await loadHistory(player, null, true);
     var previous = ME;
     var card = '';
     try { ME = player; card = P.identityCard(history.events, history.joins, history.badges); }
     finally { ME = previous; }
-    return '<div class="pi-id-page pj-public-page">' + P.top("history.back()") + '<main class="pi-id-main"><div class="pj-public-heading"><span class="pj-label">PLAYER PROFILE</span><h1>ملف اللاعب</h1><p>الهوية، الإنجازات، والمشاركات.</p></div>' + card + '<div class="pi-id-actions pj-public-actions"><button class="primary" onclick="window.PZ.share(\'' + e(player.name) + '\')">شارك الهوية ↗</button><button class="pj-contact-trigger" type="button" data-pj-contact-open data-target-id="' + e(player.id) + '">طلب تواصل</button></div>' + contactModalMarkup(player) + '<div class="pj-mount">' + journeyView(player, history, false) + '</div></main></div>';
+    var demoNotice = previewDemoMode() ? '<aside class="pj-demo-banner" role="status"><span>PREVIEW</span><b>بيانات تجريبية</b><small>سجل عرض فقط · لا يُحفظ في قاعدة البيانات</small></aside>' : '';
+    return '<div class="pi-id-page pj-public-page">' + P.top("window.PZ.back()") + '<main class="pi-id-main">' + demoNotice + '<div class="pj-public-heading"><span class="pj-label">PLAYER IDENTITY</span><h1>هوية اللاعب</h1><p>البطاقة، المسيرة، والإنجازات.</p></div>' + card + '<div class="pi-id-actions pj-public-actions"><button class="primary" onclick="window.PZ.share(\'' + e(player.name) + '\')">شارك الهوية ↗</button><button class="pj-contact-trigger" type="button" data-pj-contact-open data-target-id="' + e(player.id) + '">طلب تواصل</button></div>' + contactModalMarkup(player) + '<div class="pj-mount">' + journeyView(player, history, false) + '</div></main></div>';
   }
 
   var originalPublicProfile = P.publicProfile;
@@ -652,6 +756,15 @@
   if (sharedPlayer) {
     var priorRender = window.render;
     window.render = render = async function () {
+      if (previewDemoMode() && sharedPlayer) {
+        var demoTarget = sharedPlayer;
+        sharedPlayer = '';
+        if (!ME || ME.role !== 'player' || norm(ME.name) !== norm(demoTarget)) {
+          ME = { id: '89a89d4d-6792-48ff-9017-086532d128b0', role: 'player', roleSet: true, name: demoTarget, display_name: demoTarget, profile_visibility: 'public', athlete_id: 'PI-89A89D4D', org: 'أكاديمية النخبة — بيانات تجريبية', age: 14, age_group: 'U14', shirt: '18', jersey_number: '18', pos: 'RB', position_code: 'RB', preferred_foot: 'Right foot', foot: 'Right foot' };
+        }
+        P.go('profile', demoTarget);
+        return;
+      }
       if (ME && VIEW !== 'auth' && VIEW !== 'role' && sharedPlayer) {
         var target = sharedPlayer;
         sharedPlayer = '';

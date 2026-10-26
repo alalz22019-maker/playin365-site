@@ -13,7 +13,7 @@ DEMO.seed = () => {
   const d = n => new Date(Date.now() - n*864e5).toISOString();
   const h = n => new Date(Date.now() - n*36e5).toISOString();
   const ORG = "تركي الرشيد", REF = "ماجد السبيعي", CO = "عبدالله المطيري";
-  const M = (id,o) => Object.assign({id,score_a:0,score_b:0,fee:0,referee_name:"",organizer_name:ORG,organizer_id:"demo-organizer",venue:"ملعب المروج"},o);
+  const M = (id,o) => Object.assign({id,demo:true,score_a:0,score_b:0,fee:0,referee_name:"",organizer_name:ORG,organizer_id:"demo-organizer",venue:"ملعب المروج"},o);
   const matches = [
     M("dm-01",{title:"الصقور × الشرق — الجولة ٣",comp:"دوري الحي ٢٠٢٥",team_a:"الصقور",team_b:"الشرق",status:"final",score_a:4,score_b:1,match_time:"20:00",referee_name:REF,created_at:d(41)}),
     M("dm-02",{title:"النخبة × الرواد — ودية",comp:"ودية",status:"final",score_a:2,score_b:2,match_time:"19:30",referee_name:REF,created_at:d(27)}),

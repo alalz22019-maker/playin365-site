@@ -23,37 +23,41 @@ function badge(icon,title,meta){
 
 PZ.identityCard=function(ev,joins,badges){
   ev=ev||[];joins=joins||[];badges=badges||[];
-  var code=ME.athlete_id||ME.handle||'PI-89A89D4D';
+  var demoMode=false;
+  try{demoMode=typeof PZ.isPreviewDemo==='function'&&PZ.isPreviewDemo()}catch(_){}
+  var profileVerified=!demoMode&&(ME.verified===true||ME.is_verified===true||ME.verification_status==='verified');
+  var identityLabel=demoMode?'هوية تجريبية':(profileVerified?'موثّق':'هوية اللاعب');
+  var code=ME.athlete_id||ME.handle||'—';
   var appearanceIds=new Set(joins.filter(function(x){return x.attended===true||x.attended==='true'||x.attended===1}).map(function(x){return String(x.match_id||'')}).filter(Boolean));
   var goalRows=ev.filter(function(x){return x.type==='goal'}),assistRows=ev.filter(function(x){return x.type==='assist'});
   var stats=[];
-  if(goalRows.length)stats.push({title:goalRows.length+' أهداف مسجلة',is_verified:goalRows.every(function(x){return !!x.recorded_by}),kind:'⚽',meta:goalRows.every(function(x){return !!x.recorded_by})?'من سجل مباريات موثّق':'من سجل المباريات'});
-  if(assistRows.length)stats.push({title:assistRows.length+' صناعة أهداف',is_verified:assistRows.every(function(x){return !!x.recorded_by}),kind:'✦',meta:assistRows.every(function(x){return !!x.recorded_by})?'من سجل مباريات موثّق':'من سجل المباريات'});
-  if(appearanceIds.size)stats.push({title:appearanceIds.size+' مشاركات موثّقة',is_verified:true,kind:'◷',meta:'حضور مثبت في المباريات'});
+  if(goalRows.length)stats.push({title:goalRows.length+' أهداف مسجلة',is_verified:!demoMode&&goalRows.every(function(x){return !!x.recorded_by}),kind:'⚽',meta:demoMode?'بيانات تجريبية':(goalRows.every(function(x){return !!x.recorded_by})?'من سجل مباريات موثّق':'من سجل المباريات')});
+  if(assistRows.length)stats.push({title:assistRows.length+' صناعة أهداف',is_verified:!demoMode&&assistRows.every(function(x){return !!x.recorded_by}),kind:'✦',meta:demoMode?'بيانات تجريبية':(assistRows.every(function(x){return !!x.recorded_by})?'من سجل مباريات موثّق':'من سجل المباريات')});
+  if(appearanceIds.size)stats.push({title:appearanceIds.size+(demoMode?' مشاركات تجريبية':' مشاركات موثّقة'),is_verified:!demoMode,kind:'◷',meta:demoMode?'بيانات تجريبية':'حضور مثبت في المباريات'});
   var signals=badges.slice(0,3).concat(stats).slice(0,3);
-  var code=e(ME.athlete_id||ME.handle||'PI-89A89D4D');
+  var code=e(ME.athlete_id||ME.handle||'—');
   var src=e(playerSrc(ME));
-  var age=e(ME.age_group||ME.category||'U14'),shirt=e(ME.jersey_number||ME.shirt_number||'18'),position=e(ME.position_code||ME.pos_en||'RB'),foot=e(ME.preferred_foot||'Right foot');
-  var badgeMeta=function(row,empty){return !row?empty:(row.verified_by||row.verified_at||row.is_verified===true?'موثّق':'بانتظار التوثيق')};
-  var signalIcon=function(row,index){return row&&row.kind?row.kind:(['⚽','✦','◷'][index])};
-  var b1=signals[0]&&signals[0].title||'أضف أول إنجاز موثّق',b2=signals[1]&&signals[1].title||'إنجازاتك على خط المسيرة',b3=signals[2]&&signals[2].title||'إحصاءاتك الموسمية';
-  var m1=badgeMeta(signals[0],'يظهر بعد اعتماد الجهة'),m2=badgeMeta(signals[1],'يتحدّث عند التوثيق'),m3=badgeMeta(signals[2],'بعد تسجيل المباريات');
+  var age=demoMode?'U14':e(ME.age_group||ME.category||(ME.age?'U'+ME.age:'—')),shirt=demoMode?'18':e(ME.jersey_number||ME.shirt_number||ME.shirt||'—'),position=demoMode?'RB':e(ME.position_code||ME.pos_en||ME.pos||'—'),foot=demoMode?'Right foot':e(ME.preferred_foot||ME.foot||'—');
+  var badgeMeta=function(row,empty){return !row?empty:((demoMode||row.demo)?'تجريبي · غير معتمد':(row.verified_by||row.verified_at||row.signed_by||row.proof||row.is_verified===true?'موثّق':'بانتظار التوثيق'))};
+  var signalIcon=function(row,index){return row&&['⚽','✦','◷'].indexOf(row.kind)>=0?row.kind:(['⚽','✦','◷'][index])};
+  var identityUrl=location.origin+location.pathname+'?player='+encodeURIComponent(ME.name||'اللاعب')+(demoMode?'&demo=1':'');
+  var signalList=signals.length?signals.map(function(row,index){return badge(signalIcon(row,index),e(row.title||'إنجاز أو رقم مسجل'),e(badgeMeta(row,'')))}).join(''):'<div class="pi-id-empty">لا توجد إنجازات أو أرقام مسجلة بعد.</div>';
   return '<section class="pi-id-card" aria-label="بطاقة هوية اللاعب">'+
-    '<div class="pi-id-card-top"><div><div class="pi-id-brand">Play<span>In</span><sup>365</sup></div></div><span class="pi-id-verified"><i>✓</i> موثق</span></div>'+
+    '<div class="pi-id-card-top"><div><div class="pi-id-brand">Play<span>In</span><sup>365</sup></div></div><span class="pi-id-verified '+(profileVerified?'':'is-unverified')+'">'+(profileVerified?'<i>✓</i> ':'')+identityLabel+'</span></div>'+
     '<div class="pi-id-card-body">'+
       '<div class="pi-id-photo-wrap"><svg class="pi-id-photo" viewBox="0 0 1000 1000" role="img" aria-label="صورة اللاعب"><defs><clipPath id="pi-br-clip"><path d="'+BR_PATH+'"/></clipPath><linearGradient id="pi-photo-shine" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#00a6d6" stop-opacity=".28"/><stop offset=".65" stop-color="#4636e3" stop-opacity=".08"/><stop offset="1" stop-color="#d5b642" stop-opacity=".28"/></linearGradient></defs><path d="'+BR_PATH+'" fill="#151a2e" clip-path="url(#pi-br-clip)"/><image href="'+src+'" x="-200" y="-20" width="1400" height="1400" preserveAspectRatio="xMidYMid slice" clip-path="url(#pi-br-clip)"/><path d="'+BR_PATH+'" fill="url(#pi-photo-shine)" clip-path="url(#pi-br-clip)"/><path d="'+BR_PATH+'" fill="none" stroke="#62d8ff" stroke-width="12"/></svg><span class="pi-id-photo-label">صورة اللاعب</span></div>'+
-      '<div class="pi-id-summary"><div class="pi-id-name-row"><div><h1>'+val(ME.display_name||ME.name,'سعود القحطاني')+'</h1><p>'+val(ME.org||'أكاديمية النخبة','أكاديمية النخبة')+'</p></div></div>'+
+      '<div class="pi-id-summary"><div class="pi-id-name-row"><div><h1>'+val(ME.display_name||ME.name,'اللاعب')+'</h1><p>'+val(ME.org||ME.identity_org||(demoMode?'أكاديمية النخبة — بيانات تجريبية':'—'),'—')+'</p></div></div>'+
         '<div class="pi-id-data"><div><b>'+age+'</b><small>الفئة العمرية</small></div><div><b>'+shirt+'</b><small>رقم القميص</small></div><div><b>'+position+'</b><small>المركز</small></div><div><b>'+foot+'</b><small>القدم المفضلة</small></div></div>'+
       '</div>'+
     '</div>'+
-    '<div class="pi-id-lower"><div class="pi-id-achievements"><div class="pi-id-section-title"><span>CAREER SIGNALS</span><b>إنجازات وأرقام</b></div>'+badge(signalIcon(signals[0],0),b1,m1)+badge(signalIcon(signals[1],1),b2,m2)+badge(signalIcon(signals[2],2),b3,m3)+'</div>'+
-      '<div class="pi-id-qr"><img src="'+('https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=8&data='+encodeURIComponent(location.origin+location.pathname+'?player='+encodeURIComponent(ME.name||'سعود القحطاني'))) +'" alt="باركود هوية اللاعب"><b>'+val(code)+'</b><small>امسح لفتح الهوية الرقمية</small></div>'+
+    '<div class="pi-id-lower"><div class="pi-id-achievements"><div class="pi-id-section-title"><span>CAREER SIGNALS</span><b>إنجازات وأرقام</b></div>'+signalList+'</div>'+
+      '<div class="pi-id-qr"><img src="'+('https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=8&data='+encodeURIComponent(identityUrl)) +'" alt="باركود هوية اللاعب"><b>'+val(code)+'</b><small>امسح لفتح الهوية الرقمية</small></div>'+
     '</div>'+
   '</section>';
 };
 
 PZ.myCard=async function(){
-  var d=await Promise.all([
+  var d=(PZ.isPreviewDemo&&PZ.isPreviewDemo())?[[],[],[]]:await Promise.all([
     PZ.safe('events',sb.from('match_events').select('*').eq('who',ME.name).limit(120)),
     PZ.safe('joins',sb.from('match_joins').select('*').eq('player_name',ME.name)),
     PZ.safe('badges',sb.from('pi_badges').select('*').eq('person',ME.name).limit(8))

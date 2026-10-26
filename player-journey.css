@@ -284,7 +284,7 @@
 .pj-position-name b{color:#ffe170;font:900 15px Cairo;text-shadow:0 0 16px rgba(245,197,24,.22)}
 .pj-position-name small{color:#83dff8;font:700 8px Cairo}
 .pj-role-copy p{font-size:9.5px}
-.pj-role-map .pj-pitch{display:block;min-height:160px;overflow:visible;filter:drop-shadow(0 8px 22px rgba(0,119,255,.18))}
+.pj-role-map .pj-pitch{display:block;width:100%;height:auto;min-height:160px;overflow:visible;filter:drop-shadow(0 8px 22px rgba(0,119,255,.18))}
 .pj-role-map .pj-pitch rect,.pj-role-map .pj-pitch path,.pj-role-map .pj-pitch circle{vector-effect:non-scaling-stroke}
 .pj-role-map .pj-pitch>circle:nth-last-of-type(2){filter:drop-shadow(0 0 8px rgba(245,197,24,.55))}
 .pj-proof-column .pj-section-title h3{font-size:18px}
@@ -365,3 +365,8 @@
 .pj-time-gap small{position:relative;z-index:1;padding:2px 7px;border:1px solid rgba(102,152,208,.13);border-radius:999px;background:rgba(9,24,51,.82);color:#8395b2;font:600 7.5px Cairo}
 .pj-time-gap[hidden]{display:none}
 @media(max-width:420px){.pj-city-anchor{grid-template-columns:46px minmax(0,1fr);gap:9px;padding:12px 10px}.pj-city-signal{width:43px;height:43px}.pj-city-signal svg{width:20px;height:20px}.pj-city-copy .pj-label{font-size:7px}.pj-city-copy b{font-size:23px}.pj-city-seal{grid-column:2;justify-self:start;margin-top:-2px;padding:3px 7px;font-size:7px}.pj-route-top h3{font-size:14px}.pj-time-gap small{font-size:7px}}
+
+.pj-month-marker b{font-size:12px}
+.pj-month-marker small{font-size:10px}
+.pj-event-copy b{font-size:12px}
+.pj-event-copy small{font-size:10px}
