@@ -13,6 +13,10 @@ TAC.FIT = {"حارس":["حارس"],"دفاع":["مدافع","ظهير"],"ارت�
 TAC.key  = () => "pi_line_" + (ME && ME.id);
 TAC.get  = () => { try { return JSON.parse(localStorage.getItem(TAC.key())||"null") || {f:"4-3-3", slots:{}, out:[]}; } catch(e){ return {f:"4-3-3", slots:{}, out:[]}; } };
 TAC.set  = o => { try{ localStorage.setItem(TAC.key(), JSON.stringify(o)); }catch(e){} };
+TAC.date = st => { const v=String(st&&st.date||""); const d=new Date(v+"T00:00:00Z"); return v.length===10&&!Number.isNaN(d.valueOf())&&d.toISOString().slice(0,10)===v?v:CO.today(); };
+TAC.time = st => { const v=String(st&&st.time||""); const h=+v.slice(0,2),m=+v.slice(3,5); return v.length===5&&v[2]===":"&&h>=0&&h<=23&&m>=0&&m<=59?v:"18:00"; };
+window.tacDate = v => { const d=new Date(String(v||"")+"T00:00:00Z"); if(String(v||"").length===10&&!Number.isNaN(d.valueOf())&&d.toISOString().slice(0,10)===v&&v>=CO.today()){const st=TAC.get();st.date=v;TAC.set(st);} };
+window.tacTime = v => { const h=+(v||"").slice(0,2),m=+(v||"").slice(3,5); if(String(v||"").length===5&&(v||"")[2]===":"&&h>=0&&h<=23&&m>=0&&m<=59){const st=TAC.get();st.time=v;TAC.set(st);} };
 TAC.slots = f => { const out=[]; (TAC.FORMS[f]||TAC.FORMS["4-3-3"]).forEach(([n,lb],li)=>{ for(let i=0;i<n;i++) out.push({i:out.length, line:li, lb, n}); }); return out; };
 TAC.pick = null;
 
@@ -53,22 +57,32 @@ window.tacOut = n => { const st=TAC.get(); st.out=st.out||[];
   Object.keys(st.slots).forEach(k=>{ if(st.slots[k]===n) delete st.slots[k]; });
   TAC.set(st); render(); };
 window.tacPub2 = async () => {
-  const st = TAC.get(), roster = await CO.roster();
-  const slots = TAC.slots(st.f);
-  const start = slots.map(s=>st.slots[s.i]).filter(Boolean);
-  if(start.length < slots.length) return toast(`أكمل التشكيلة — ناقص ${slots.length-start.length}`,1);
-  const bench = roster.map(p=>p.name).filter(n => start.indexOf(n)<0 && (st.out||[]).indexOf(n)<0);
-  const rows = roster.filter(p => (st.out||[]).indexOf(p.name)<0).map(p=>{
-    const si = slots.find(s=>st.slots[s.i]===p.name);
-    return {player_name:p.name, kind:"match",
-      title: si ? `تشكيلة ${st.f} · أساسي — ${si.lb}` : `تشكيلة ${st.f} · احتياط`,
-      subtitle:`الأساسيون: ${start.map(n=>String(n).split(" ")[0]).join(" · ")} — أعلنها ${ME.name} — مدرب`,
-      at_time:"18:00", on_date:new Date().toISOString().slice(0,10), org:ME.org||"", needs_confirm:true, created_by:ME.name};
-  });
-  const {error} = await sb.from("calendar_items").insert(rows);
-  if(error) return toast("تعذّر النشر: "+error.message,1);
-  await trans(`أعلن تشكيلة ${st.f} — ${start.length} أساسيًا و${bench.length} احتياطًا`);
-  toast(`وصلت ${rows.length} لاعبًا — كلٌّ يعرف دوره`);
+  if(TAC._publishing)return toast("يجري إعلان التشكيلة الآن",1);
+  const st=TAC.get(),roster=await CO.roster(),slots=TAC.slots(st.f);
+  const plannedDate=TAC.date(st),plannedTime=TAC.time(st);
+  if(plannedDate<CO.today())return toast("اختر اليوم أو موعدًا لاحقًا",1);
+  const start=slots.map(s=>st.slots[s.i]).filter(Boolean);
+  if(start.length<slots.length)return toast("أكمل التشكيلة — ناقص "+(slots.length-start.length),1);
+  const recipients=roster.filter(p=>(st.out||[]).indexOf(p.name)<0);
+  if(!recipients.length)return toast("لا يوجد لاعبون لإبلاغهم",1);
+  const bench=recipients.map(p=>p.name).filter(n=>start.indexOf(n)<0);
+  TAC._publishing=true;
+  try{
+    const prior=await q("c",sb.from("calendar_items").select("player_name,title,on_date,at_time,created_by").eq("created_by",ME.name).eq("kind","match").eq("on_date",plannedDate).eq("at_time",plannedTime).ilike("title","تشكيلة "+st.f+"%").limit(500));
+    if(prior.some(x=>String(x.on_date||"").slice(0,10)===plannedDate&&x.at_time===plannedTime))return toast("سبق إعلان تشكيلة لهذا الموعد — غيّر الموعد لتجنب تكرار الإعلان",1);
+    const summary="راجع التشكيلة قبل الإعلان\nالخطة: "+st.f+" · "+start.length+" أساسيًا · "+bench.length+" احتياطيًا\nالمستلمون: "+recipients.length+" لاعبًا\nالموعد: "+plannedDate+" · "+plannedTime+"\nهل تريد الإعلان؟";
+    if(!confirm(summary))return;
+    const rows=recipients.map(p=>{
+      const si=slots.find(s=>st.slots[s.i]===p.name);
+      return {player_name:p.name,kind:"match",title:si?("تشكيلة "+st.f+" · أساسي — "+si.lb):("تشكيلة "+st.f+" · احتياط"),
+        subtitle:"الأساسيون: "+start.map(n=>String(n).split(" ")[0]).join(" · ")+" — أعلنها "+ME.name+" — مدرب",
+        at_time:plannedTime,on_date:plannedDate,org:ME.org||"",needs_confirm:true,created_by:ME.name};
+    });
+    const {error}=await sb.from("calendar_items").insert(rows);
+    if(error)return toast("تعذّر النشر: "+error.message,1);
+    await trans("أعلن تشكيلة "+st.f+" — "+start.length+" أساسيًا و"+bench.length+" احتياطًا");
+    toast("وصلت التشكيلة إلى "+recipients.length+" لاعبًا");
+  }finally{TAC._publishing=false;}
 };
 
 T.tactics = async () => {
@@ -152,6 +166,12 @@ T.tactics = async () => {
         ${roster.filter(ok).map(p=>`<button onclick="tacOut('${CO.esn(p.name)}')" style="background:${(st.out||[]).indexOf(p.name)>=0?"#151a2e":"#faf8f3"};color:${(st.out||[]).indexOf(p.name)>=0?"#faf8f3":"#5b6078"};border:1px solid ${(st.out||[]).indexOf(p.name)>=0?"#151a2e":"#e9e4d8"};border-radius:999px;padding:6px 11px;font:900 10px Cairo;cursor:pointer">${esc(String(p.name).split(" ")[0])}</button>`).join("")}
       </div>`)}
 
+    <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:8px">
+      <label style="font-size:10px;font-weight:900;color:#5b6078">موعد التشكيلة
+        <input type="date" value="${TAC.date(st)}" min="${CO.today()}" onchange="tacDate(this.value)" style="display:block;width:100%;margin-top:5px;border:1px solid #e9e4d8;border-radius:11px;padding:9px 8px;font:800 11px Cairo;background:#fff;color:#151a2e"></label>
+      <label style="font-size:10px;font-weight:900;color:#5b6078">الوقت
+        <input type="time" value="${TAC.time(st)}" onchange="tacTime(this.value)" style="display:block;width:100%;margin-top:5px;border:1px solid #e9e4d8;border-radius:11px;padding:9px 8px;font:800 11px Cairo;background:#fff;color:#151a2e"></label>
+    </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
       <button onclick="tacPub2()" style="background:#4636e3;color:#fff;border:0;border-radius:14px;padding:13px 10px;font:900 12px Cairo;cursor:pointer;box-shadow:0 8px 18px rgba(70,54,227,.3)">أعلن التشكيلة</button>
       <button onclick="openBoard()" style="background:#fff;color:#151a2e;border:1px solid #e9e4d8;border-radius:14px;padding:13px 10px;font:900 12px Cairo;cursor:pointer">✎ ارسم لوحًا</button></div>
