@@ -24,11 +24,21 @@ HUB.ROLE = {
     ["◷","تقويمي","calendar"]
   ],
   coach:[
+    ["◔","مساحة المدرب","coachHome"],
     ["▦","فريقي","squad"],
-    ["◈","الحصص ومخططها","sessions","#efedff","#7b5cff"],
-    ["▤","اللوحة التكتيكية","tactics","#fff6d6","#c78c00"],
+    ["◈","حصة اليوم","session","#eaf5ee","#2c6e49"],
+    ["◷","الحصص ومخططها","sessions","#efedff","#4636e3"],
+    ["▤","بنك التمارين","drills","#efedff","#4636e3"],
+    ["✎","تعليمات الحصة","brief"],
+    ["★","تقييم اللاعب","rate","#fff6d6","#c78c00"],
+    ["⚽","التشكيلة والاحتياط","tactics","#fff6d6","#c78c00"],
+    ["↗","لوحاتي التكتيكية","boards","#fff6d6","#c78c00"],
+    ["♙","فريقك في الملعب","pitch","#eaf5ee","#2c6e49"],
     ["✓","سلسلة الثقة","chain","#eaf5ee","#2c6e49"],
-    ["▥","التقارير","reports","#e7ecf1","#243244"]
+    ["▥","مهامي","coachTasks","#e7ecf1","#243244"],
+    ["♛","ملفي المهني","coachMe","#fff6d6","#c78c00"],
+    ["▣","التقارير","reports","#e7ecf1","#243244"],
+    ["▶","المباريات والتسجيل","orgMatch","#fdeee8","#e8531f"]
   ],
   organizer:[
     ["▶","مبارياتي","orgMatch"],
@@ -117,7 +127,7 @@ HUB.OPEN = ["liveNow","tours","toursOfficial","toursNews"];
 /* أسطح كل دور — القائمة البيضاء. الظهور = ملكية الدور لا وجود الدالة (القانون ٤) */
 HUB.ROLE_OK = {
   player:["pitch","explore","opps","publicView","messages","market","feed","records","cabinet","health","wallet","calendar","viewLog","privacy","role","settings"],
-  coach:["pitch","explore","messages","market","coachHome","squad","session","drills","brief","rate","tactics","coachTasks","coachMe","chain","reports","orgMatch","role","settings"],
+  coach:["pitch","explore","messages","market","coachHome","squad","session","sessions","drills","brief","rate","tactics","boards","coachTasks","coachMe","chain","reports","orgMatch","role","settings"],
   organizer:["pitch","explore","messages","market","orgMatch","newMatch","pitches","tournament","approvals","reports","role","settings"],
   referee:["pitch","explore","messages","refDuty","orgMatch","reports","role","settings"],
   scout:["pitch","explore","messages","market","scout","reports","deals","role","settings"],
