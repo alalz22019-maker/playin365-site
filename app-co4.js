@@ -121,12 +121,12 @@ T.tactics = async () => {
   </div>
   <div style="text-align:center;padding:6px 18px 0">
     <b style="display:block;font-size:26px;font-weight:900;line-height:1.3">التشكيلة والاحتياط</b>
-    <span style="display:block;font-size:11px;color:#8a8fa5;font-weight:700;margin-top:2px">للفئات الصغيرة اختر 5 أو 7 لاعبين · بدّل المراكز بالسحب والاختيار</span>
-    <span style="display:inline-block;margin-top:8px;padding:5px 10px;border-radius:999px;background:#efedff;color:#4636e3;font-size:10px;font-weight:900">الفئة: ${selectedGroup==="all"?"كل الفئات":esc(selectedGroup)} · <span class="ltr">${roster.length}</span> لاعبًا</span>
+    <span style="display:block;font-size:11px;color:#8a8fa5;font-weight:700;margin-top:2px">للفئات الصغيرة اختر 5 أو 7 أو 9 لاعبين · اختر اللاعب ثم المركز لتبديل المراكز</span>
+    <span style="display:inline-block;margin-top:8px;padding:5px 10px;border-radius:999px;background:#efedff;color:#4636e3;font-size:10px;font-weight:900">الفئة: ${selectedGroup==="all"?"كل الفئات":esc(selectedGroup)} · <span class="ltr">${roster.length}</span> ${roster.length===1?"لاعب":"لاعبين"}</span>
   </div>
   <main style="flex:1;padding:16px 18px 118px;display:flex;flex-direction:column;gap:12px">
     ${Object.keys(groups).length ? '<div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:2px"><button onclick="coGrp(\'all\')" style="flex:none;background:'+(selectedGroup==="all"?"#151a2e":"#fff")+';color:'+(selectedGroup==="all"?"#faf8f3":"#5b6078")+';border:1px solid '+(selectedGroup==="all"?"#151a2e":"#e9e4d8")+';border-radius:999px;padding:8px 12px;font:900 10.5px Cairo;cursor:pointer">كل الفئات · <span class="ltr">'+fullRoster.length+'</span></button>'+Object.entries(groups).sort().map(([g,n])=>'<button onclick="coGrp(\''+g+'\')" style="flex:none;background:'+(selectedGroup===g?"#151a2e":"#fff")+';color:'+(selectedGroup===g?"#faf8f3":"#5b6078")+';border:1px solid '+(selectedGroup===g?"#151a2e":"#e9e4d8")+';border-radius:999px;padding:8px 12px;font:900 10.5px Cairo;cursor:pointer">'+esc(g)+' · <span class="ltr">'+n+'</span></button>').join("")+'</div>' : ""}
-    ${roster.length<slots.length?CO.note(`الفئة الحالية تضم ${roster.length} لاعبًا، بينما تحتاج خطة ${esc(st.f)} إلى ${slots.length} أساسيين. اختر فئة أكبر أو خطة تناسب عدد اللاعبين.`):""}
+    ${roster.length<slots.length?CO.note(`الفئة الحالية تضم ${roster.length} ${roster.length===1?"لاعبًا":"لاعبين"}، بينما تحتاج خطة ${esc(st.f)} إلى ${slots.length} أساسيين. اختر فئة أكبر أو خطة تناسب عدد اللاعبين.`):""}
     <div style="display:flex;gap:6px;overflow-x:auto">
       ${Object.keys(TAC.FORMS).map(k=>`<button onclick="tacForm2('${k}')" dir="ltr" style="flex:none;background:${k===st.f?"#151a2e":"#fff"};color:${k===st.f?"#faf8f3":"#5b6078"};border:1px solid ${k===st.f?"#151a2e":"#e9e4d8"};border-radius:13px;padding:11px 15px;font:700 13px 'Space Grotesk';cursor:pointer">${k}</button>`).join("")}
     </div>
