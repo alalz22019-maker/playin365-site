@@ -25,20 +25,20 @@ PZ.identityCard=function(ev,joins,badges){
   ev=ev||[];joins=joins||[];badges=badges||[];
   var demoMode=false;
   try{demoMode=typeof PZ.isPreviewDemo==='function'&&PZ.isPreviewDemo()}catch(_){}
-  var profileVerified=demoMode||ME.verified===true||ME.is_verified===true||ME.verification_status==='verified';
-  var identityLabel=demoMode?'موثّق تجريبي':(profileVerified?'موثّق':'هوية اللاعب');
+  var profileVerified=!demoMode&&(ME.verified===true||ME.is_verified===true||ME.verification_status==='verified');
+  var identityLabel=demoMode?'هوية تجريبية':(profileVerified?'موثّق':'هوية اللاعب');
   var code=ME.athlete_id||ME.handle||'—';
   var appearanceIds=new Set(joins.filter(function(x){return x.attended===true||x.attended==='true'||x.attended===1}).map(function(x){return String(x.match_id||'')}).filter(Boolean));
   var goalRows=ev.filter(function(x){return x.type==='goal'}),assistRows=ev.filter(function(x){return x.type==='assist'});
   var stats=[];
-  if(goalRows.length)stats.push({title:goalRows.length+' أهداف مسجلة',is_verified:goalRows.every(function(x){return !!x.recorded_by}),kind:'⚽',meta:goalRows.every(function(x){return !!x.recorded_by})?'من سجل مباريات موثّق':'من سجل المباريات'});
-  if(assistRows.length)stats.push({title:assistRows.length+' صناعة أهداف',is_verified:assistRows.every(function(x){return !!x.recorded_by}),kind:'✦',meta:assistRows.every(function(x){return !!x.recorded_by})?'من سجل مباريات موثّق':'من سجل المباريات'});
-  if(appearanceIds.size)stats.push({title:appearanceIds.size+' مشاركات موثّقة',is_verified:true,kind:'◷',meta:'حضور مثبت في المباريات'});
+  if(goalRows.length)stats.push({title:goalRows.length+' أهداف مسجلة',is_verified:!demoMode&&goalRows.every(function(x){return !!x.recorded_by}),kind:'⚽',meta:demoMode?'بيانات تجريبية':(goalRows.every(function(x){return !!x.recorded_by})?'من سجل مباريات موثّق':'من سجل المباريات')});
+  if(assistRows.length)stats.push({title:assistRows.length+' صناعة أهداف',is_verified:!demoMode&&assistRows.every(function(x){return !!x.recorded_by}),kind:'✦',meta:demoMode?'بيانات تجريبية':(assistRows.every(function(x){return !!x.recorded_by})?'من سجل مباريات موثّق':'من سجل المباريات')});
+  if(appearanceIds.size)stats.push({title:appearanceIds.size+(demoMode?' مشاركات تجريبية':' مشاركات موثّقة'),is_verified:!demoMode,kind:'◷',meta:demoMode?'بيانات تجريبية':'حضور مثبت في المباريات'});
   var signals=badges.slice(0,3).concat(stats).slice(0,3);
   var code=e(ME.athlete_id||ME.handle||'—');
   var src=e(playerSrc(ME));
   var age=demoMode?'U14':e(ME.age_group||ME.category||(ME.age?'U'+ME.age:'—')),shirt=demoMode?'18':e(ME.jersey_number||ME.shirt_number||ME.shirt||'—'),position=demoMode?'RB':e(ME.position_code||ME.pos_en||ME.pos||'—'),foot=demoMode?'Right foot':e(ME.preferred_foot||ME.foot||'—');
-  var badgeMeta=function(row,empty){return !row?empty:((demoMode||row.demo)?'تجريبي · توثيق محاكى':(row.verified_by||row.verified_at||row.signed_by||row.proof||row.is_verified===true?'موثّق':'بانتظار التوثيق'))};
+  var badgeMeta=function(row,empty){return !row?empty:((demoMode||row.demo)?'تجريبي · غير معتمد':(row.verified_by||row.verified_at||row.signed_by||row.proof||row.is_verified===true?'موثّق':'بانتظار التوثيق'))};
   var signalIcon=function(row,index){return row&&['⚽','✦','◷'].indexOf(row.kind)>=0?row.kind:(['⚽','✦','◷'][index])};
   var identityUrl=location.origin+location.pathname+'?player='+encodeURIComponent(ME.name||'اللاعب')+(demoMode?'&demo=1':'');
   var signalList=signals.length?signals.map(function(row,index){return badge(signalIcon(row,index),e(row.title||'إنجاز أو رقم مسجل'),e(badgeMeta(row,'')))}).join(''):'<div class="pi-id-empty">لا توجد إنجازات أو أرقام مسجلة بعد.</div>';
