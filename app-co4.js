@@ -13,8 +13,15 @@ TAC.FORMS = {
   "3-4-3":  [[1,"حارس"],[3,"دفاع"],[4,"وسط"],[3,"هجوم"]]
 };
 TAC.FIT = {"حارس":["حارس"],"دفاع":["مدافع","ظهير"],"ارتكاز":["وسط","مدافع"],"وسط":["وسط","جناح"],"صناعة":["جناح","وسط","مهاجم"],"رأس حربة":["مهاجم"],"هجوم":["مهاجم","جناح"]};
+TAC.defaultForm = roster => {
+  const team=roster||[],ages=team.map(p=>p.age==null||String(p.age).trim()===""?NaN:Number(p.age)).filter(Number.isFinite);
+  let f=ages.length?(Math.max(...ages)<=8?"5 لاعبين":Math.max(...ages)<=10?"7 لاعبين":Math.max(...ages)<=14?"9 لاعبين":"4-3-3"):(team.length<=5?"5 لاعبين":team.length<=7?"7 لاعبين":team.length<=9?"9 لاعبين":"4-3-3");
+  if(team.length<5)return "5 لاعبين";
+  if(team.length<TAC.slots(f).length){const choices=Object.keys(TAC.FORMS).filter(k=>TAC.slots(k).length<=team.length);if(choices.length)f=choices[choices.length-1];}
+  return f;
+};
 TAC.key  = () => "pi_line_" + (ME && ME.id) + "_" + (CO.grp ? CO.grp() : "all");
-TAC.get  = () => { try { return JSON.parse(localStorage.getItem(TAC.key())||"null") || {f:"4-3-3", slots:{}, out:[]}; } catch(e){ return {f:"4-3-3", slots:{}, out:[]}; } };
+TAC.get  = () => { try { return JSON.parse(localStorage.getItem(TAC.key())||"null") || {f:"", slots:{}, out:[]}; } catch(e){ return {f:"", slots:{}, out:[]}; } };
 TAC.set  = o => { try{ localStorage.setItem(TAC.key(), JSON.stringify(o)); }catch(e){} };
 TAC.date = st => { const v=String(st&&st.date||""); const d=new Date(v+"T00:00:00Z"); return v.length===10&&!Number.isNaN(d.valueOf())&&d.toISOString().slice(0,10)===v?v:CO.today(); };
 TAC.time = st => { const v=String(st&&st.time||""); const h=+v.slice(0,2),m=+v.slice(3,5); return v.length===5&&v[2]===":"&&h>=0&&h<=23&&m>=0&&m<=59?v:"18:00"; };
@@ -64,19 +71,23 @@ window.tacOut = n => { const st=TAC.get(); st.out=st.out||[];
   TAC.set(st); render(); };
 window.tacPub2 = async () => {
   if(TAC._publishing)return toast("يجري إعلان التشكيلة الآن",1);
-  const st=TAC.get(),roster=await CO.roster(),slots=TAC.slots(st.f);
+  const st=TAC.get(),[roster,health]=await Promise.all([CO.roster(),q("h",sb.from("health_status").select("player_name,state").limit(140))]),slots=TAC.slots(st.f);
+  const healthByName={};health.forEach(h=>healthByName[h.player_name]=h);
+  const allowed=p=>!!p&&(!healthByName[p.name]||healthByName[p.name].state==="available");
   const plannedDate=TAC.date(st),plannedTime=TAC.time(st);
   if(plannedDate<CO.today())return toast("اختر اليوم أو موعدًا لاحقًا",1);
   const start=slots.map(s=>st.slots[s.i]).filter(Boolean);
   if(start.length<slots.length)return toast("أكمل التشكيلة — ناقص "+(slots.length-start.length),1);
-  const recipients=roster.filter(p=>(st.out||[]).indexOf(p.name)<0);
+  const restrictedStarts=start.filter(name=>!allowed(roster.find(p=>p.name===name)));
+  if(restrictedStarts.length)return toast("لا يمكن إعلان التشكيلة قبل إزالة لاعب عليه قيد طبي",1);
+  const recipients=roster.filter(p=>(st.out||[]).indexOf(p.name)<0&&allowed(p));
   if(!recipients.length)return toast("لا يوجد لاعبون لإبلاغهم",1);
   const bench=recipients.map(p=>p.name).filter(n=>start.indexOf(n)<0);
   TAC._publishing=true;
   try{
     const prior=await q("c",sb.from("calendar_items").select("player_name,title,on_date,at_time,created_by").eq("created_by",ME.name).eq("kind","match").eq("on_date",plannedDate).eq("at_time",plannedTime).ilike("title","تشكيلة "+st.f+"%").limit(500));
     if(prior.some(x=>String(x.on_date||"").slice(0,10)===plannedDate&&x.at_time===plannedTime))return toast("سبق إعلان تشكيلة لهذا الموعد — غيّر الموعد لتجنب تكرار الإعلان",1);
-    const summary="راجع التشكيلة قبل الإعلان\nالخطة: "+st.f+" · "+start.length+" أساسيًا · "+bench.length+" احتياطيًا\nالمستلمون: "+recipients.length+" لاعبًا\nالموعد: "+plannedDate+" · "+plannedTime+"\nهل تريد الإعلان؟";
+    const summary="راجع التشكيلة قبل الإعلان\nالخطة: "+st.f+" · "+start.length+" أساسيًا · "+bench.length+" احتياطيًا\nالمستلمون: "+recipients.length+" "+CO.playerCount(recipients.length)+"\nالموعد: "+plannedDate+" · "+plannedTime+"\nهل تريد الإعلان؟";
     if(!confirm(summary))return;
     const rows=recipients.map(p=>{
       const si=slots.find(s=>st.slots[s.i]===p.name);
@@ -87,7 +98,7 @@ window.tacPub2 = async () => {
     const {error}=await sb.from("calendar_items").insert(rows);
     if(error)return toast("تعذّر النشر: "+error.message,1);
     await trans("أعلن تشكيلة "+st.f+" — "+start.length+" أساسيًا و"+bench.length+" احتياطًا");
-    toast("وصلت التشكيلة إلى "+recipients.length+" لاعبًا");
+    toast("وصلت التشكيلة إلى "+recipients.length+" "+CO.playerCount(recipients.length));
   }finally{TAC._publishing=false;}
 };
 
@@ -95,11 +106,14 @@ T.tactics = async () => {
   const [roster,hs,att] = await Promise.all([
     CO.roster(),
     q("h", sb.from("health_status").select("player_name,state,phase").limit(140)),
-    q("a", sb.from("attendance").select("player_name,created_at").eq("org",ME.org||"").limit(600))
+    q("a", sb.from("attendance").select("player_name,created_at,present,session_date,session_id").eq("org",ME.org||"").limit(600))
   ]);
   const hMap = {}; hs.forEach(h=>hMap[h.player_name]=h);
   const ok = p => !hMap[p.name] || hMap[p.name].state==="available";
-  const st = TAC.auto(TAC.get(), roster.filter(ok));
+  const knownAges=roster.map(p=>p.age==null||String(p.age).trim()===""?NaN:Number(p.age)).filter(Number.isFinite);
+  const formKeys=knownAges.length&&Math.max(...knownAges)<=14?["5 لاعبين","7 لاعبين","9 لاعبين"]:Object.keys(TAC.FORMS);
+  const state=TAC.get(); if(!formKeys.includes(state.f))state.f=TAC.defaultForm(roster);
+  const st = TAC.auto(state, roster.filter(ok));
   TAC.set(st);
   const slots = TAC.slots(st.f), lines = TAC.FORMS[st.f]||TAC.FORMS["4-3-3"];
   const byName = {}; roster.forEach(p=>byName[p.name]=p);
@@ -120,19 +134,19 @@ T.tactics = async () => {
   let si = -1;
 
   return `<div style="padding:18px 18px 0;display:flex;justify-content:space-between;align-items:center">
-    <button onclick="go('coachHome')" style="width:40px;height:40px;border-radius:${CO.DROP};background:#fff;border:1px solid #e9e4d8;display:grid;place-items:center;font-size:15px;cursor:pointer;font-family:Cairo">⌂</button>
+    <button onclick="coBack()" aria-label="رجوع للصفحة السابقة" title="رجوع" style="width:40px;height:40px;border-radius:${CO.DROP};background:#fff;border:1px solid #e9e4d8;display:grid;place-items:center;font-size:15px;cursor:pointer;font-family:Cairo">←</button>
     <button onclick="go('boards')" style="width:40px;height:40px;border-radius:${CO.DROP};background:#fff;border:1px solid #e9e4d8;display:grid;place-items:center;font-size:15px;cursor:pointer;font-family:Cairo">✎</button>
   </div>
   <div style="text-align:center;padding:6px 18px 0">
     <b style="display:block;font-size:26px;font-weight:900;line-height:1.3">التشكيلة والاحتياط</b>
-    <span style="display:block;font-size:11px;color:#8a8fa5;font-weight:700;margin-top:2px">للفئات الصغيرة اختر 5 أو 7 أو 9 لاعبين · اختر اللاعب ثم المركز لتبديل المراكز</span>
+    <span style="display:block;font-size:11px;color:#8a8fa5;font-weight:700;margin-top:2px">اختر خطة 5 أو 7 أو 9 أو 11 لاعبًا؛ 4-3-3 و4-4-2 خطط من 11 · اختر اللاعب ثم المركز لتبديل المراكز</span>
     <span style="display:inline-block;margin-top:8px;padding:5px 10px;border-radius:999px;background:#efedff;color:#4636e3;font-size:10px;font-weight:900">الفئة: ${selectedGroup==="all"?"كل الفئات":esc(selectedGroup)} · <span class="ltr">${roster.length}</span> ${countLabel(roster.length)}</span>
   </div>
   <main style="flex:1;padding:16px 18px 118px;display:flex;flex-direction:column;gap:12px">
     ${Object.keys(groups).length ? '<div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:2px"><button onclick="coGrp(\'all\')" style="flex:none;background:'+(selectedGroup==="all"?"#151a2e":"#fff")+';color:'+(selectedGroup==="all"?"#faf8f3":"#5b6078")+';border:1px solid '+(selectedGroup==="all"?"#151a2e":"#e9e4d8")+';border-radius:999px;padding:8px 12px;font:900 10.5px Cairo;cursor:pointer">كل الفئات · <span class="ltr">'+fullRoster.length+'</span></button>'+Object.entries(groups).sort().map(([g,n])=>'<button onclick="coGrp(\''+g+'\')" style="flex:none;background:'+(selectedGroup===g?"#151a2e":"#fff")+';color:'+(selectedGroup===g?"#faf8f3":"#5b6078")+';border:1px solid '+(selectedGroup===g?"#151a2e":"#e9e4d8")+';border-radius:999px;padding:8px 12px;font:900 10.5px Cairo;cursor:pointer">'+esc(g)+' · <span class="ltr">'+n+'</span></button>').join("")+'</div>' : ""}
     ${roster.length<slots.length?CO.note(`الفئة الحالية تضم ${roster.length} ${countLabel(roster.length)}، بينما تحتاج خطة ${esc(st.f)} إلى ${slots.length} أساسيين. اختر فئة أكبر أو خطة تناسب عدد اللاعبين.`):""}
     <div style="display:flex;gap:6px;overflow-x:auto">
-      ${Object.keys(TAC.FORMS).map(k=>`<button onclick="tacForm2('${k}')" dir="ltr" style="flex:none;background:${k===st.f?"#151a2e":"#fff"};color:${k===st.f?"#faf8f3":"#5b6078"};border:1px solid ${k===st.f?"#151a2e":"#e9e4d8"};border-radius:13px;padding:11px 15px;font:700 13px 'Space Grotesk';cursor:pointer">${k}</button>`).join("")}
+      ${formKeys.map(k=>`<button onclick="tacForm2('${k}')" dir="ltr" style="flex:none;background:${k===st.f?"#151a2e":"#fff"};color:${k===st.f?"#faf8f3":"#5b6078"};border:1px solid ${k===st.f?"#151a2e":"#e9e4d8"};border-radius:13px;padding:11px 15px;font:700 13px 'Space Grotesk';cursor:pointer">${k}</button>`).join("")}
     </div>
 
     ${TAC.pick?`<div style="background:#efedff;border:1px solid #ddd8fb;border-radius:14px;padding:11px 13px;display:flex;align-items:center;gap:10px">
@@ -244,7 +258,7 @@ T.pitch = async () => {
   const stat = [["حدثًا لفريقك", myEv.length],["اطّلاع كشاف", scouts.length],["لقطة رفعوها", myMed.length]];
 
   return `<div style="padding:18px 18px 0;display:flex;justify-content:space-between;align-items:center">
-    <button onclick="go('coachHome')" style="width:40px;height:40px;border-radius:${CO.DROP};background:#fff;border:1px solid #e9e4d8;display:grid;place-items:center;font-size:15px;cursor:pointer;font-family:Cairo">⌂</button>
+    <button onclick="coBack()" aria-label="رجوع للصفحة السابقة" title="رجوع" style="width:40px;height:40px;border-radius:${CO.DROP};background:#fff;border:1px solid #e9e4d8;display:grid;place-items:center;font-size:15px;cursor:pointer;font-family:Cairo">←</button>
     <button onclick="go('explore')" style="width:40px;height:40px;border-radius:${CO.DROP};background:#fff;border:1px solid #e9e4d8;display:grid;place-items:center;font-size:15px;cursor:pointer;font-family:Cairo">◎</button>
   </div>
   <div style="text-align:center;padding:6px 18px 0">

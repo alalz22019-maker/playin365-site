@@ -28,7 +28,7 @@ window.coSend = async () => {
   const kit=(b.kit||[]).map(k=>(CO.KIT.find(x=>x[1]===k)||[])[0]).filter(Boolean);
   const sub=["سجّلها "+ME.name+" — مدرب",kit.length?("يُرفق: "+kit.join(" · ")):""].filter(Boolean).join(" · ");
   const title="تعليمات المدرب — "+(msg.length>60?msg.slice(0,60)+"…":msg);
-  const scope=b.scope==="one"?"للاعب "+names[0]:"لـ"+names.length+" لاعبًا";
+  const scope=b.scope==="one"?"للاعب "+names[0]:"لـ"+names.length+" "+CO.playerCount(names.length);
   const summary="راجع الإرسال قبل التأكيد\n"+scope+"\nالموعد: "+plannedDate+" · "+plannedTime+(kit.length?"\nالمرفقات: "+kit.join("، "):"")+"\n\n"+msg+"\n\nهل تريد الإرسال؟";
   CO._briefSending=true;
   try{
@@ -42,9 +42,9 @@ window.coSend = async () => {
     const rows=recipients.map(n=>({player_name:n,kind:"training",title,subtitle:sub,at_time:plannedTime,on_date:plannedDate,org:ME.org||"",needs_confirm:false,created_by:ME.name}));
     const {error}=await sb.from("calendar_items").insert(rows);
     if(error)return toast("تعذّر الإرسال: "+error.message,1);
-    await trans("أرسل تعليمات الحصة لـ"+recipients.length+" لاعبًا");
+    await trans("أرسل تعليمات الحصة لـ"+recipients.length+" "+CO.playerCount(recipients.length));
     CO.setBrief({msg:""});
-    toast("وصلت التعليمات لـ"+recipients.length+" لاعبًا"+(skipped?" · دون تكرار":"")+" — باسمك");
+    toast("وصلت التعليمات لـ"+recipients.length+" "+CO.playerCount(recipients.length)+(skipped?" · دون تكرار":"")+" — باسمك");
     render();
   }finally{CO._briefSending=false;}
 };
@@ -55,7 +55,7 @@ T.brief = async () => {
   const CH_ = [["للجميع","all"],["لاعب محدّد","one"]];
 
   return `<div style="padding:18px 18px 0;display:flex;justify-content:space-between;align-items:center">
-    <button onclick="go('coachHome')" style="width:40px;height:40px;border-radius:${CO.DROP};background:#fff;border:1px solid #e9e4d8;display:grid;place-items:center;font-size:15px;cursor:pointer;font-family:Cairo">⌂</button>
+    <button onclick="coBack()" aria-label="رجوع للصفحة السابقة" title="رجوع" style="width:40px;height:40px;border-radius:${CO.DROP};background:#fff;border:1px solid #e9e4d8;display:grid;place-items:center;font-size:15px;cursor:pointer;font-family:Cairo">←</button>
     <button onclick="coSend()" style="width:40px;height:40px;border-radius:${CO.DROP};background:#fff;border:1px solid #e9e4d8;display:grid;place-items:center;font-size:15px;cursor:pointer;font-family:Cairo">✓</button>
   </div>
   <div style="text-align:center;padding:6px 18px 0">
@@ -68,7 +68,7 @@ T.brief = async () => {
         <div style="display:flex;align-items:center;gap:12px">
           ${CO.ic("⚽","#efedff","#4636e3","50% 50% 8px 50%")}
           <div style="flex:1;min-width:0"><span style="display:block;font-size:10px;color:#b9b0f5;font-weight:900">إلى</span>
-            <b style="display:block;font-size:15px;font-weight:900">${scope==="one"?(b.to?esc(b.to):"اختر لاعبًا"):`كشفك${CO.grp()!=="all"?` · <span class="ltr">${CO.grp()}</span>`:""} · <span class="ltr">${roster.length||CO.dash}</span> ${roster.length===1?"لاعب":"لاعبًا"}`}</b>
+            <b style="display:block;font-size:15px;font-weight:900">${scope==="one"?(b.to?esc(b.to):"اختر لاعبًا"):`كشفك${CO.grp()!=="all"?` · <span class="ltr">${CO.grp()}</span>`:""} · <span class="ltr">${roster.length||CO.dash}</span> ${CO.playerCount(roster.length)}`}</b>
             <span style="display:block;font-size:10.5px;color:#c6cade;font-weight:700;margin-top:2px">${ME.org?esc(ME.org)+" · ":""}${plannedDate} · ${plannedTime}</span></div>
         </div>
         <div style="display:flex;gap:6px;margin-top:12px;flex-wrap:wrap">
@@ -156,7 +156,7 @@ T.rate = async () => {
 
   return `<div style="padding:18px 18px 0;display:flex;justify-content:space-between;align-items:center">
     <button onclick="go('squad')" style="width:40px;height:40px;border-radius:${CO.DROP};background:#fff;border:1px solid #e9e4d8;display:grid;place-items:center;font-size:15px;cursor:pointer;font-family:Cairo">→</button>
-    <button onclick="go('coachHome')" style="width:40px;height:40px;border-radius:${CO.DROP};background:#fff;border:1px solid #e9e4d8;display:grid;place-items:center;font-size:15px;cursor:pointer;font-family:Cairo">⌂</button>
+    <button onclick="coBack()" aria-label="رجوع للصفحة السابقة" title="رجوع" style="width:40px;height:40px;border-radius:${CO.DROP};background:#fff;border:1px solid #e9e4d8;display:grid;place-items:center;font-size:15px;cursor:pointer;font-family:Cairo">←</button>
   </div>
   <div style="text-align:center;padding:6px 18px 0">
     <b style="display:block;font-size:26px;font-weight:900;line-height:1.3">تقييم بتوقيعك</b>
@@ -213,7 +213,7 @@ T.tactics = async () => {
   let idx = 0;
 
   return `<div style="padding:18px 18px 0;display:flex;justify-content:space-between;align-items:center">
-    <button onclick="go('coachHome')" style="width:40px;height:40px;border-radius:${CO.DROP};background:#fff;border:1px solid #e9e4d8;display:grid;place-items:center;font-size:15px;cursor:pointer;font-family:Cairo">⌂</button>
+    <button onclick="coBack()" aria-label="رجوع للصفحة السابقة" title="رجوع" style="width:40px;height:40px;border-radius:${CO.DROP};background:#fff;border:1px solid #e9e4d8;display:grid;place-items:center;font-size:15px;cursor:pointer;font-family:Cairo">←</button>
     <button onclick="go('boards')" style="width:40px;height:40px;border-radius:${CO.DROP};background:#fff;border:1px solid #e9e4d8;display:grid;place-items:center;font-size:15px;cursor:pointer;font-family:Cairo">✎</button>
   </div>
   <div style="text-align:center;padding:6px 18px 0">
@@ -267,25 +267,28 @@ T.coachTasks = async () => {
     q("m", sb.from("matches").select("*").order("created_at",{ascending:false}).limit(20))
   ]);
   const hMap = {}; hs.forEach(h => hMap[h.player_name] = h);
+  CO._sessionOptions=CO.sessionOptions(cal,roster); CO._currentSession=CO.activeSession(CO._sessionOptions);
+  CO._allowLegacyAttendance=CO._sessionOptions[0]&&CO._currentSession.id===CO._sessionOptions[0].id;
+  const activeCoachSession=CO._currentSession;
   const live = mt.find(m => m.status === "live");
   const T1 = [];
   if(live) T1.push({g:"●", bg:"#fdeee8", ink:"#e8531f", t:"مباراة مباشرة — سجّل بلمستين", s:esc(live.title)+" · أُسند التسجيل", v:"orgMatch", urg:true});
-  const noSess = !CO.sessionsOf(cal).some(c => String(c.on_date||"").slice(0,10) === CO.today());
+  const noSess = !activeCoachSession||!activeCoachSession.planned;
   if(noSess) T1.push({g:"◈", bg:"#efedff", ink:"#4636e3", t:"لا حصة مثبّتة اليوم", s:"ابنِ حصتك من البنك وانشرها باسمك", v:"drills"});
-  const unsigned = roster.filter(p => !att.some(a => a.player_name===p.name && String(a.created_at||"").slice(0,10)===CO.today()));
-  if(CO.sessionsOf(cal).some(c => String(c.on_date||"").slice(0,10)===CO.today()) && unsigned.length)
-    T1.push({g:"✓", bg:"#fff6d6", ink:"#c78c00", t:`لم توقّع حضور ${unsigned.length} ${unsigned.length===1?"لاعب":"لاعبًا"}`, s:"الحضور بنقرة في «حصة اليوم»", v:"session"});
+  const unsigned = roster.filter(p => !att.some(a => a.player_name===p.name && CO.rowDate(a)===CO.today() && (a.session_id===activeCoachSession.id || (!a.session_id&&CO._allowLegacyAttendance))));
+  if(activeCoachSession&&activeCoachSession.planned&&unsigned.length)
+    T1.push({g:"✓", bg:"#fff6d6", ink:"#c78c00", t:`لم توقّع حضور ${unsigned.length} ${CO.playerCount(unsigned.length)}`, s:"الحضور بنقرة في «حصة اليوم»", v:"session"});
   const rehab = roster.filter(p => hMap[p.name] && ["rehab","out","limited"].includes(hMap[p.name].state));
-  if(rehab.length) T1.push({g:"🔒", bg:"#eef7f4", ink:"#2c8471", t:`${rehab.length} ${rehab.length===1?"لاعب":"لاعبًا"} بقيود طبية`, s:"يكتبها المختص — احترم القيد في حصتك", v:"squad"});
+  if(rehab.length) T1.push({g:"🔒", bg:"#eef7f4", ink:"#2c8471", t:`${rehab.length} ${CO.playerCount(rehab.length)} بقيود طبية`, s:"يكتبها المختص — احترم القيد في حصتك", v:"squad"});
   const heavy = roster.filter(p => { const l = CO.load(att, p.name); return l && l > 1.3; });
-  if(heavy.length) T1.push({g:"▲", bg:"#fdeee8", ink:"#e8531f", t:`حمل حادّ عند ${heavy.length}`, s:heavy.slice(0,3).map(p=>esc(String(p.name).split(" ")[0])).join(" · "), v:"squad", urg:true});
+  if(heavy.length) T1.push({g:"▲", bg:"#fdeee8", ink:"#e8531f", t:`انتظام أعلى من المعتاد عند ${heavy.length}`, s:heavy.slice(0,3).map(p=>esc(String(p.name).split(" ")[0])).join(" · "), v:"squad", urg:true});
   const norate = roster.filter(p => !cal.some(c => c.player_name===p.name && String(c.title||"").includes("تقييم المدرب")));
   if(norate.length) T1.push({g:"★", bg:"#fff6d6", ink:"#c78c00", t:`${norate.length} بلا تقييم منك`, s:"أربعة محاور وتوقيع واحد", v:"rate"});
   const soon = cal.filter(c => String(c.on_date||"") > CO.today()).slice(0,4);
 
   return `<div style="padding:18px 18px 0;display:flex;justify-content:space-between;align-items:center">
-    <button onclick="go('coachHome')" style="width:40px;height:40px;border-radius:${CO.DROP};background:#fff;border:1px solid #e9e4d8;display:grid;place-items:center;font-size:15px;cursor:pointer;font-family:Cairo">⌂</button>
-    <button onclick="go('hub')" style="width:40px;height:40px;border-radius:${CO.DROP};background:#fff;border:1px solid #e9e4d8;display:grid;place-items:center;font-size:15px;cursor:pointer;font-family:Cairo">☰</button>
+    <button onclick="coBack()" aria-label="رجوع للصفحة السابقة" title="رجوع" style="width:40px;height:40px;border-radius:${CO.DROP};background:#fff;border:1px solid #e9e4d8;display:grid;place-items:center;font-size:15px;cursor:pointer;font-family:Cairo">←</button>
+    <button onclick="go('hub')" aria-label="جميع الخدمات" title="جميع الخدمات" style="width:40px;height:40px;border-radius:${CO.DROP};background:#fff;border:1px solid #e9e4d8;display:grid;place-items:center;font-size:15px;cursor:pointer;font-family:Cairo">☰</button>
   </div>
   <div style="text-align:center;padding:6px 18px 0">
     <b style="display:block;font-size:26px;font-weight:900;line-height:1.3">مهامي</b>
@@ -305,9 +308,9 @@ T.coachTasks = async () => {
         <span style="display:block;font-size:10.5px;color:#8a8fa5;font-weight:700;margin-top:2px">${t.s}</span></div>
       <span style="color:${t.urg?"#e8531f":"#8a8fa5"};flex:none">←</span></button>`).join("")
     :CO.card(`<div style="display:flex;gap:12px;align-items:center">${CO.ic("✓","#eaf5ee","#2c6e49","50% 50% 8px 50%")}
-      <div style="flex:1;min-width:0"><b style="display:block;font-size:12.5px">كل شيء موقّع</b>${CO.sub("لا حمل حادّ ولا حضور ناقص ولا قيد مهمَل")}</div></div>`)}
+      <div style="flex:1;min-width:0"><b style="display:block;font-size:12.5px">كل شيء موقّع</b>${CO.sub("لا مؤشر انتظام لافت ولا حضور ناقص ولا قيد مهمَل")}</div></div>`)}
 
-    ${soon.length?CO.card(`<div style="display:flex;justify-content:space-between;align-items:baseline">${CO.h("القادم في تقويمك")}<a onclick="go('coachHome')" style="font-size:11px;font-weight:900;cursor:pointer">مساحتك ←</a></div>
+    ${soon.length?CO.card(`<div style="display:flex;justify-content:space-between;align-items:baseline">${CO.h("القادم في تقويمك")}<a onclick="coBack()" aria-label="رجوع للصفحة السابقة" title="رجوع" style="font-size:11px;font-weight:900;cursor:pointer">مساحتك ←</a></div>
       ${soon.map(c=>`<div style="display:flex;gap:11px;align-items:flex-start;padding:10px 0;border-top:1px solid #f0ece2">${CO.ic("◷","#efedff","#4636e3")}
         <div style="flex:1;min-width:0"><b style="display:block;font-size:12px;line-height:1.5">${esc(c.title)}</b>
           <span style="display:block;font-size:10px;color:#8a8fa5;font-weight:700;margin-top:2px">${esc(c.player_name)} · <span class="ltr">${esc(c.at_time||"")}</span></span></div>
@@ -338,7 +341,7 @@ T.coachMe = async () => {
   const missing  = fields.filter(f => !f[1]);
 
   return `<div style="padding:18px 18px 0;display:flex;justify-content:space-between;align-items:center">
-    <button onclick="go('coachHome')" style="width:40px;height:40px;border-radius:${CO.DROP};background:#fff;border:1px solid #e9e4d8;display:grid;place-items:center;font-size:15px;cursor:pointer;font-family:Cairo">⌂</button>
+    <button onclick="coBack()" aria-label="رجوع للصفحة السابقة" title="رجوع" style="width:40px;height:40px;border-radius:${CO.DROP};background:#fff;border:1px solid #e9e4d8;display:grid;place-items:center;font-size:15px;cursor:pointer;font-family:Cairo">←</button>
     <button onclick="go('settings')" style="width:40px;height:40px;border-radius:${CO.DROP};background:#fff;border:1px solid #e9e4d8;display:grid;place-items:center;font-size:15px;cursor:pointer;font-family:Cairo">⚙</button>
   </div>
   <main style="flex:1;padding:14px 18px 118px;display:flex;flex-direction:column;gap:12px">

@@ -1,6 +1,20 @@
 /* PlayIn365 — عمود المدرب مطابقًا للتصميم المعتمد «Coach App» (4a · 4c · 4d · 4f)
    يُحمّل بعد app-coach.js فيتقدّم عليه. قطرة المدرب أسفل-يمين في كل عنصر بلا استثناء. */
 const CO = {};
+CO.COACH_VIEWS=new Set(["coachHome","coachTasks","coachMe","brief","squad","session","orgMatch","explore","tactics","rate","drills","boards","hub","settings","chain","sessions","newMatch","publicView"]);
+CO.navStack=[];
+CO._baseGo=window.go;
+window.go=(view,param)=>{
+  const current=VIEW;
+  if(CO.COACH_VIEWS.has(view)){
+    if(CO.COACH_VIEWS.has(current)&&current!==view)CO.navStack.push({view:current,param:PARAM});
+  }else CO.navStack=[];
+  return CO._baseGo(view,param);
+};
+window.coBack=()=>{
+  const previous=CO.navStack.pop();
+  return CO._baseGo(previous?previous.view:"coachHome",previous?previous.param:null);
+};
 CO.DROP  = "50% 50% 6px 50%";
 CO.dash  = "—";
 CO.esn   = s => esc(String(s == null ? "" : s));
@@ -25,9 +39,31 @@ CO.note  = t => `<div style="background:#fff8df;border:1px solid #f0e2b4;border-
 CO.empty = t => `<div style="border:1.5px dashed #d5d0c4;border-radius:16px;padding:18px;text-align:center;font-size:10.5px;color:#8a8fa5;font-weight:700;line-height:1.8">${t}</div>`;
 CO.disc  = orange => `<div style="position:absolute;inset-inline-start:62%;top:-70%;width:70%;height:230%;background:${orange?"#e8531f":"linear-gradient(200deg,#4636e3,#7b5cff)"};border-radius:50%;opacity:${orange?".55":".5"}"></div>`;
 CO.TITLE = {};
-CO.today = () => new Date().toISOString().slice(0,10);
+CO.today = () => new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Riyadh",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
 CO.isSession = c => c && c.kind === "training" && !/تقييم المدرب|تعليمات المدرب|خطة راحة/.test(String(c.title||""));
 CO.sessionsOf = cal => (cal||[]).filter(CO.isSession);
+CO.hash = value => { let h=0; for(const c of String(value||"")) h=Math.imul(31,h)+c.charCodeAt(0)|0; return (h>>>0).toString(36); };
+CO.playerCount = n => n===0?"لاعب":n===1?"لاعب":n===2?"لاعبان":n<=10?"لاعبين":"لاعبًا";
+CO.sessionSelKey = () => `pi_co_session_${ME&&ME.id}_${CO.today()}_${CO.hash(CO.grp())}`;
+CO.sessionOptions = (cal,roster,day=CO.today()) => {
+  const allowed=new Set((roster||[]).map(p=>p.name)), group=CO.grp(), byKey=new Map();
+  CO.sessionsOf(cal).filter(c=>String(c.on_date||"").slice(0,10)===day&&(!c.player_name||group==="all"||allowed.has(c.player_name))).forEach(c=>{
+    const time=String(c.at_time||"18:00").slice(0,5), title=String(c.title||"حصة تدريب"), key=day+"|"+time+"|"+title;
+    if(!byKey.has(key))byKey.set(key,{id:"coach:"+ME.id+":"+day+":"+time.replace(":","")+":"+CO.hash(key+"|"+group),date:day,time,title,planned:true,count:0});
+    byKey.get(key).count++;
+  });
+  const options=[...byKey.values()].sort((a,b)=>a.time.localeCompare(b.time)||a.title.localeCompare(b.title,"ar"));
+  return options.length?options:[{id:"coach:"+ME.id+":"+day+":manual:"+CO.hash(group),date:day,time:"",title:"حصة غير مثبّتة",planned:false,count:0}];
+};
+CO.activeSession = options => {
+  let saved="";try{saved=localStorage.getItem(CO.sessionSelKey())||""}catch(e){}
+  return (options||[]).find(x=>x.id===saved)||(options||[])[0]||null;
+};
+window.coSessionSet = id => {
+  const choice=(CO._sessionOptions||[]).find(x=>x.id===id);if(!choice)return;
+  try{localStorage.setItem(CO.sessionSelKey(),choice.id)}catch(e){}
+  render();
+};
 CO.grpOf = age => { const a=Number(age); if(!Number.isFinite(a)||a<4||a>70)return null; if(a<6)return "براعم أقل من 6"; if(a<=8)return "براعم 6–8"; if(a<=10)return "براعم 9–10"; if(a<=12)return "ناشئون 11–12"; if(a<=14)return "ناشئون 13–14"; if(a<=16)return "شباب 15–16"; if(a<=18)return "شباب 17–18"; if(a<=23)return "U23"; return "الفريق الأول"; };
 CO.groupOf = p => { const group=p&&(p.group_name||p.age_group||p.cohort); return group?String(group).trim():(p?(CO.grpOf(p.age)||"غير مصنّف"):null); };
 
@@ -37,13 +73,13 @@ CO.grp  = () => { try { return localStorage.getItem(CO.gkey()) || "all"; } catch
 window.coGrp = g => { try{ localStorage.setItem(CO.gkey(), g); }catch(e){} render(); };
 
 /* كشف المدرب: لاعبو جهته */
-CO.roster = async () => {
+CO.roster = async (includeAll=false) => {
   const org = ME.org || "";
   const pf = await q("p", sb.from("profiles").select("id,name,role,org,pos,age,shirt,avatar_url").eq("role","player").not("name","is",null).limit(120));
   const mine = pf.filter(p => !org || p.org === org);
   const g = CO.grp();
   CO._roster = mine;
-  return g === "all" ? mine : mine.filter(p => CO.groupOf(p) === g);
+  return includeAll || g === "all" ? mine : mine.filter(p => CO.groupOf(p) === g);
 };
 CO.load = (att, name) => {
   const sessions=new Map();
@@ -68,24 +104,31 @@ T.coachHome = async () => {
     q("e", sb.from("match_events").select("*,matches(title)").eq("recorded_by",ME.name).order("created_at",{ascending:false}).limit(20))
   ]);
   const hMap = {}; hs.forEach(h => hMap[h.player_name] = h);
-  const ses = CO.sessionsOf(cal);
-  const today = ses.find(c => String(c.on_date||"").slice(0,10) === CO.today()) || ses.find(c => String(c.on_date||"") >= CO.today());
+  const ses = CO.sessionsOf(cal).filter(c=>CO.grp()==="all"||!c.player_name||(CO._roster||roster).some(p=>p.name===c.player_name));
+  const nextScheduled = ses.find(c => String(c.on_date||"").slice(0,10) === CO.today()) || ses.find(c => String(c.on_date||"") >= CO.today());
   const live  = mt.find(m => m.status === "live");
   const nextM = mt.find(m => m.status === "today") || mt.find(m => m.status === "open");
   const groupNames = new Set(roster.map(p=>p.name));
-  const conf  = today ? new Set(att.filter(a=>CO.rowDate(a)===String(today.on_date||"").slice(0,10)&&a.present!==false&&groupNames.has(a.player_name)).map(a=>a.player_name)).size : 0;
+  const allRoster=CO._roster||roster, chosenGroup=CO.grp(), groupCounts={};
+  allRoster.forEach(p=>{const g=CO.groupOf(p);if(g)groupCounts[g]=(groupCounts[g]||0)+1;});
+  const sessionChoices=CO.sessionOptions(cal,roster), activeHomeSession=CO.activeSession(sessionChoices);
+  CO._sessionOptions=sessionChoices; CO._currentSession=activeHomeSession;
+  CO._allowLegacyAttendance=sessionChoices[0]&&activeHomeSession.id===sessionChoices[0].id;
+  const today=activeHomeSession&&activeHomeSession.planned?activeHomeSession:nextScheduled;
+  const homeRows=att.filter(a=>CO.rowDate(a)===CO.today()&&(a.session_id===activeHomeSession.id||(!a.session_id&&CO._allowLegacyAttendance))&&a.present===true&&groupNames.has(a.player_name));
+  const conf=new Set(homeRows.map(a=>a.player_name)).size;
   const ready = roster.filter(p => !hMap[p.name] || hMap[p.name].state === "available").length;
   const rehab = roster.filter(p => hMap[p.name] && hMap[p.name].state === "rehab").length;
   const out   = roster.filter(p => hMap[p.name] && hMap[p.name].state === "out").length;
   const limited = roster.filter(p => hMap[p.name] && hMap[p.name].state === "limited").length;
-  const stat  = [["جاهز", ready||CO.dash, "#2c6e49"],["تأهيل", rehab||CO.dash, "#c78c00"],["بقيود", limited||CO.dash, "#c78c00"],["غير متاح", out||CO.dash, "#a83b25"]];
+  const stat  = [["بلا تقييد مسجل", ready||CO.dash, "#2c6e49"],["تأهيل", rehab||CO.dash, "#c78c00"],["بقيود", limited||CO.dash, "#c78c00"],["غير متاح", out||CO.dash, "#a83b25"]];
   const flags = roster.map(p => {
     const h = hMap[p.name], lv = CO.load(att, p.name);
     const last = att.find(a => a.player_name === p.name&&a.present!==false);
     const off  = last ? Math.floor((Date.now()-Date.parse(CO.rowDate(last)+"T00:00:00Z"))/864e5) : null;
     if(h && h.state === "out")   return {n:p.name, w:"غير متاح — بقرار المختص", ink:"#a83b25"};
     if(h && h.state === "rehab") return {n:p.name, w:"عائد من إصابة · "+(h.phase||"تأهيل"), ink:"#c78c00"};
-    if(lv!==null && lv < 0.8)     return {n:p.name, w:"حضور أقل من المعتاد · "+Math.round(lv*100)+"٪", ink:"#c78c00"};
+    if(lv!==null && lv < 0.8)     return {n:p.name, w:"حضور أقل من المعتاد · "+Math.round(lv*100)+"٪ من المعتاد", ink:"#c78c00"};
     if(off !== null && off >= 14) return {n:p.name, w:"غائب "+off+" يومًا", ink:"#c78c00"};
     return null;
   }).filter(Boolean).slice(0,3);
@@ -103,7 +146,7 @@ T.coachHome = async () => {
   ].slice(0,4);
 
   return `<div style="padding:18px 18px 0;display:flex;justify-content:space-between;align-items:center">
-    <button onclick="go('coachTasks')" style="position:relative;width:40px;height:40px;border-radius:${CO.DROP};background:#fff;border:1px solid #e9e4d8;display:grid;place-items:center;font-size:15px;cursor:pointer;font-family:Cairo">◔${flags.length?`<span style="position:absolute;top:8px;inset-inline-end:9px;width:7px;height:7px;border-radius:50%;background:#e8531f"></span>`:""}</button>
+    <button onclick="go('coachTasks')" aria-label="فتح المهام" title="المهام" style="position:relative;width:40px;height:40px;border-radius:${CO.DROP};background:#fff;border:1px solid #e9e4d8;display:grid;place-items:center;font-size:15px;cursor:pointer;font-family:Cairo">◔${flags.length?`<span style="position:absolute;top:8px;inset-inline-end:9px;width:7px;height:7px;border-radius:50%;background:#e8531f"></span>`:""}</button>
     ${WM()}
     <button onclick="go('coachMe')" style="position:relative;background:none;border:0;padding:0;cursor:pointer;flex:none">${CO.av(ME.name,44,{dark:true,r:"50% 50% 10px 50%"})}</button>
   </div>
@@ -113,6 +156,7 @@ T.coachHome = async () => {
     <span style="display:block;font-size:10.5px;color:#8a8fa5;font-weight:700;margin-top:2px">فريقك اليوم — من يحضر ومن يحتاجك</span>
   </div>
   <main style="flex:1;padding:16px 18px 118px;display:flex;flex-direction:column;gap:12px">
+    ${Object.keys(groupCounts).length?CO.card(`<div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><b style="font-size:12px;font-weight:900">الفئة الحالية</b><span style="font-size:10px;color:#8a8fa5;font-weight:800">${chosenGroup==="all"?"كل الفئات":CO.esn(chosenGroup)} · <span class="ltr">${roster.length}</span></span></div><div style="display:flex;gap:6px;overflow-x:auto;margin-top:9px;padding-bottom:3px"><button onclick="coGrp('all')" aria-label="عرض كل الفئات" style="flex:none;background:${chosenGroup==="all"?"#151a2e":"#fff"};color:${chosenGroup==="all"?"#fff":"#5b6078"};border:1px solid #e9e4d8;border-radius:999px;padding:7px 11px;font:900 10px Cairo;cursor:pointer">الكل · <span class="ltr">${allRoster.length}</span></button>${Object.entries(groupCounts).sort().map(([g,n])=>`<button onclick="coGrp('${CO.esn(g)}')" aria-label="الفئة ${CO.esn(g)}" style="flex:none;background:${chosenGroup===g?"#151a2e":"#fff"};color:${chosenGroup===g?"#fff":"#5b6078"};border:1px solid #e9e4d8;border-radius:999px;padding:7px 11px;font:900 10px Cairo;cursor:pointer">${CO.esn(g)} · <span class="ltr">${n}</span></button>`).join("")}</div>`):""}
     <div style="position:relative;border-radius:22px;overflow:hidden;background:#151a2e;min-height:236px;display:flex">${CO.disc()}
       <div style="position:relative;padding:18px;display:flex;flex-direction:column;gap:8px;width:64%">
         <span style="color:#b9b0f5;font-size:10.5px;font-weight:900">⚽ ${today?(String(today.on_date||"").slice(0,10)===CO.today()?"حصة اليوم":"الحصة القادمة"):"يومك"}${CO.grp()!=="all"?` · <span class="ltr">${CO.grp()}</span>`:""}</span>
@@ -129,7 +173,7 @@ T.coachHome = async () => {
         <div style="text-align:center"><b class="ltr" style="display:block;font-size:${roster.length?"22px":"26px"};font-weight:700;color:#faf8f3">${roster.length?conf+"/"+roster.length:CO.dash}</b><span style="display:block;font-size:9px;color:#c6cade;font-weight:800">أكّدوا</span></div></div>
     </div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+    <div style="display:grid;grid-template-columns:1fr;gap:10px">
       <div style="background:#fff;border:1px solid #e9e4d8;border-radius:20px;overflow:hidden;display:flex;flex-direction:column">
         <div style="background:#151a2e;color:#faf8f3;padding:9px 14px;font-size:12px;font-weight:900;text-align:center">جاهزية الفريق</div>
         <div style="padding:10px 14px 12px;flex:1">
@@ -153,7 +197,7 @@ T.coachHome = async () => {
         <span style="display:block;font-size:10.5px;color:#8a8fa5;font-weight:700;margin-top:2px">أدخله فترتبط بها — ويصير كشفها كشفك</span></div>
       <span style="color:#4636e3">←</span></button>`:""}
     ${CO.h("اختصارات سريعة")}
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px">
       ${SC.map(([g,t,s,v,bg,ink])=>`<button onclick="go('${v}')" style="background:#fff;border:1px solid #e9e4d8;border-radius:20px;padding:14px 8px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;color:#151a2e;cursor:pointer;font-family:Cairo">
         <span style="width:40px;height:40px;border-radius:50% 50% 8px 50%;display:grid;place-items:center;font-size:17px;background:${bg};color:${ink}">${g}</span>
         <b style="font-size:12px;font-weight:900">${t}</b><span style="font-size:9.5px;color:#8a8fa5;font-weight:800">${s}</span></button>`).join("")}
@@ -191,7 +235,8 @@ T.squad = async () => {
   const mine = all.filter(p => !org || p.org === org);
   const groups = {}; mine.forEach(p => { const g = CO.groupOf(p); if(g) groups[g] = (groups[g]||0)+1; });
   const gsel = CO.grp();
-  const sessionKeys = [...new Set(att.filter(a=>a.present!==false).map(CO.sessionKey).filter(Boolean))];
+  const rosterNames=new Set(roster.map(p=>p.name));
+  const sessionKeys = [...new Set(att.filter(a=>rosterNames.has(a.player_name)).map(CO.sessionKey).filter(Boolean))];
   const sessions = sessionKeys.length;
   const last2 = sessionKeys.slice(0,2);
   const hex = roster.map(p => {
@@ -203,18 +248,18 @@ T.squad = async () => {
   const SQ = (typeof CO.sq==="function") ? CO.sq() : {sort:"load",q:""};
   const nAtt = n => new Set(att.filter(x=>x.player_name===n&&x.present!==false).map(CO.sessionKey).filter(Boolean)).size;
   let rows = roster.map(p => {
-    const h = hMap[p.name], lv = CO.load(att, p.name), st = CO.HS[h?h.state:"available"] || CO.HS.available;
+    const h = hMap[p.name], lv = CO.load(att, p.name), st = h ? (CO.HS[h.state] || ["غير محدد","#8a8fa5"]) : ["لا توجد حالة مسجلة","#8a8fa5"];
     return {p, st, lv, n:nAtt(p.name), pct: lv==null?0:Math.min(100, Math.round(lv/2*100)), ink: CO.loadInk(lv)};
   });
   if(SQ.q) rows = rows.filter(r => String(r.p.name).indexOf(SQ.q)>=0 || String(r.p.pos||"").indexOf(SQ.q)>=0);
   rows.sort((x,y) => SQ.sort==="name" ? String(x.p.name).localeCompare(y.p.name,"ar")
     : SQ.sort==="pos" ? String(x.p.pos||"").localeCompare(y.p.pos||"","ar")
     : SQ.sort==="att" ? y.n-x.n : (y.lv||0)-(x.lv||0));
-  const bench = rows.filter(r => r.st[0] === "متاح").slice(-5).reverse();
+  const bench = rows.filter(r => ["متاح","لا توجد حالة مسجلة"].includes(r.st[0])).slice(-5).reverse();
 
   return `<div style="padding:18px 18px 0;display:flex;justify-content:space-between;align-items:center">
-    <button onclick="go('coachHome')" style="width:40px;height:40px;border-radius:${CO.DROP};background:#fff;border:1px solid #e9e4d8;display:grid;place-items:center;font-size:15px;cursor:pointer;font-family:Cairo">⌂</button>
-    <button onclick="go('explore')" style="width:40px;height:40px;border-radius:${CO.DROP};background:#fff;border:1px solid #e9e4d8;display:grid;place-items:center;font-size:15px;cursor:pointer;font-family:Cairo">⌕</button>
+    <button onclick="coBack()" aria-label="رجوع للصفحة السابقة" title="رجوع" style="width:40px;height:40px;border-radius:${CO.DROP};background:#fff;border:1px solid #e9e4d8;display:grid;place-items:center;font-size:15px;cursor:pointer;font-family:Cairo">←</button>
+    <button onclick="go('explore')" aria-label="البحث عن لاعب أو خدمة" title="البحث" style="width:40px;height:40px;border-radius:${CO.DROP};background:#fff;border:1px solid #e9e4d8;display:grid;place-items:center;font-size:15px;cursor:pointer;font-family:Cairo">⌕</button>
   </div>
   <div style="text-align:center;padding:6px 18px 0">
     <b style="display:block;font-size:26px;font-weight:900;line-height:1.3">فريقي</b>
@@ -226,7 +271,7 @@ T.squad = async () => {
       ${Object.entries(groups).sort().map(([g,n])=>`<button onclick="coGrp('${g}')" style="flex:none;background:${gsel===g?"#151a2e":"#fff"};color:${gsel===g?"#faf8f3":"#5b6078"};border:1px solid ${gsel===g?"#151a2e":"#e9e4d8"};border-radius:999px;padding:7px 12px;font:900 10.5px Cairo;cursor:pointer"><span class="ltr">${g}</span> · <span class="ltr">${n}</span></button>`).join("")}
     </div>`:""}
 
-    ${CO.card(`<div style="display:flex;justify-content:space-between;align-items:baseline">${CO.h("خلية الحضور")}<span style="font-size:10px;color:#8a8fa5;font-weight:800"><span class="ltr">${roster.length||CO.dash}</span> لاعبًا × <span class="ltr">${sessions||CO.dash}</span> حصة</span></div>
+    ${CO.card(`<div style="display:flex;justify-content:space-between;align-items:baseline">${CO.h("خلية الحضور")}<span style="font-size:10px;color:#8a8fa5;font-weight:800"><span class="ltr">${roster.length||CO.dash}</span> ${CO.playerCount(roster.length)} × <span class="ltr">${sessions||CO.dash}</span> حصة</span></div>
       ${roster.length?`<div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:10px">
         ${hex.map(x=>`<span title="${CO.esn(x.n)}" style="width:34px;height:38px;clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);display:grid;place-items:center;font-size:9px;font-weight:900;background:${x.bg};color:${x.ink}" class="ltr">${CO.esn(x.v)}</span>`).join("")}</div>
       <span style="display:block;font-size:9.5px;color:#8a8fa5;font-weight:700;margin-top:8px">داكن = التزام فوق <span class="ltr">90%</span> · فاتح = دونه · برتقالي = غياب متتالٍ · رمادي = بلا حصة موقّعة</span>`
@@ -246,7 +291,7 @@ T.squad = async () => {
             <div style="flex:1;height:6px;border-radius:999px;background:#f0ece2;overflow:hidden;position:relative">
               <span style="position:absolute;inset-inline-start:40%;width:25%;height:100%;background:#eaf5ee"></span>
               <span style="display:block;height:100%;border-radius:999px;background:${r.ink};width:${r.pct}%"></span></div>
-            <b class="ltr" style="font-size:10.5px;flex:none;color:${r.ink}">${r.lv==null?CO.dash:Math.round(r.lv*100)+"٪"}</b></div></div>
+            <b class="ltr" style="font-size:10.5px;flex:none;color:${r.ink}">${r.lv==null?CO.dash:Math.round(r.lv*100)+"٪ من المعتاد"}</b></div></div>
         <button onclick="sqSheet('${CO.esn(r.p.name)}')" style="background:#faf8f3;border:1px solid #e9e4d8;border-radius:10px;color:#4636e3;font:900 12px Cairo;cursor:pointer;flex:none;padding:7px 10px">⋯</button></div>`).join("")
       :CO.empty(SQ.q?"لا نتيجة لبحثك":"لا لاعبين في هذه الفئة")}`)}
 
@@ -255,7 +300,7 @@ T.squad = async () => {
         ${bench.map(b=>`<div style="flex:none;width:64px;text-align:center;background:#faf8f3;border:1px solid #e9e4d8;border-radius:16px;padding:8px 4px">
           <b class="ltr" style="display:block;font-size:16px;color:#4636e3">${b.p.shirt||CO.dash}</b>
           <span style="display:block;font-size:9px;font-weight:900;margin-top:2px">${esc(String(b.p.name).split(" ")[0])}</span>
-          <span class="ltr" style="display:block;font-size:9px;font-weight:800;color:${b.ink};margin-top:2px">${b.lv==null?CO.dash:Math.round(b.lv*100)+"٪"}</span></div>`).join("")}
+          <span class="ltr" style="display:block;font-size:9px;font-weight:800;color:${b.ink};margin-top:2px">${b.lv==null?CO.dash:Math.round(b.lv*100)+"٪ من المعتاد"}</span></div>`).join("")}
       </div>`):""}
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
@@ -275,46 +320,56 @@ CO.PLAN = [
   {min:30, t:"لعب مقسّم", s:"استقبال تحت الضغط · روندو", tag:"متوسط", tagBg:"#fff6d6", tagInk:"#c78c00"},
   {min:15, t:"استشفاء", s:"إطالات · تنفّس", tag:"خفيف", tagBg:"#eaf5ee", tagInk:"#2c6e49"}
 ];
-CO.akey = () => "pi_att_" + (ME&&ME.id) + "_" + CO.today();
-CO.attState = () => { try { return JSON.parse(localStorage.getItem(CO.akey())||"{}"); } catch(e){ return {}; } };
+CO.legacyAkey = () => "pi_att_" + (ME&&ME.id) + "_" + CO.today();
+CO.akey = () => "pi_att_" + (ME&&ME.id) + "_" + CO.today() + "_" + CO.hash((CO._currentSession&&CO._currentSession.id)||CO.grp());
+CO.attState = () => {
+  try {
+    const key=CO.akey(),saved=localStorage.getItem(key);
+    if(saved)return JSON.parse(saved)||{};
+    const legacy=CO._allowLegacyAttendance===false?null:localStorage.getItem(CO.legacyAkey());
+    if(legacy){localStorage.setItem(key,legacy);localStorage.removeItem(CO.legacyAkey());return JSON.parse(legacy)||{};}
+    return {};
+  } catch(e){return {};}
+};
 CO.rowDate = row => String((row&&row.session_date)||((row&&row.created_at)||"").slice(0,10)||"").slice(0,10);
 CO.rowState = row => {
-  if(!row) return "none";
-  if(row.present===true || row.status==="present") return "in";
+  if(!row)return "none";
+  if(row.present===true||row.status==="present")return "in";
   const source=String(row.source||row.status||"").toLowerCase();
-  return source==="coach_excused"||source==="excused"||source==="off" ? "off" : "none";
+  if(source==="coach_excused"||source==="excused"||source==="off")return "off";
+  if(source==="coach_absent"||source==="absent"||row.present===false)return "absent";
+  return "none";
 };
 CO.sessionKey = row => String((row&&row.session_id)||CO.rowDate(row)||"");
 window.coTap = async name => {
-  const s=CO.attState();
-  const prior=(CO._attendanceRows||[]).filter(r=>r.player_name===name).sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0))[0];
-  const cur=Object.prototype.hasOwnProperty.call(s,name)?s[name]:CO.rowState(prior);
-  const nx=cur==="none"?"in":cur==="in"?"off":"none";
-  s[name]=nx;
-  try{localStorage.setItem(CO.akey(),JSON.stringify(s));}catch(e){}
+  const st=CO.attState(),session=CO._currentSession&&CO._currentSession.id,allowLegacy=CO._allowLegacyAttendance!==false;
+  const prior=(CO._attendanceRows||[]).filter(r=>r.player_name===name&&CO.rowDate(r)===CO.today()&&(r.session_id===session||(!r.session_id&&allowLegacy))).sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0))[0];
+  const cur=Object.prototype.hasOwnProperty.call(st,name)?st[name]:CO.rowState(prior);
+  const next={none:"in",in:"absent",absent:"off",off:"none"}[cur]||"in";
+  st[name]=next;
+  try{localStorage.setItem(CO.akey(),JSON.stringify(st))}catch(e){}
   toast("تم تحديد الحالة. احفظ القائمة لتثبيتها");
   render();
 };
 window.coSaveAttendance = async silent => {
-  const st=CO.attState(), roster=CO._roster||[];
+  const st=CO.attState(),roster=CO._roster||[];
   const people=roster.filter(p=>Object.prototype.hasOwnProperty.call(st,p.name));
   if(!people.length){if(!silent)toast("لا توجد حالات جديدة للحفظ");return true;}
   const {data,error}=await sb.from("attendance").select("*").eq("org",ME.org||"").order("created_at",{ascending:false}).limit(500);
   if(error){toast("تعذّر تحميل سجل الحضور",1);return false;}
-  const day=CO.today(), dayRows=(data||[]).filter(a=>CO.rowDate(a)===day);
+  const day=CO.today(),session=CO._currentSession&&CO._currentSession.id,allowLegacy=CO._allowLegacyAttendance!==false;
+  const dayRows=(data||[]).filter(a=>CO.rowDate(a)===day&&(a.session_id===session||(!a.session_id&&allowLegacy)));
   const work=people.map(p=>{
-    const rows=dayRows.filter(a=>a.player_name===p.name);
-    const latest=rows[0]||null, next=st[p.name], previous=CO.rowState(latest);
+    const rows=dayRows.filter(a=>a.player_name===p.name),latest=rows[0]||null,next=st[p.name],previous=CO.rowState(latest);
     return {p,rows,next,previous,correction:!!latest&&previous!==next};
-  }).filter(x=>!x.rows.length||x.previous!==x.next);
+  }).filter(x=>x.rows.length?x.previous!==x.next:x.next!=="none");
   if(!work.length){
-    const remaining={...st}; people.forEach(p=>delete remaining[p.name]);
-    try{if(Object.keys(remaining).length)localStorage.setItem(CO.akey(),JSON.stringify(remaining));else localStorage.removeItem(CO.akey());}catch(e){}
+    const remaining={...st};people.forEach(p=>delete remaining[p.name]);
+    try{if(Object.keys(remaining).length)localStorage.setItem(CO.akey(),JSON.stringify(remaining));else localStorage.removeItem(CO.akey())}catch(e){}
     if(!silent)toast("الحالات المسجلة مطابقة للقائمة");
     render();return true;
   }
-  const corrections=work.filter(x=>x.correction);
-  let reason="";
+  const corrections=work.filter(x=>x.correction);let reason="";
   if(corrections.length){
     const answer=typeof PI!=="undefined"&&PI.sheet?await PI.sheet({icon:"↺",title:"سبب تصحيح الحضور",sub:"التعديل يحفظ اسمك ووقته في سجل المراجعة.",fields:[{id:"reason",label:"سبب التصحيح",placeholder:"مثال: سُجلت الحالة بالخطأ"}],ok:"سجّل التصحيح"}):null;
     if(!answer||!String(answer.reason||"").trim())return false;
@@ -322,8 +377,8 @@ window.coSaveAttendance = async silent => {
   }
   let saved=0;
   for(const item of work){
-    const p=item.p, state=item.next;
-    const row={player_name:p.name,org:ME.org||"",group_name:CO.groupOf(p)||"عام",session_date:day,recorded_by:ME.name,present:state==="in",source:state==="in"?"coach_present":state==="off"?"coach_excused":"coach_absent"};
+    const p=item.p,state=item.next;
+    const row={player_name:p.name,org:ME.org||"",group_name:CO.groupOf(p)||"عام",session_date:day,session_id:session,recorded_by:ME.name,present:state==="in"?true:state==="none"?null:false,source:state==="in"?"coach_present":state==="off"?"coach_excused":state==="absent"?"coach_absent":"coach_unmarked"};
     if(item.rows.length){
       const ids=item.rows.map(r=>r.id).filter(Boolean);
       if(!ids.length){toast("تعذّر تحديد سجل اللاعب لتصحيحه",1);return false;}
@@ -335,16 +390,18 @@ window.coSaveAttendance = async silent => {
     }
     saved++;
   }
-  if(corrections.length) await trans("تصحيح الحضور ("+corrections.map(x=>x.p.name).join("، ")+") · السبب: "+reason);
-  else await trans("حفظ حالات حضور الحصة · "+saved+" لاعبًا");
-  const remaining={...st}; people.forEach(p=>delete remaining[p.name]);
-  try{if(Object.keys(remaining).length)localStorage.setItem(CO.akey(),JSON.stringify(remaining));else localStorage.removeItem(CO.akey());}catch(e){}
+  if(corrections.length)await trans("تصحيح الحضور ("+corrections.map(x=>x.p.name).join("، ")+") · السبب: "+reason);
+  else await trans("حفظ الحضور ("+saved+" "+CO.playerCount(saved)+")");
+  const remaining={...st};people.forEach(p=>delete remaining[p.name]);
+  try{if(Object.keys(remaining).length)localStorage.setItem(CO.akey(),JSON.stringify(remaining));else localStorage.removeItem(CO.akey())}catch(e){}
   if(!silent)toast("حُفظت حالات الحضور والتصحيحات باسمك");
   render();return true;
 };
 window.coStart = async () => {
-  const st=CO.attState(), roster=CO._roster||[];
-  const current=name=>Object.prototype.hasOwnProperty.call(st,name)?st[name]:CO.rowState((CO._attendanceRows||[]).find(a=>a.player_name===name));
+  const st=CO.attState(),roster=CO._roster||[],session=CO._currentSession&&CO._currentSession.id,allowLegacy=CO._allowLegacyAttendance!==false;
+  const todayRows=(CO._attendanceRows||[]).filter(a=>CO.rowDate(a)===CO.today()&&(a.session_id===session||(!a.session_id&&allowLegacy))),saved={};
+  todayRows.forEach(a=>{if(!saved[a.player_name])saved[a.player_name]=a});
+  const current=name=>Object.prototype.hasOwnProperty.call(st,name)?st[name]:CO.rowState(saved[name]);
   const present=roster.filter(p=>current(p.name)==="in").length;
   if(!present)return toast("سجّل حضور لاعب واحد على الأقل أولًا",1);
   if(Object.keys(st).length){const ok=await coSaveAttendance(true);if(!ok)return;}
@@ -358,15 +415,19 @@ T.session = async () => {
     q("a", sb.from("attendance").select("*").eq("org",org).order("created_at",{ascending:false}).limit(500)),
     q("c", sb.from("calendar_items").select("*").eq("created_by",ME.name).order("on_date",{ascending:true}).limit(40))
   ]);
-  const st = CO.attState();
+  CO._sessionOptions=CO.sessionOptions(cal,roster);
+  CO._currentSession=CO.activeSession(CO._sessionOptions);
+  CO._allowLegacyAttendance=CO._sessionOptions[0]&&CO._currentSession.id===CO._sessionOptions[0].id;
+  const st=CO.attState();
   CO._attendanceRows=att;
-  const today = CO.sessionsOf(cal).find(c => String(c.on_date||"").slice(0,10) === CO.today());
-  const todayRows=att.filter(a=>CO.rowDate(a)===CO.today()), savedToday={};
+  const today=CO._currentSession&&CO._currentSession.planned?CO._currentSession:null;
+  const todayRows=att.filter(a=>CO.rowDate(a)===CO.today()&&(a.session_id===CO._currentSession.id||(!a.session_id&&CO._allowLegacyAttendance))),savedToday={};
   todayRows.forEach(a=>{if(!savedToday[a.player_name])savedToday[a.player_name]=a;});
-  const stOf = n => Object.prototype.hasOwnProperty.call(st,n) ? st[n] : CO.rowState(savedToday[n]);
-  const inN  = roster.filter(p => stOf(p.name) === "in").length;
-  const offN = roster.filter(p => stOf(p.name) === "off").length;
-  const noN  = roster.length - inN - offN;
+  const stOf=n=>Object.prototype.hasOwnProperty.call(st,n)?st[n]:CO.rowState(savedToday[n]);
+  const inN=roster.filter(p=>stOf(p.name)==="in").length;
+  const offN=roster.filter(p=>stOf(p.name)==="off").length;
+  const absentN=roster.filter(p=>stOf(p.name)==="absent").length;
+  const noN=roster.length-inN-offN-absentN;
   const savedKeys = typeof CH !== "undefined" && typeof CH.plan === "function" ? CH.plan() : [];
   const selected = typeof CH !== "undefined" && Array.isArray(savedKeys) && Array.isArray(CH.DRILLS)
     ? savedKeys.map(k => CH.DRILLS.find(d => d.k === k)).filter(Boolean) : [];
@@ -376,36 +437,38 @@ T.session = async () => {
     return {min:Math.max(0,Number(d.min)||0), t:d.ar||"تمرين", s:d.d||"", tag:aim.ar||"تمرين", tagBg:tint[d.aim]||"#f2f0ea", tagInk:aim.c||"#4636e3"};
   }) : CO.PLAN;
   const mins = plan.reduce((s,p) => s+p.min, 0);
-  const RING = {in:"#4636e3", off:"#e8531f", none:"#e9e4d8"};
-  const INK  = {in:"#4636e3", off:"#e8531f", none:"#8a8fa5"};
+  const RING={in:"#4636e3",off:"#e8531f",absent:"#c63e2e",none:"#e9e4d8"};
+  const INK={in:"#4636e3",off:"#e8531f",absent:"#a83b25",none:"#8a8fa5"};
+  const STATE_LABEL={in:"حاضر",off:"معتذر",absent:"غائب",none:"غير مسجل"};
   const four = [...roster];
   const gsz  = Math.max(1, Math.ceil(four.length/4));
   const gr   = [0,1,2,3].map(i => four.slice(i*gsz, (i+1)*gsz)).filter(g => g.length);
 
   return `<div style="padding:18px 18px 0;display:flex;justify-content:space-between;align-items:center">
-    <button onclick="go('coachHome')" style="width:40px;height:40px;border-radius:${CO.DROP};background:#fff;border:1px solid #e9e4d8;display:grid;place-items:center;font-size:15px;cursor:pointer;font-family:Cairo">⌂</button>
-    <button onclick="go('drills')" style="width:40px;height:40px;border-radius:${CO.DROP};background:#fff;border:1px solid #e9e4d8;display:grid;place-items:center;font-size:15px;cursor:pointer;font-family:Cairo">✎</button>
+    <button onclick="coBack()" aria-label="رجوع للصفحة السابقة" title="رجوع" style="width:40px;height:40px;border-radius:${CO.DROP};background:#fff;border:1px solid #e9e4d8;display:grid;place-items:center;font-size:15px;cursor:pointer;font-family:Cairo">←</button>
+    <button onclick="go('drills')" aria-label="فتح بنك التمارين" title="بنك التمارين" style="width:40px;height:40px;border-radius:${CO.DROP};background:#fff;border:1px solid #e9e4d8;display:grid;place-items:center;font-size:15px;cursor:pointer;font-family:Cairo">✎</button>
   </div>
   <div style="text-align:center;padding:6px 18px 0">
     <b style="display:block;font-size:26px;font-weight:900;line-height:1.3">حصة اليوم</b>
     <span style="display:block;font-size:11px;color:#8a8fa5;font-weight:700;margin-top:2px">الحضور بنقرة · تقسيم الفريق · سجل الحضور</span>
   </div>
   <main style="flex:1;padding:16px 18px 118px;display:flex;flex-direction:column;gap:12px">
+    ${CO._sessionOptions.length>1?CO.card(`<label style="display:flex;align-items:center;gap:10px;font-size:11px;font-weight:900"><span style="flex:none">اختر حصة اليوم</span><select aria-label="اختر حصة اليوم" onchange="coSessionSet(this.value)" style="flex:1;min-width:0;border:1px solid #e9e4d8;border-radius:10px;padding:9px;background:#faf8f3;font:800 11px Cairo">${CO._sessionOptions.map(x=>`<option value="${CO.esn(x.id)}" ${x.id===CO._currentSession.id?"selected":""}>${CO.esn(x.time?x.time+" · ":"")}${CO.esn(x.title)} · ${x.count} ${CO.playerCount(x.count)}</option>`).join("")}</select></label>`):""}
     <div style="position:relative;overflow:hidden;background:#151a2e;border-radius:22px;padding:18px;color:#faf8f3">${CO.disc()}
       <div style="position:relative;display:flex;justify-content:space-between;align-items:flex-end;gap:12px">
-        <div style="min-width:0"><span style="display:block;font-size:10px;color:#b9b0f5;font-weight:900">${esc(today?today.title:"حصة غير مثبّتة")} · <span class="ltr">${mins}</span> دقيقة</span>
+        <div style="min-width:0"><span style="display:block;font-size:10px;color:#b9b0f5;font-weight:900">${esc(today?today.title:"حصة غير مثبّتة")}${today&&today.time?" · <span class=\"ltr\">"+today.time+"</span>":""} · <span class="ltr">${mins}</span> دقيقة</span>
           <b class="ltr" style="display:block;font-size:32px;font-weight:700;margin-top:4px">${roster.length?inN+" / "+roster.length:CO.dash}</b>
-          <span style="display:block;font-size:10.5px;color:#c6cade;font-weight:700">حاضرون · اعتذر <span class="ltr">${offN||CO.dash}</span> · لم يصل <span class="ltr">${noN||CO.dash}</span></span></div>
+          <span style="display:block;font-size:10.5px;color:#c6cade;font-weight:700">حاضرون · اعتذر <span class="ltr">${offN||CO.dash}</span> · غائب <span class="ltr">${absentN||CO.dash}</span> · لم يُسجّل <span class="ltr">${noN||CO.dash}</span></span></div>
         <button onclick="coStart()" style="background:#fff;color:#151a2e;border:0;border-radius:14px;padding:12px 14px;font:900 12px Cairo;cursor:pointer;flex:none">ابدأ الحصة ▶</button>
       </div></div>
 
     ${CO.card(`<div style="display:flex;justify-content:space-between;align-items:baseline">${CO.h("الحضور بنقرة")}<span style="font-size:10px;color:#8a8fa5;font-weight:800">حدّد الحالة ثم احفظ القائمة مرة واحدة</span></div>
       ${roster.length?`<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:7px;margin-top:10px">
         ${roster.map(p=>{const s=stOf(p.name);
-          return `<button onclick="coTap('${CO.esn(p.name)}')" style="background:none;border:0;padding:0;cursor:pointer;text-align:center;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:Cairo">
+          return `<button aria-label="${CO.esn(p.name)} — ${STATE_LABEL[s]}" title="${STATE_LABEL[s]}" onclick="coTap('${CO.esn(p.name)}')" style="background:none;border:0;padding:0;cursor:pointer;text-align:center;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:Cairo">
             <span style="width:42px;height:42px;border-radius:50% 50% 12px 50%;padding:2px;background:${RING[s]};display:block">${CO.av(p.name,38,{url:p.avatar_url,dark:true,r:"50% 50% 11px 50%",ring:"2px solid #fff"})}</span>
             <span style="font-size:8.5px;font-weight:900;color:${INK[s]}">${esc(String(p.name).split(" ")[0])}</span></button>`;}).join("")}</div>
-      <span style="display:block;font-size:9.5px;color:#8a8fa5;font-weight:700;margin-top:8px">بنفسجي حاضر · برتقالي اعتذر · رمادي غائب — اضغط لاختيار الحالة، ثم احفظ. أي تصحيح يحتاج سببًا ويحفظ باسمك.</span><button onclick="coSaveAttendance()" style="display:block;width:100%;margin-top:10px;background:#4636e3;color:#fff;border:0;border-radius:12px;padding:11px;font:900 11px Cairo;cursor:pointer">احفظ الحضور</button>`
+      <span style="display:block;font-size:9.5px;color:#8a8fa5;font-weight:700;margin-top:8px">بنفسجي حاضر · أحمر غائب · برتقالي اعتذر · رمادي غير مسجّل. اضغط للتبديل بين الحالات ثم احفظ؛ أي تصحيح يحتاج سببًا ويحفظ باسمك.</span><button onclick="coSaveAttendance()" style="display:block;width:100%;margin-top:10px;background:#4636e3;color:#fff;border:0;border-radius:12px;padding:11px;font:900 11px Cairo;cursor:pointer">احفظ الحضور</button>`
       :CO.empty("لا لاعبين في كشفك بعد")}`)}
 
     ${CO.card(`<div style="display:flex;justify-content:space-between;align-items:baseline">${CO.h("خطة الحصة")}<span style="font-size:10px;color:#8a8fa5;font-weight:800"><span class="ltr">${mins}</span> دقيقة</span></div>
@@ -491,7 +554,7 @@ T.drills = async () => {
   const byAim = {}; plan.forEach(d => byAim[d.aim] = (byAim[d.aim]||0)+d.min);
 
   return `<div style="padding:18px 18px 0;display:flex;justify-content:space-between;align-items:center">
-    <button onclick="go('coachHome')" style="width:40px;height:40px;border-radius:${CO.DROP};background:#fff;border:1px solid #e9e4d8;display:grid;place-items:center;font-size:15px;cursor:pointer;font-family:Cairo">⌂</button>
+    <button onclick="coBack()" aria-label="رجوع للصفحة السابقة" title="رجوع" style="width:40px;height:40px;border-radius:${CO.DROP};background:#fff;border:1px solid #e9e4d8;display:grid;place-items:center;font-size:15px;cursor:pointer;font-family:Cairo">←</button>
     <button onclick="go('boards')" style="width:40px;height:40px;border-radius:${CO.DROP};background:#fff;border:1px solid #e9e4d8;display:grid;place-items:center;font-size:15px;cursor:pointer;font-family:Cairo">✎</button>
   </div>
   <div style="text-align:center;padding:6px 18px 0">
@@ -534,7 +597,7 @@ T.drills = async () => {
         <input type="time" value="${CH.time()}" onchange="chTime(this.value)" style="display:block;width:100%;margin-top:5px;border:1px solid #e9e4d8;border-radius:11px;padding:9px 8px;font:800 11px Cairo;background:#faf8f3;color:#151a2e"></label>
     </div>
     ${incompatible.length?`<div style="background:#fff8df;border:1px solid #f0e2b4;border-radius:13px;padding:10px;font-size:10px;color:#8a6912;font-weight:800;line-height:1.8;margin-top:9px">أزل تمارين الفئات الأكبر قبل النشر: ${incompatible.map(d=>CO.esn(d.ar)).join("، ")}</div>`:""}
-    <span style="display:block;font-size:10px;color:#8a8fa5;font-weight:700;margin-top:7px">سيصل المخطط إلى <span class="ltr">${roster.length}</span> لاعبًا في ${CO.grp()!=="all"?CO.esn(CO.grp()):"كل الفئات"}.</span>`):""}
+    <span style="display:block;font-size:10px;color:#8a8fa5;font-weight:700;margin-top:7px">سيصل المخطط إلى <span class="ltr">${roster.length}</span> ${CO.playerCount(roster.length)} في ${CO.grp()!=="all"?CO.esn(CO.grp()):"كل الفئات"}.</span>`):""}
 \n    <div style="display:flex;gap:6px;flex-wrap:wrap">
       <button onclick="drillFilt('all')" style="background:${filt==="all"?"#151a2e":"#fff"};color:${filt==="all"?"#faf8f3":"#5b6078"};border:1px solid ${filt==="all"?"#151a2e":"#e9e4d8"};border-radius:999px;padding:7px 13px;font:900 10.5px Cairo;cursor:pointer">الكل</button>
       ${Object.entries(CH.AIM).map(([k,a])=>`<button onclick="drillFilt('${k}')" style="background:${filt===k?a.c:"#fff"};color:${filt===k?"#fff":"#5b6078"};border:1px solid ${filt===k?a.c:"#e9e4d8"};border-radius:999px;padding:7px 13px;font:900 10.5px Cairo;cursor:pointer">${a.ar}</button>`).join("")}

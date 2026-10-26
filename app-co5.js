@@ -122,7 +122,7 @@ CV.ring = parts => {
 T.coachMe = async () => {
   const org = ME.org || "";
   const [roster,att,ev,tr,cal,career,certs,views,hs,alum] = await Promise.all([
-    CO.roster(),
+    CO.roster(true),
     q("a", sb.from("attendance").select("*").eq("recorded_by",ME.name).order("created_at",{ascending:false}).limit(900)),
     q("e", sb.from("match_events").select("*,matches(title)").eq("recorded_by",ME.name).order("created_at",{ascending:false}).limit(80)),
     q("t", sb.from("transparency").select("*").ilike("actor","%"+ME.name+"%").order("created_at",{ascending:false}).limit(40)),
@@ -169,7 +169,7 @@ T.coachMe = async () => {
   const missing = fields.filter(f=>!f[1]);
 
   return `<div style="padding:18px 18px 0;display:flex;justify-content:space-between;align-items:center">
-    <button onclick="go('coachHome')" style="width:40px;height:40px;border-radius:${CO.DROP};background:#fff;border:1px solid #e9e4d8;display:grid;place-items:center;font-size:15px;cursor:pointer;font-family:Cairo">⌂</button>
+    <button onclick="coBack()" aria-label="رجوع للصفحة السابقة" title="رجوع" style="width:40px;height:40px;border-radius:${CO.DROP};background:#fff;border:1px solid #e9e4d8;display:grid;place-items:center;font-size:15px;cursor:pointer;font-family:Cairo">←</button>
     <button onclick="go('settings')" style="width:40px;height:40px;border-radius:${CO.DROP};background:#fff;border:1px solid #e9e4d8;display:grid;place-items:center;font-size:15px;cursor:pointer;font-family:Cairo">⚙</button>
   </div>
   <main style="flex:1;padding:14px 18px 118px;display:flex;flex-direction:column;gap:12px">

@@ -14,18 +14,26 @@ CH.DRILLS=[
 ];
 CH.AIM={tactic:{ar:"تكتيكي",c:"#4636e3"},tech:{ar:"مهاري",c:"#c78c00"},phys:{ar:"بدني",c:"#e8531f"},recover:{ar:"استشفاء",c:"#2c6e49"}};
 CH.ageOf=p=>{const n=Number(p&&p.age);if(Number.isFinite(n)&&n>=4&&n<=60)return n;const raw=String(p&&(p.group_name||p.age_group||p.cohort)||"").replace(/[٠-٩]/g,c=>String("٠١٢٣٤٥٦٧٨٩".indexOf(c)));const m=raw.match(/[0-9]+/);return m?Number(m[0]):null;};
-CH.suitable=(d,roster)=>{const team=roster||[];if(d.grp==="كل الفئات")return true;if(d.grp==="حرّاس")return team.some(p=>String(p.pos||"").includes("حارس"));const m=String(d.grp||"").match(/^U([0-9]+)/i);if(!m)return true;const ages=team.map(CH.ageOf).filter(n=>n!==null);return ages.length>0&&Math.min(...ages)>=Number(m[1]);};
+CH.suitable=(d,roster)=>{
+  const team=roster||[];
+  if(d.grp==="كل الفئات")return true;
+  if(d.grp==="حرّاس")return team.length>0&&team.every(p=>String(p.pos||"").includes("حارس"));
+  const m=String(d.grp||"").match(/^U([0-9]+)/i);
+  if(!m)return true;
+  const ages=team.map(CH.ageOf);
+  return ages.length>0&&ages.every(n=>n!==null)&&Math.min(...ages)>=Number(m[1]);
+};
 
 /* ── مخطط الحصة المحلي (يبقى مع المدرب) ── */
-CH.pkey=()=>`pi_plan_${ME.id}`;
-CH.dateKey=()=>`pi_plan_date_${ME.id}`;
-CH.timeKey=()=>`pi_plan_time_${ME.id}`;
+CH.pkey=()=>`pi_plan_${ME.id}_${CO.grp()}_${CH.date()}`;
+CH.dateKey=()=>`pi_plan_date_${ME.id}_${CO.grp()}`;
+CH.timeKey=()=>`pi_plan_time_${ME.id}_${CO.grp()}`;
 CH.today=()=>typeof CO!=="undefined"&&CO.today?CO.today():new Date().toISOString().slice(0,10);
-CH.date=()=>{try{const v=localStorage.getItem(CH.dateKey())||"";return /^\d{4}-\d{2}-\d{2}$/.test(v)?v:CH.today()}catch(e){return CH.today()}};
-CH.time=()=>{try{const v=localStorage.getItem(CH.timeKey())||"";return /^\d{2}:\d{2}$/.test(v)?v:"18:00"}catch(e){return "18:00"}};
+CH.date=()=>{try{const v=localStorage.getItem(CH.dateKey())||localStorage.getItem("pi_plan_date_"+ME.id)||"";return /^\d{4}-\d{2}-\d{2}$/.test(v)?v:CH.today()}catch(e){return CH.today()}};
+CH.time=()=>{try{const v=localStorage.getItem(CH.timeKey())||localStorage.getItem("pi_plan_time_"+ME.id)||"";return /^\d{2}:\d{2}$/.test(v)?v:"18:00"}catch(e){return "18:00"}};
 window.chDate=v=>{if(/^\d{4}-\d{2}-\d{2}$/.test(String(v||"")))try{localStorage.setItem(CH.dateKey(),v)}catch(e){}};
 window.chTime=v=>{if(/^\d{2}:\d{2}$/.test(String(v||"")))try{localStorage.setItem(CH.timeKey(),v)}catch(e){}};
-CH.plan=()=>{try{return JSON.parse(localStorage.getItem(CH.pkey())||"[]")}catch(e){return []}};
+CH.plan=()=>{try{const key=CH.pkey(),saved=localStorage.getItem(key);if(saved)return JSON.parse(saved)||[];const oldKey="pi_plan_"+ME.id,old=localStorage.getItem(oldKey);if(old&&CO.grp()==="all"&&CH.date()===CH.today()){localStorage.setItem(key,old);localStorage.removeItem(oldKey);return JSON.parse(old)||[]}return []}catch(e){return []}};
 CH.setPlan=p=>{try{localStorage.setItem(CH.pkey(),JSON.stringify(p))}catch(e){}};
 window.chAdd=k=>{const d=CH.DRILLS.find(x=>x.k===k);if(!d)return;
   const p=CH.plan(); if(p.includes(k)) return toast("موجود في المخطط");
@@ -47,18 +55,18 @@ window.chPublish=async()=>{
   if(items.some(d=>!CH.suitable(d,roster)))return toast("بعض التمارين لا تناسب الفئة المختارة أو تعذّر التأكد من العمر؛ أزلها أو اختر الفئة المناسبة",1);
   CH._publishing=true;
   try{
-    const prior=await q("c",sb.from("calendar_items").select("player_name,title,on_date,created_by").eq("created_by",ME.name).eq("on_date",plannedDate).eq("kind","training").eq("title",title).limit(500));
-    const already=new Set(prior.filter(x=>x.title===title&&String(x.on_date||"").slice(0,10)===plannedDate).map(x=>x.player_name));
+    const prior=await q("c",sb.from("calendar_items").select("player_name,title,on_date,at_time,created_by").eq("created_by",ME.name).eq("on_date",plannedDate).eq("kind","training").eq("title",title).eq("at_time",plannedTime).limit(500));
+    const already=new Set(prior.filter(x=>x.title===title&&String(x.on_date||"").slice(0,10)===plannedDate&&String(x.at_time||"").slice(0,5)===plannedTime).map(x=>x.player_name));
     const recipients=names.filter(n=>!already.has(n));
     if(!recipients.length)return toast("سبق نشر هذه الحصة لجميع اللاعبين في هذا الموعد",1);
     const group=CO.grp&&CO.grp()!=="all"?CO.grp():"كل الفئات";
-    const summary="مراجعة الحصة قبل النشر\n"+title+" · "+mins+" دقيقة\nالفئة: "+group+" · المستلمون: "+recipients.length+" لاعبًا"+(already.size?" · تم استبعاد "+already.size+" سبق أن وصلتهم":"")+"\nالموعد: "+plannedDate+" · "+plannedTime+"\nهل تريد المتابعة؟";
+    const summary="مراجعة الحصة قبل النشر\n"+title+" · "+mins+" دقيقة\nالفئة: "+group+" · المستلمون: "+recipients.length+" "+CO.playerCount(recipients.length)+(already.size?" · تم استبعاد "+already.size+" سبق أن وصلتهم":"")+"\nالموعد: "+plannedDate+" · "+plannedTime+"\nهل تريد المتابعة؟";
     if(!confirm(summary))return;
     const rows=recipients.map(n=>({player_name:n,kind:"training",title,subtitle:items.length+" تمارين · "+mins+" دقيقة · سجّلها "+ME.name,at_time:plannedTime,on_date:plannedDate,org,needs_confirm:false,created_by:ME.name}));
     const {error}=await sb.from("calendar_items").insert(rows);
     if(error)return toast("تعذّر: "+error.message,1);
-    await trans("نشر مخطط حصة ("+items.length+" تمرين · "+mins+" دقيقة) لـ"+recipients.length+" لاعبًا");
-    toast("نُشرت الحصة لـ"+recipients.length+" لاعبًا"+(already.size?" · أُزيل التكرار":""));
+    await trans("نشر مخطط حصة ("+items.length+" تمرين · "+mins+" دقيقة) لـ"+recipients.length+" "+CO.playerCount(recipients.length));
+    toast("نُشرت الحصة لـ"+recipients.length+" "+CO.playerCount(recipients.length)+(already.size?" · أُزيل التكرار":""));
     CH.setPlan([]);render();
   }finally{CH._publishing=false;}
 };
@@ -125,7 +133,7 @@ T.sessions=async()=>{
         <label style="font-size:10px;font-weight:900;color:#5b6078">وقت الحصة
           <input type="time" value="${CH.time()}" onchange="chTime(this.value)" style="display:block;width:100%;margin-top:5px;border:1px solid #e9e4d8;border-radius:11px;padding:9px 8px;font:800 11px Cairo;background:#faf8f3;color:#151a2e"></label>
       </div>
-      <span class="muted" style="display:block;margin-top:7px">ستصل إلى <span class="ltr">${recipients.length}</span> لاعبًا في ${CO.grp&&CO.grp()!=="all"?CO.grp():"كل الفئات"}</span>
+      <span class="muted" style="display:block;margin-top:7px">ستصل إلى <span class="ltr">${recipients.length}</span> ${CO.playerCount(recipients.length)} في ${CO.grp&&CO.grp()!=="all"?CO.grp():"كل الفئات"}</span>
       <div style="display:flex;gap:8px;margin-top:13px">
         <button class="btn" ${incompatible.length?"disabled":""} style="flex:1;${incompatible.length?"opacity:.5;":""}" onclick="chPublish()">انشر في تقويم لاعبيك</button>
         <button class="btn ghost" style="flex:none;width:auto;padding:13px 17px" onclick="chClear()">أفرغ</button></div>
