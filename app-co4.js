@@ -46,7 +46,7 @@ TAC.auto = (st, roster) => {
   });
   return st;
 };
-window.tacForm2 = f => { const st=TAC.get(); st.f=f; st.slots={}; TAC.set(st); TAC.pick=null; render(); };
+window.tacForm2 = f => { const st=TAC.get(); st.f=f; st.manual=true; st.slots={}; TAC.set(st); TAC.pick=null; render(); };
 window.tacAuto  = () => { const st=TAC.get(); st.slots={}; TAC.set(st); toast("رُتّبت التشكيلة بالمراكز — بدّل ما تشاء"); render(); };
 window.tacTap   = (kind, val) => {
   const st = TAC.get();
@@ -112,7 +112,7 @@ T.tactics = async () => {
   const ok = p => !hMap[p.name] || hMap[p.name].state==="available";
   const knownAges=roster.map(p=>p.age==null||String(p.age).trim()===""?NaN:Number(p.age)).filter(Number.isFinite);
   const formKeys=knownAges.length&&Math.max(...knownAges)<=14?["5 لاعبين","7 لاعبين","9 لاعبين"]:Object.keys(TAC.FORMS);
-  const state=TAC.get(); if(!formKeys.includes(state.f))state.f=TAC.defaultForm(roster);
+  const state=TAC.get(); if(!formKeys.includes(state.f)||(!state.manual&&roster.length<TAC.slots(state.f).length))state.f=TAC.defaultForm(roster);
   const st = TAC.auto(state, roster.filter(ok));
   TAC.set(st);
   const slots = TAC.slots(st.f), lines = TAC.FORMS[st.f]||TAC.FORMS["4-3-3"];
