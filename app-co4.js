@@ -13,8 +13,8 @@ TAC.FORMS = {
   "3-4-3":  [[1,"حارس"],[3,"دفاع"],[4,"وسط"],[3,"هجوم"]]
 };
 TAC.FIT = {"حارس":["حارس"],"دفاع":["مدافع","ظهير"],"ارتكاز":["وسط","مدافع"],"وسط":["وسط","جناح"],"صناعة":["جناح","وسط","مهاجم"],"رأس حربة":["مهاجم"],"هجوم":["مهاجم","جناح"]};
-TAC.key  = () => "pi_line_" + (ME && ME.id);
-TAC.get  = () => { try { return JSON.parse(localStorage.getItem(TAC.key())||"null") || {f:"4-3-3", slots:{}, out:[]}; } catch(e){ return {f:"4-3-3", slots:{}, out:[]}; } };
+TAC.key  = () => "pi_line_" + (ME && ME.id) + "_" + (CO.grp ? CO.grp() : "all");
+TAC.get  = () => { try { const raw=localStorage.getItem(TAC.key()); if(raw) return JSON.parse(raw); const prior=JSON.parse(localStorage.getItem("pi_line_"+(ME&&ME.id))||"null"); const current=new Set((CO._roster||[]).map(p=>p.name)); if(prior&&Object.values(prior.slots||{}).every(n=>current.has(n))) return prior; return {f:"4-3-3", slots:{}, out:[]}; } catch(e){ return {f:"4-3-3", slots:{}, out:[]}; } };
 TAC.set  = o => { try{ localStorage.setItem(TAC.key(), JSON.stringify(o)); }catch(e){} };
 TAC.date = st => { const v=String(st&&st.date||""); const d=new Date(v+"T00:00:00Z"); return v.length===10&&!Number.isNaN(d.valueOf())&&d.toISOString().slice(0,10)===v?v:CO.today(); };
 TAC.time = st => { const v=String(st&&st.time||""); const h=+v.slice(0,2),m=+v.slice(3,5); return v.length===5&&v[2]===":"&&h>=0&&h<=23&&m>=0&&m<=59?v:"18:00"; };
@@ -106,6 +106,9 @@ T.tactics = async () => {
   const incomplete = start.length < slots.length;
   const rest = roster.filter(p => (st.out||[]).indexOf(p.name)>=0);
   const load = n => CO.load(att, n);
+  const fullRoster=CO._roster||roster, groups={};
+  fullRoster.forEach(p=>{const g=CO.groupOf(p);if(g)groups[g]=(groups[g]||0)+1;});
+  const selectedGroup=CO.grp();
   const chip = (p,sel,on) => `<button onclick="${on}" style="flex:none;width:74px;background:${sel?"#efedff":"#fff"};border:1.5px solid ${sel?"#4636e3":"#e9e4d8"};border-radius:16px;padding:9px 4px;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;font-family:Cairo">
     ${CO.av(p.name,42,{url:p.avatar_url,dark:true,r:"50% 50% 10px 50%"})}
     <span style="font-size:9px;font-weight:900;color:${sel?"#4636e3":"#151a2e"}">${esc(String(p.name).split(" ")[0])}</span>
@@ -119,8 +122,11 @@ T.tactics = async () => {
   <div style="text-align:center;padding:6px 18px 0">
     <b style="display:block;font-size:26px;font-weight:900;line-height:1.3">التشكيلة والاحتياط</b>
     <span style="display:block;font-size:11px;color:#8a8fa5;font-weight:700;margin-top:2px">للفئات الصغيرة اختر 5 أو 7 لاعبين · بدّل المراكز بالسحب والاختيار</span>
+    <span style="display:inline-block;margin-top:8px;padding:5px 10px;border-radius:999px;background:#efedff;color:#4636e3;font-size:10px;font-weight:900">الفئة: ${selectedGroup==="all"?"كل الفئات":esc(selectedGroup)} · <span class="ltr">${roster.length}</span> لاعبًا</span>
   </div>
   <main style="flex:1;padding:16px 18px 118px;display:flex;flex-direction:column;gap:12px">
+    ${Object.keys(groups).length ? '<div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:2px"><button onclick="coGrp(\'all\')" style="flex:none;background:'+(selectedGroup==="all"?"#151a2e":"#fff")+';color:'+(selectedGroup==="all"?"#faf8f3":"#5b6078")+';border:1px solid '+(selectedGroup==="all"?"#151a2e":"#e9e4d8")+';border-radius:999px;padding:8px 12px;font:900 10.5px Cairo;cursor:pointer">كل الفئات · <span class="ltr">'+fullRoster.length+'</span></button>'+Object.entries(groups).sort().map(([g,n])=>'<button onclick="coGrp(\''+g+'\')" style="flex:none;background:'+(selectedGroup===g?"#151a2e":"#fff")+';color:'+(selectedGroup===g?"#faf8f3":"#5b6078")+';border:1px solid '+(selectedGroup===g?"#151a2e":"#e9e4d8")+';border-radius:999px;padding:8px 12px;font:900 10.5px Cairo;cursor:pointer">'+esc(g)+' · <span class="ltr">'+n+'</span></button>').join("")+'</div>' : ""}
+    ${roster.length<slots.length?CO.note(`الفئة الحالية تضم ${roster.length} لاعبًا، بينما تحتاج خطة ${esc(st.f)} إلى ${slots.length} أساسيين. اختر فئة أكبر أو خطة تناسب عدد اللاعبين.`):""}
     <div style="display:flex;gap:6px;overflow-x:auto">
       ${Object.keys(TAC.FORMS).map(k=>`<button onclick="tacForm2('${k}')" dir="ltr" style="flex:none;background:${k===st.f?"#151a2e":"#fff"};color:${k===st.f?"#faf8f3":"#5b6078"};border:1px solid ${k===st.f?"#151a2e":"#e9e4d8"};border-radius:13px;padding:11px 15px;font:700 13px 'Space Grotesk';cursor:pointer">${k}</button>`).join("")}
     </div>
