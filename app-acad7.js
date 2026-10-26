@@ -148,7 +148,7 @@
 
 /* توحيد شاشات الخدمات المشتركة في حساب الأكاديمية */
 (function(){
-  const ids=["liveNow","tours","pitches","explore","messages","market"];
+  const ids=["liveNow","tours","venuePage","explore","messages","market","deals","settings","role","publicView"];
   const css=`<style>
     .academy-shared-skin{color:#f3f5ff!important;background:transparent!important}
     .academy-shared-skin main{background:transparent!important;color:#f3f5ff!important}
