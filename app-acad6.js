@@ -184,6 +184,8 @@
     body.r-academy .nav button i{width:33px;height:33px;border-radius:12px;background:transparent;color:inherit}
     body.r-academy .nav button.on i{background:linear-gradient(135deg,#855fff,#603ce0)!important;color:#fff!important;box-shadow:0 0 24px rgba(120,78,255,.38)}
     body.r-academy .nav button i svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+    .a6-brandbar{position:sticky;top:0;z-index:72;height:64px;padding:9px 18px;display:flex;align-items:center;justify-content:space-between;background:rgba(7,10,21,.96);backdrop-filter:blur(18px);border-bottom:1px solid rgba(90,119,169,.2);color:#f4f6ff}
+    .a6-brand-mark{flex:1;display:flex;justify-content:center;align-items:center}.a6-brand-mark b{font:900 21px Cairo,sans-serif;letter-spacing:-1px;color:#f5f7ff}.a6-brand-mark b span{color:#e0c346}.a6-brand-mark small{font:700 9px 'Space Grotesk',sans-serif;color:#987bff;vertical-align:top;margin-inline-start:2px}
     .a6-header-side{width:38px;height:38px;border-radius:13px;background:rgba(18,24,43,.92);border:1px solid rgba(111,130,178,.3);color:#e9eeff;display:grid;place-items:center;cursor:pointer}
     .a6-header-side svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
     .a6-header-avatar{width:36px;height:36px;border-radius:50% 50% 14px 50%;display:grid;place-items:center;background:linear-gradient(135deg,#855fff,#603ce0);color:#fff;font:900 14px Cairo;border:1px solid rgba(177,157,255,.38)}
@@ -218,6 +220,20 @@
   `;
   const style=document.createElement("style");style.id="ac6Styles";style.textContent=css;document.head.appendChild(style);
 
+  function styleNav6(nav){
+    if(!nav)return;
+    const props={position:"fixed",left:"50%",right:"auto",bottom:"12px",transform:"translateX(-50%)",width:"min(500px, calc(100% - 24px))",maxWidth:"500px",display:"flex",justifyContent:"space-around",alignItems:"center",background:"rgba(8,10,22,.96)",backdropFilter:"blur(18px)",border:"1px solid rgba(111,88,195,.4)",borderRadius:"28px",boxShadow:"0 18px 46px rgba(0,0,0,.55)",padding:"8px 10px calc(8px + env(safe-area-inset-bottom))"};
+    Object.keys(props).forEach(k=>nav.style.setProperty(k.replace(/[A-Z]/g,m=>"-"+m.toLowerCase()),props[k],"important"));
+    nav.querySelectorAll("button").forEach(b=>{
+      const bp={color:b.classList.contains("on")?"#fff":"#9299b6",font:"800 9.5px Cairo",minWidth:"50px",background:"transparent",border:"0",display:"flex",flexDirection:"column",alignItems:"center",gap:"3px"};
+      Object.keys(bp).forEach(k=>b.style.setProperty(k.replace(/[A-Z]/g,m=>"-"+m.toLowerCase()),bp[k],"important"));
+      b.querySelectorAll("i").forEach(i=>{
+        const ip={width:"33px",height:"33px",display:"grid",placeItems:"center",borderRadius:"12px",background:b.classList.contains("on")?"linear-gradient(135deg,#855fff,#603ce0)":"transparent",color:b.classList.contains("on")?"#fff":"#9299b6"};
+        Object.keys(ip).forEach(k=>i.style.setProperty(k.replace(/[A-Z]/g,m=>"-"+m.toLowerCase()),ip[k],"important"));
+        i.querySelectorAll("svg").forEach(s=>{s.style.width="19px";s.style.height="19px";s.style.fill="none";s.style.stroke="currentColor";s.style.strokeWidth="1.8";s.style.strokeLinecap="round";s.style.strokeLinejoin="round";});
+      });
+    });
+  }
   const previousRender=window.render;
   window.render=async function(){
     await previousRender.apply(this,arguments);
@@ -225,8 +241,15 @@
       const academy=!!(ME&&ME.role==="academy");
       document.body.classList.toggle("r-academy",academy);
       if(!academy){document.getElementById("ac6Fab")?.remove();AC6.closeQuick();return;}
-      const hd=document.querySelector("#app .hd");
-      if(hd){const current=VIEW||"acadHome";const home=current==="acad"||current==="acadHome";hd.innerHTML=`<button class="a6-header-side" onclick="${home?"go('hub')":"go('acadHome')"}" aria-label="${home?"الخدمات":"رجوع"}">${svg(home?"menu":"back")}</button><div style="display:flex;align-items:center;justify-content:center;flex:1">${typeof WM==="function"?WM(1):'<b class="wm">Play<span style="color:#e0c346">In</span><small>365</small></b>'}</div><button class="a6-header-avatar" onclick="go('acadProfile')" aria-label="ملف الأكاديمية">ن</button>`;}
+      const app=document.querySelector("#app");
+      if(app){
+        const hd=app.querySelector(".hd");if(hd)hd.remove();
+        app.querySelectorAll("#fn_bar").forEach(x=>x.remove());
+        let bar=app.querySelector(".a6-brandbar");if(!bar){bar=document.createElement("header");bar.className="a6-brandbar";app.insertBefore(bar,app.firstChild);}
+        const current=VIEW||"acadHome";const home=current==="acad"||current==="acadHome";
+        bar.innerHTML=`<button class="a6-header-side" onclick="${home?"go('hub')":"go('acadHome')"}" aria-label="${home?"الخدمات":"رجوع"}">${svg(home?"menu":"back")}</button><div class="a6-brand-mark"><b>Play<span>In</span><small>365</small></b></div><button class="a6-header-avatar" onclick="go('acadProfile')" aria-label="ملف الأكاديمية">ن</button>`;
+        styleNav6(app.querySelector("nav.nav"));
+      }
       let fab=document.getElementById("ac6Fab");if(!fab){fab=document.createElement("button");fab.id="ac6Fab";fab.className="ac6-fab";fab.setAttribute("aria-label","اختصارات الأكاديمية");fab.title="اختصارات الأكاديمية";fab.innerHTML=svg("plus");fab.onclick=()=>AC6.openQuick();document.body.appendChild(fab);}
     }catch(e){console.error("Academy shell:",e)}
   };
