@@ -304,7 +304,15 @@ T.session = async () => {
   const inN  = roster.filter(p => stOf(p.name) === "in").length;
   const offN = roster.filter(p => stOf(p.name) === "off").length;
   const noN  = roster.length - inN - offN;
-  const mins = CO.PLAN.reduce((s,p) => s+p.min, 0);
+  const savedKeys = typeof CH !== "undefined" && typeof CH.plan === "function" ? CH.plan() : [];
+  const selected = typeof CH !== "undefined" && Array.isArray(savedKeys) && Array.isArray(CH.DRILLS)
+    ? savedKeys.map(k => CH.DRILLS.find(d => d.k === k)).filter(Boolean) : [];
+  const tint = {tactic:"#efedff", tech:"#fff6d6", phys:"#fdeee8", recover:"#eaf5ee"};
+  const plan = selected.length ? selected.map(d => {
+    const aim = (CH.AIM || {})[d.aim] || {};
+    return {min:Math.max(0,Number(d.min)||0), t:d.ar||"تمرين", s:d.d||"", tag:aim.ar||"تمرين", tagBg:tint[d.aim]||"#f2f0ea", tagInk:aim.c||"#4636e3"};
+  }) : CO.PLAN;
+  const mins = plan.reduce((s,p) => s+p.min, 0);
   const RING = {in:"#4636e3", off:"#e8531f", none:"#e9e4d8"};
   const INK  = {in:"#4636e3", off:"#e8531f", none:"#8a8fa5"};
   const four = [...roster].sort(() => 0).slice(0, 16);
