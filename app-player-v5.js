@@ -40,14 +40,14 @@ function demoPack(today){
   ]
  }
 }
-var top5=function(){return '<header class="pz5-top"><button aria-label="الخدمات" onclick="window.PZ.openServices()">☰</button><div class="pz5-brand">Play<span>In</span><sup>365</sup></div><button aria-label="هويتي" title="هويتي" onclick="window.PZ.go(\'publicView\')">'+PZ.icon('profile')+'</button></header>'};
+var top5=function(){return '<header class="pz5-top"><button aria-label="الخدمات" onclick="window.PZ.go(&quot;hub&quot;)">☰</button><div class="pz5-brand">Play<span>In</span><sup>365</sup></div><button aria-label="هويتي" title="هويتي" onclick="window.PZ.go(\'publicView\')">'+PZ.icon('profile')+'</button></header>'};
 var routeTrail=[];var basePlayerGo=PZ.go;PZ.go=function(route,param){var next=String(route||'feed'),from=String(window.VIEW||'');if(next!==from&&from&&from!=='auth'&&from!=='role'){routeTrail.push(from);if(routeTrail.length>20)routeTrail.shift()}return basePlayerGo.apply(this,arguments)};PZ.back=function(){var target=routeTrail.pop();if(!target||target==='auth'||target==='role')target='feed';return basePlayerGo.call(PZ,target)};var basePlayerClose=PZ.close;PZ.close=function(){if(typeof basePlayerClose==="function")basePlayerClose.apply(PZ,arguments);var menu=document.getElementById("pzFabMenu");if(menu)menu.remove()};var basePlayerTop=PZ.top;var basePlayerPage=PZ.page;
 PZ.top=function(back){
  if(!ME||ME.role!=='player')return basePlayerTop.call(PZ,back);
  if(!back||back==="window.PZ.go('feed')")back="window.PZ.back()";
  var isBack=back.indexOf('PZ.back')>=0;
- var first=isBack?'<button aria-label="رجوع" title="رجوع" onclick="'+back+'">'+PZ.icon('back')+'</button>':'<button aria-label="الخدمات" title="الخدمات" onclick="window.PZ.openServices()">☰</button>';
- var last=isBack?'<button aria-label="الخدمات" title="الخدمات" onclick="window.PZ.openServices()">'+PZ.icon('services')+'</button>':'<button aria-label="هويتي" title="هويتي" onclick="window.PZ.go(&quot;publicView&quot;)">'+PZ.icon('profile')+'</button>';
+ var first=isBack?'<button aria-label="رجوع" title="رجوع" onclick="'+back+'">'+PZ.icon('back')+'</button>':'<button aria-label="الخدمات" title="الخدمات" onclick="window.PZ.go(&quot;hub&quot;)">☰</button>';
+ var last=isBack?'<button aria-label="الخدمات" title="الخدمات" onclick="window.PZ.go(&quot;hub&quot;)">'+PZ.icon('services')+'</button>':'<button aria-label="هويتي" title="هويتي" onclick="window.PZ.go(&quot;publicView&quot;)">'+PZ.icon('profile')+'</button>';
  return '<header class="pz5-top">'+first+'<div class="pz5-brand">Play<span>In</span><sup>365</sup></div>'+last+'</header>'
 };
 PZ.page=function(route,body){
@@ -61,7 +61,7 @@ PZ.nav=function(active){
  var a=[['home','الرئيسية','feed'],['opps','فرصي','opps'],['services','الخدمات','services'],['records','أدائي','records'],['profile','هويتي','publicView']];
  var nav='<nav class="pz5-nav">'+a.map(function(x){
   var on=active===x[2]||(x[0]==='services'&&(active==='hub'||active==='services'));
-  if(x[0]==='services')return '<button class="'+(on?'on':'')+'" aria-label="الخدمات" onclick="window.PZ.openServices()"><span>'+PZ.icon(x[0])+'</span><b>'+x[1]+'</b></button>';
+  if(x[0]==='services')return '<button class="'+(on?'on':'')+'" aria-label="الخدمات" onclick="window.PZ.go(&quot;hub&quot;)"><span>'+PZ.icon(x[0])+'</span><b>'+x[1]+'</b></button>';
   return '<button class="'+(on?'on':'')+'" aria-label="'+x[1]+'" onclick="window.PZ.go(&quot;'+x[2]+'&quot;)"><span>'+PZ.icon(x[0])+'</span><b>'+x[1]+'</b></button>'
  }).join('')+'</nav>';
  return nav+'<button class="pz-fab pz-basmat-fab pz5-quick-fab" style="display:grid!important" aria-label="اختصارات سريعة" title="اختصارات سريعة" onclick="window.PZ.toggleFab()">'+PZ.icon('plus')+'</button>'
