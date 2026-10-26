@@ -132,7 +132,7 @@ HUB.ROLE_OK = {
   referee:["pitch","explore","messages","refDuty","orgMatch","reports","role","settings"],
   scout:["pitch","explore","messages","market","scout","reports","deals","role","settings"],
   guardian:["pitch","explore","messages","guardian","updates","medical","role","settings"],
-  academy:["pitch","explore","messages","market","erp","acad","teams","tryouts","importPlayers","reports","deals","role","settings"],
+  academy:["pitch","explore","messages","market","erp","acad","teams","tryouts","importPlayers","acadProfile","acadSquads","acadTryouts","acadRosterImport","acadPerformance","reports","deals","role","settings"],
   venue:["explore","messages","venue","pitches","reports","role","settings"],
   club:["pitch","explore","messages","market","club","erp","tournament","reports","deals","role","settings"],
   fed:["explore","messages","accredit","tournament","reports","role","settings"],
