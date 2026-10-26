@@ -62,11 +62,11 @@ HUB.ROLE = {
     ["🔒","الطبي بإذني","medical","#eef7f4","#2c8471"]
   ],
   academy:[
-    ["▦","ديوان الجهة","erp","#e7ecf1","#243244"],
+    ["▦","ملف الأكاديمية","acadProfile","#e7ecf1","#243244"],
     ["▥","الأكاديمية","acad","#e7ecf1","#243244"],
-    ["◍","الفئات والفرق","teams"],
-    ["✎","اختبارات القبول","tryouts","#fff6d6","#c78c00"],
-    ["⇪","استيراد القوائم","importPlayers"]
+    ["◍","الفئات والفرق","acadSquads"],
+    ["✎","اختبارات القبول","acadTryouts","#fff6d6","#c78c00"],
+    ["⇪","استيراد القوائم","acadRosterImport"]
   ],
   venue:[
     ["▦","ملعبي","venue","#eaf5ee","#2c6e49"],
@@ -141,6 +141,11 @@ HUB.ROLE_OK = {
   investor:["explore","messages","market","investor","deals","reports","role","settings"],
   admin:["admin","owner","adminTrans","reports","market","explore","messages","role","settings"]
 };
+HUB.dest = v => {
+  const role=(ME&&ME.role)||"player";
+  if(role==="academy") return ({erp:"acadProfile",teams:"acadSquads",tryouts:"acadTryouts",importPlayers:"acadRosterImport",reports:"acadPerformance"})[v]||v;
+  return v;
+};
 HUB.has = v => {
   if(typeof T[v] !== "function") return false;
   if(HUB.OPEN.indexOf(v) >= 0) return true;
@@ -199,7 +204,7 @@ HUB.icon = route => {
   const icon = names[route] || "dashboard";
   return `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[icon]||paths.dashboard}</svg>`;
 };
-HUB.tile = ([g,lb,v,bg,ink]) => `<button onclick="go('${v}')" style="background:#11182d;border:1px solid rgba(112,139,190,.24);border-radius:20px;padding:14px 8px;display:flex;flex-direction:column;align-items:center;gap:7px;cursor:pointer;font-family:Cairo;color:#f1f4ff;text-align:center">
+HUB.tile = ([g,lb,v,bg,ink]) => `<button onclick="go('${HUB.dest(v)}')" style="background:#11182d;border:1px solid rgba(112,139,190,.24);border-radius:20px;padding:14px 8px;display:flex;flex-direction:column;align-items:center;gap:7px;cursor:pointer;font-family:Cairo;color:#f1f4ff;text-align:center">
   <span style="width:40px;height:40px;border-radius:${(typeof ME!=="undefined"&&ME&&ME.role==="coach")?"50% 50% 8px 50%":"50% 50% 50% 8px"};background:rgba(112,80,255,.14);color:#b09aff;display:grid;place-items:center;flex:none">${HUB.icon(v)}</span>
   <b style="font-size:11.5px;font-weight:900;line-height:1.5">${lb}</b></button>`;
 
