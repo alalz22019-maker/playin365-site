@@ -520,19 +520,19 @@ T.drills = async () => {
     <div style="background:#fff;border:1px solid #e9e4d8;border-radius:20px;padding:14px 16px">
       <label style="display:block;font-size:12px;font-weight:900;color:#151a2e">الفئة المستهدفة
         <select onchange="coGrp(this.value)" style="display:block;width:100%;margin-top:8px;border:1px solid #e9e4d8;border-radius:11px;padding:10px;font:800 11.5px Cairo;background:#faf8f3">
-          \${groupOptions.map(([label,value,count])=>'<option value="'+CO.esn(value)+'"'+(CO.grp()===value?' selected':'')+'>'+CO.esn(label)+' · '+count+' لاعب</option>').join("")}
+          ${groupOptions.map(([label,value,count])=>'<option value="'+CO.esn(value)+'"'+(CO.grp()===value?' selected':'')+'>'+CO.esn(label)+' · '+count+' لاعب</option>').join("")}
         </select>
       </label>
       <span style="display:block;font-size:10px;color:#8a8fa5;font-weight:700;margin-top:7px">تظهر التمارين الملائمة لأعمار المجموعة المختارة.</span>
     </div>
-    \${plan.length?CO.card(\`<div style="display:grid;grid-template-columns:1.2fr 1fr;gap:8px">
+    ${plan.length?CO.card(`<div style="display:grid;grid-template-columns:1.2fr 1fr;gap:8px">
       <label style="font-size:10px;font-weight:900;color:#5b6078">موعد الحصة
-        <input type="date" value="\${CH.date()}" min="\${CH.today()}" onchange="chDate(this.value)" style="display:block;width:100%;margin-top:5px;border:1px solid #e9e4d8;border-radius:11px;padding:9px 8px;font:800 11px Cairo;background:#faf8f3;color:#151a2e"></label>
+        <input type="date" value="${CH.date()}" min="${CH.today()}" onchange="chDate(this.value)" style="display:block;width:100%;margin-top:5px;border:1px solid #e9e4d8;border-radius:11px;padding:9px 8px;font:800 11px Cairo;background:#faf8f3;color:#151a2e"></label>
       <label style="font-size:10px;font-weight:900;color:#5b6078">الوقت
-        <input type="time" value="\${CH.time()}" onchange="chTime(this.value)" style="display:block;width:100%;margin-top:5px;border:1px solid #e9e4d8;border-radius:11px;padding:9px 8px;font:800 11px Cairo;background:#faf8f3;color:#151a2e"></label>
+        <input type="time" value="${CH.time()}" onchange="chTime(this.value)" style="display:block;width:100%;margin-top:5px;border:1px solid #e9e4d8;border-radius:11px;padding:9px 8px;font:800 11px Cairo;background:#faf8f3;color:#151a2e"></label>
     </div>
-    \${incompatible.length?\`<div style="background:#fff8df;border:1px solid #f0e2b4;border-radius:13px;padding:10px;font-size:10px;color:#8a6912;font-weight:800;line-height:1.8;margin-top:9px">أزل تمارين الفئات الأكبر قبل النشر: \${incompatible.map(d=>CO.esn(d.ar)).join("، ")}</div>\`:""}
-    <span style="display:block;font-size:10px;color:#8a8fa5;font-weight:700;margin-top:7px">سيصل المخطط إلى <span class="ltr">\${roster.length}</span> لاعبًا في \${CO.grp()!=="all"?CO.esn(CO.grp()):"كل الفئات"}.</span>\`):""}
+    ${incompatible.length?`<div style="background:#fff8df;border:1px solid #f0e2b4;border-radius:13px;padding:10px;font-size:10px;color:#8a6912;font-weight:800;line-height:1.8;margin-top:9px">أزل تمارين الفئات الأكبر قبل النشر: ${incompatible.map(d=>CO.esn(d.ar)).join("، ")}</div>`:""}
+    <span style="display:block;font-size:10px;color:#8a8fa5;font-weight:700;margin-top:7px">سيصل المخطط إلى <span class="ltr">${roster.length}</span> لاعبًا في ${CO.grp()!=="all"?CO.esn(CO.grp()):"كل الفئات"}.</span>`):""}
 \n    <div style="display:flex;gap:6px;flex-wrap:wrap">
       <button onclick="drillFilt('all')" style="background:${filt==="all"?"#151a2e":"#fff"};color:${filt==="all"?"#faf8f3":"#5b6078"};border:1px solid ${filt==="all"?"#151a2e":"#e9e4d8"};border-radius:999px;padding:7px 13px;font:900 10.5px Cairo;cursor:pointer">الكل</button>
       ${Object.entries(CH.AIM).map(([k,a])=>`<button onclick="drillFilt('${k}')" style="background:${filt===k?a.c:"#fff"};color:${filt===k?"#fff":"#5b6078"};border:1px solid ${filt===k?a.c:"#e9e4d8"};border-radius:999px;padding:7px 13px;font:900 10.5px Cairo;cursor:pointer">${a.ar}</button>`).join("")}
