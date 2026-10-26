@@ -145,3 +145,58 @@
   T.acad=async()=>home();T.acadHome=async()=>home();T.acadSquads=async()=>squads();T.acadSessions=async()=>sessionsPage();T.acadPerformance=async()=>performance();T.acadProfile=async()=>profile();T.acadTryouts=async()=>tryoutsPage();T.acadRosterImport=async()=>rosterImportPage();
   if(typeof TITLES!=="undefined"){TITLES.acad="مساحة الأكاديمية";TITLES.acadHome="مساحة الأكاديمية";TITLES.acadSquads="الفئات والفرق";TITLES.acadSessions="الحصص والحضور";TITLES.acadPerformance="التطوير والتقارير";TITLES.acadProfile="ملف الأكاديمية";TITLES.acadTryouts="اختبارات القبول";TITLES.acadRosterImport="استيراد قوائم اللاعبين"}
 })();
+
+/* توحيد شاشات الخدمات المشتركة في حساب الأكاديمية */
+(function(){
+  const ids=["liveNow","tours","pitches","explore","messages","market"];
+  const css=`<style>
+    .academy-shared-skin{color:#f3f5ff!important;background:transparent!important}
+    .academy-shared-skin main{background:transparent!important;color:#f3f5ff!important}
+    .academy-shared-skin [style*="background:#fff;"],
+    .academy-shared-skin [style*="background: #fff;"],
+    .academy-shared-skin [style*="background:#ffffff"],
+    .academy-shared-skin [style*="background:#faf8f3"],
+    .academy-shared-skin [style*="background: #faf8f3"],
+    .academy-shared-skin [style*="background:#f8f6f0"],
+    .academy-shared-skin [style*="background:#fffefb"]{
+      background:linear-gradient(145deg,#11172d,#0c1020)!important;color:#f3f5ff!important;border-color:#29304e!important
+    }
+    .academy-shared-skin [style*="background:#fff8df"],
+    .academy-shared-skin [style*="background:#fff6d6"]{background:#28223a!important;color:#f5d76e!important;border-color:#594b2b!important}
+    .academy-shared-skin [style*="background:#efedff"]{background:#24204b!important;border-color:#443b78!important}
+    .academy-shared-skin [style*="background:#fdeee8"]{background:#321e2c!important;border-color:#63364a!important}
+    .academy-shared-skin [style*="background:#eaf5ee"]{background:#142d27!important;border-color:#275c47!important}
+    .academy-shared-skin [style*="color:#151a2e"]{color:#f3f5ff!important}
+    .academy-shared-skin [style*="color:#565d78"]{color:#c1c9df!important}
+    .academy-shared-skin [style*="color:#8a8fa5"]{color:#aeb8d2!important}
+    .academy-shared-skin [style*="color:#4636e3"]{color:#ad9bff!important}
+    .academy-shared-skin [style*="color:#c78c00"],
+    .academy-shared-skin [style*="color:#8a6912"]{color:#f5d76e!important}
+    .academy-shared-skin [style*="color:#2c6e49"]{color:#7fe0a6!important}
+    .academy-shared-skin [style*="color:#e8531f"]{color:#ff9478!important}
+    .academy-shared-skin [style*="border:1px solid #e9e4d8"],
+    .academy-shared-skin [style*="border:1px solid #f0ece2"],
+    .academy-shared-skin [style*="border-top:1px solid #f0ece2"]{border-color:#29304e!important}
+    .academy-shared-skin input,.academy-shared-skin select,.academy-shared-skin textarea{
+      background:#10162b!important;color:#f3f5ff!important;border-color:#343c5c!important
+    }
+  </style>`;
+  ids.forEach(id=>{
+    const original=T[id];
+    if(typeof original!=="function")return;
+    T[id]=async function(...args){
+      const html=await original.apply(this,args);
+      if(typeof ME==="undefined"||!ME||ME.role!=="academy"||typeof html!=="string")return html;
+      setTimeout(()=>{
+        const root=document.querySelector(".academy-shared-skin");
+        if(!root)return;
+        root.querySelectorAll("img").forEach(img=>{
+          const hide=()=>{img.style.display="none"};
+          img.addEventListener("error",hide,{once:true});
+          if(img.complete&&img.naturalWidth===0)hide();
+        });
+      },0);
+      return '<div class="academy-shared-skin">'+html+'</div>'+css;
+    };
+  });
+})();
