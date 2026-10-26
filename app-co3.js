@@ -48,8 +48,8 @@ CO.sessionSelKey = () => `pi_co_session_${ME&&ME.id}_${CO.today()}_${CO.hash(CO.
 CO.sessionOptions = (cal,roster,day=CO.today()) => {
   const allowed=new Set((roster||[]).map(p=>p.name)), group=CO.grp(), byKey=new Map();
   CO.sessionsOf(cal).filter(c=>String(c.on_date||"").slice(0,10)===day&&(!c.player_name||group==="all"||allowed.has(c.player_name))).forEach(c=>{
-    const time=String(c.at_time||"18:00").slice(0,5), title=String(c.title||"حصة تدريب"), key=day+"|"+time+"|"+title;
-    if(!byKey.has(key))byKey.set(key,{id:"coach:"+ME.id+":"+day+":"+time.replace(":","")+":"+CO.hash(key+"|"+group),date:day,time,title,planned:true,count:0});
+    const time=String(c.at_time||"18:00").slice(0,5), title=String(c.title||"حصة تدريب"), sessionId=String(c.session_id||""), key=sessionId?("session:"+sessionId):(day+"|"+time+"|"+title);
+    if(!byKey.has(key))byKey.set(key,{id:sessionId||("coach:"+ME.id+":"+day+":"+time.replace(":","")+":"+CO.hash(key+"|"+group)),date:day,time,title,planned:true,count:0});
     byKey.get(key).count++;
   });
   const options=[...byKey.values()].sort((a,b)=>a.time.localeCompare(b.time)||a.title.localeCompare(b.title,"ar"));
