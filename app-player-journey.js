@@ -45,7 +45,7 @@
   function maySharePublic(player) {
     // A QR code is an identity link, not an age-gated feature. Visibility is
     // governed by the profile's own public/private setting, not the player's age.
-    return !!(player && player.role === 'player' && (player.profile_visibility === 'public' || previewDemoMode()));
+    return !!(player && player.role === 'player' && (player.profile_visibility === 'public' || (previewDemoMode() && player.isSyntheticDemo === true)));
   }
   function shareNotice(message) {
     if (typeof toast === 'function') toast(message);
