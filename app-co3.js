@@ -72,18 +72,18 @@ T.coachHome = async () => {
   const today = ses.find(c => String(c.on_date||"").slice(0,10) === CO.today()) || ses.find(c => String(c.on_date||"") >= CO.today());
   const live  = mt.find(m => m.status === "live");
   const nextM = mt.find(m => m.status === "today") || mt.find(m => m.status === "open");
-  const conf  = today ? att.filter(a => String(a.created_at||"").slice(0,10) === String(today.on_date||"").slice(0,10)).length : 0;
+  const conf  = today ? new Set(att.filter(a=>CO.rowDate(a)===String(today.on_date||"").slice(0,10)&&a.present!==false).map(a=>a.player_name)).size : 0;
   const ready = roster.filter(p => !hMap[p.name] || hMap[p.name].state === "available").length;
   const rehab = roster.filter(p => hMap[p.name] && hMap[p.name].state === "rehab").length;
   const out   = roster.filter(p => hMap[p.name] && hMap[p.name].state === "out").length;
   const stat  = [["جاهز", ready||CO.dash, "#2c6e49"],["تأهيل", rehab||CO.dash, "#c78c00"],["غير متاح", out||CO.dash, "#a83b25"]];
   const flags = roster.map(p => {
     const h = hMap[p.name], lv = CO.load(att, p.name);
-    const last = att.find(a => a.player_name === p.name);
-    const off  = last ? Math.floor((Date.now()-new Date(last.created_at))/864e5) : null;
+    const last = att.find(a => a.player_name === p.name&&a.present!==false);
+    const off  = last ? Math.floor((Date.now()-Date.parse(CO.rowDate(last)+"T00:00:00Z"))/864e5) : null;
     if(h && h.state === "out")   return {n:p.name, w:"غير متاح — بقرار المختص", ink:"#a83b25"};
     if(h && h.state === "rehab") return {n:p.name, w:"عائد من إصابة · "+(h.phase||"تأهيل"), ink:"#c78c00"};
-    if(lv && lv > 1.3)           return {n:p.name, w:"حمل حادّ · "+lv, ink:"#e8531f"};
+    if(lv!==null && lv < 0.8)     return {n:p.name, w:"حضور أقل من المعتاد · "+Math.round(lv*100)+"٪", ink:"#c78c00"};
     if(off !== null && off >= 14) return {n:p.name, w:"غائب "+off+" يومًا", ink:"#c78c00"};
     return null;
   }).filter(Boolean).slice(0,3);
@@ -230,7 +230,7 @@ T.squad = async () => {
       <span style="display:block;font-size:9.5px;color:#8a8fa5;font-weight:700;margin-top:8px">داكن = التزام فوق <span class="ltr">90%</span> · فاتح = دونه · برتقالي = غياب متتالٍ · رمادي = بلا حصة موقّعة</span>`
       :CO.empty("لا كشف بعد — أنشئ مجموعتك الأولى أو اقبل دعوة أكاديمية")}`)}
 
-    ${CO.card(`<div style="display:flex;justify-content:space-between;align-items:baseline">${CO.h("الكشف والانتظام")}<span style="font-size:10px;color:#8a8fa5;font-weight:800">مقارنة بمتوسط آخر ٤ أسابيع <span class="ltr">0.8 – 1.3</span></span></div>
+    ${CO.card(`<div style="display:flex;justify-content:space-between;align-items:baseline">${CO.h("الكشف والانتظام")}<span style="font-size:10px;color:#8a8fa5;font-weight:800">مؤشر مقارنة بمتوسط آخر ٤ أسابيع</span></div>
       <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
         <input value="${CO.esn(SQ.q)}" oninput="sqFind(this.value)" placeholder="ابحث باسم أو مركز" style="flex:1;min-width:120px;border:1px solid #e9e4d8;border-radius:11px;padding:8px 11px;font:700 11px Cairo;background:#faf8f3">
         ${(CO.SORT||[]).map(([k,lb])=>`<button onclick="sqSort('${k}')" style="flex:none;background:${SQ.sort===k?"#151a2e":"#faf8f3"};color:${SQ.sort===k?"#faf8f3":"#5b6078"};border:1px solid ${SQ.sort===k?"#151a2e":"#e9e4d8"};border-radius:999px;padding:7px 11px;font:900 10px Cairo;cursor:pointer">${lb}</button>`).join("")}
@@ -244,7 +244,7 @@ T.squad = async () => {
             <div style="flex:1;height:6px;border-radius:999px;background:#f0ece2;overflow:hidden;position:relative">
               <span style="position:absolute;inset-inline-start:40%;width:25%;height:100%;background:#eaf5ee"></span>
               <span style="display:block;height:100%;border-radius:999px;background:${r.ink};width:${r.pct}%"></span></div>
-            <b class="ltr" style="font-size:10.5px;flex:none;color:${r.ink}">${r.lv??CO.dash}</b></div></div>
+            <b class="ltr" style="font-size:10.5px;flex:none;color:${r.ink}">${r.lv==null?CO.dash:Math.round(r.lv*100)+"٪"}</b></div></div>
         <button onclick="sqSheet('${CO.esn(r.p.name)}')" style="background:#faf8f3;border:1px solid #e9e4d8;border-radius:10px;color:#4636e3;font:900 12px Cairo;cursor:pointer;flex:none;padding:7px 10px">⋯</button></div>`).join("")
       :CO.empty(SQ.q?"لا نتيجة لبحثك":"لا لاعبين في هذه الفئة")}`)}
 
@@ -253,7 +253,7 @@ T.squad = async () => {
         ${bench.map(b=>`<div style="flex:none;width:64px;text-align:center;background:#faf8f3;border:1px solid #e9e4d8;border-radius:16px;padding:8px 4px">
           <b class="ltr" style="display:block;font-size:16px;color:#4636e3">${b.p.shirt||CO.dash}</b>
           <span style="display:block;font-size:9px;font-weight:900;margin-top:2px">${esc(String(b.p.name).split(" ")[0])}</span>
-          <span class="ltr" style="display:block;font-size:9px;font-weight:800;color:${b.ink};margin-top:2px">${b.lv??CO.dash}</span></div>`).join("")}
+          <span class="ltr" style="display:block;font-size:9px;font-weight:800;color:${b.ink};margin-top:2px">${b.lv==null?CO.dash:Math.round(b.lv*100)+"٪"}</span></div>`).join("")}
       </div>`):""}
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
@@ -397,7 +397,7 @@ T.session = async () => {
         <button onclick="coStart()" style="background:#fff;color:#151a2e;border:0;border-radius:14px;padding:12px 14px;font:900 12px Cairo;cursor:pointer;flex:none">ابدأ الحصة ▶</button>
       </div></div>
 
-    ${CO.card(`<div style="display:flex;justify-content:space-between;align-items:baseline">${CO.h("الحضور بنقرة")}<span style="font-size:10px;color:#8a8fa5;font-weight:800">توقيعك = سطر في سجل كل لاعب</span></div>
+    ${CO.card(`<div style="display:flex;justify-content:space-between;align-items:baseline">${CO.h("الحضور بنقرة")}<span style="font-size:10px;color:#8a8fa5;font-weight:800">حدّد الحالة ثم احفظ القائمة مرة واحدة</span></div>
       ${roster.length?`<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:7px;margin-top:10px">
         ${roster.map(p=>{const s=stOf(p.name);
           return `<button onclick="coTap('${CO.esn(p.name)}')" style="background:none;border:0;padding:0;cursor:pointer;text-align:center;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:Cairo">
@@ -423,7 +423,7 @@ T.session = async () => {
           <span style="display:block;font-size:9.5px;color:#5b6078;font-weight:700;margin-top:4px;line-height:1.6">${g.map(p=>esc(String(p.name).split(" ")[0])).join(" · ")}</span></div>`).join("")}
       </div>`):""}
 
-    ${CO.card(`<div style="display:flex;justify-content:space-between;align-items:baseline">${CO.h("سجل حضور الفريق")}<span style="font-size:10px;color:#8a8fa5;font-weight:800">عدد المشاركات المسجلة خلال آخر ٨ أسابيع <span class="ltr">1 – 10</span></span></div>
+    ${CO.card(`<div style="display:flex;justify-content:space-between;align-items:baseline">${CO.h("سجل حضور الفريق")}<span style="font-size:10px;color:#8a8fa5;font-weight:800">مشاركات اللاعبين المسجلة لكل أسبوع</span></div>
       ${(()=>{ const wk=[...Array(8)].map((_,i)=>{const seen=new Set();att.forEach(a=>{const age=(Date.now()-Date.parse(CO.rowDate(a)+"T00:00:00Z"))/864e5;if(a.present!==false&&age>=(7-i)*7&&age<(8-i)*7)seen.add(CO.sessionKey(a)+"|"+a.player_name);});return seen.size;});
         const mx=Math.max(...wk,1), X=i=>10+i*(320/7), Y=v=>78-(v/mx)*56;
         if(!att.length) return CO.empty("يظهر المنحنى بعد تسجيل أول حضور");
