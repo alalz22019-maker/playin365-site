@@ -23,7 +23,7 @@ TB.s = null;
 TB.blank = () => ({
   pitch:"full", land:true, zoom:1,
   frames:[{objs:[],shapes:[]}],
-  meta:{title:"لوح بلا اسم", aim:"tact", minutes:15, group:"كل الفئات", notes:""}
+  meta:{title:"لوح بلا اسم", aim:"tact", minutes:15, group:"كل الفئات", notes:"", date:CO.today(), time:"18:00"}
 });
 TB.fr   = () => TB.s.frames[TB.s.f];
 TB.uid  = () => "x"+Math.random().toString(36).slice(2,9);
@@ -234,7 +234,7 @@ window.tbSave = async (silent) => {
   const m=TB.s.meta;
   if(!String(m.title||"").trim() || m.title==="لوح بلا اسم"){ const t=prompt("اسم اللوح:","ضغط عالٍ — 3 ضد 2"); if(!t) return null; m.title=t; }
   const row = {owner_id:ME.id, coach_name:ME.name, org:ME.org||"", title:m.title, aim:m.aim, minutes:m.minutes,
-    group_name:m.group, notes:m.notes||"", scene:{pitch:TB.s.pitch, frames:TB.s.frames}, updated_at:new Date().toISOString()};
+    group_name:m.group, notes:m.notes||"", scene:{pitch:TB.s.pitch, frames:TB.s.frames, meta:{date:m.date||CO.today(),time:m.time||"18:00"}}, updated_at:new Date().toISOString()};
   let res;
   if(TB.id) res = await sb.from("pi_drills").update(row).eq("id",TB.id).select("id").single();
   else      res = await sb.from("pi_drills").insert(row).select("id").single();
@@ -244,19 +244,32 @@ window.tbSave = async (silent) => {
   return TB.id;
 };
 window.tbPublish = async () => {
-  const id = await tbSave(true); if(!id) return;
-  const roster = await CO.roster();
-  if(!roster.length) return toast("لا لاعبين في كشفك بعد",1);
+  if(TB._publishing)return toast("يجري النشر الآن",1);
+  const roster=await CO.roster();
+  if(!roster.length)return toast("لا لاعبين في الفئة المختارة",1);
   const m=TB.s.meta;
-  const rows = roster.map(p=>({player_name:p.name, kind:"training",
-    title:"لوح تكتيكي · "+m.title,
-    subtitle:`${TB.AIM[m.aim][0]} · ${m.minutes} دقيقة · ${TB.s.frames.length} لقطة${m.notes?" — "+m.notes:""} — رسمه ${ME.name} — مدرب`,
-    at_time:"18:00", on_date:new Date().toISOString().slice(0,10), org:ME.org||"", needs_confirm:false, created_by:ME.name}));
-  const {error} = await sb.from("calendar_items").insert(rows);
-  if(error) return toast("تعذّر النشر: "+error.message,1);
-  await trans(`نشر لوحًا تكتيكيًا لـ${roster.length} لاعبًا — ${m.title}`);
-  toast(`وصل ${roster.length} لاعبًا — يحضرون وهم يعرفون خطتك`);
-  TB.close();
+  if(!String(m.title||"").trim()||m.title==="لوح بلا اسم"){const t=prompt("اسم اللوح:","ضغط عالٍ — 3 ضد 2");if(!t)return;m.title=t;TB.chrome();}
+  const plannedDate=String(m.date||CO.today()),plannedTime=String(m.time||"18:00");
+  if(plannedDate<CO.today())return toast("اختر اليوم أو موعدًا لاحقًا",1);
+  const title="لوح تكتيكي · "+m.title;
+  TB._publishing=true;
+  try{
+    const prior=await q("c",sb.from("calendar_items").select("player_name,title,on_date,at_time,created_by").eq("created_by",ME.name).eq("kind","training").eq("on_date",plannedDate).eq("at_time",plannedTime).eq("title",title).limit(500));
+    const already=new Set(prior.filter(x=>x.title===title&&String(x.on_date||"").slice(0,10)===plannedDate&&x.at_time===plannedTime).map(x=>x.player_name));
+    const recipients=roster.filter(p=>!already.has(p.name));
+    if(!recipients.length)return toast("سبق إرسال هذا اللوح إلى جميع اللاعبين في هذا الموعد",1);
+    const summary="راجع اللوح قبل الإرسال\n"+m.title+" · "+(TB.AIM[m.aim]||TB.AIM.tact)[0]+" · "+m.minutes+" دقيقة · "+TB.s.frames.length+" لقطات\nالفئة: "+(m.group||"كل الفئات")+" · المستلمون: "+recipients.length+" لاعبًا"+(already.size?" · استُبعد "+already.size+" سبق أن وصلهم":"")+"\nالموعد: "+plannedDate+" · "+plannedTime+"\nهل تريد الإرسال؟";
+    if(!confirm(summary))return;
+    const id=await tbSave(true);if(!id)return;
+    const rows=recipients.map(p=>({player_name:p.name,kind:"training",title,
+      subtitle:(TB.AIM[m.aim]||TB.AIM.tact)[0]+" · "+m.minutes+" دقيقة · "+TB.s.frames.length+" لقطات"+(m.notes?" — "+m.notes:"")+" — رسمه "+ME.name+" — مدرب",
+      at_time:plannedTime,on_date:plannedDate,org:ME.org||"",needs_confirm:false,created_by:ME.name}));
+    const {error}=await sb.from("calendar_items").insert(rows);
+    if(error)return toast("تعذّر النشر: "+error.message,1);
+    await trans("نشر لوحًا تكتيكيًا لـ"+recipients.length+" لاعبًا — "+m.title);
+    toast("وصل اللوح إلى "+recipients.length+" لاعبًا"+(already.size?" دون تكرار":""));
+    TB.close();
+  }finally{TB._publishing=false;}
 };
 window.tbMeta = (k,v) => { TB.s.meta[k]= k==="minutes"?(+v||15):v; TB.chrome(); };
 
@@ -292,6 +305,12 @@ TB.metaBar = () => `
       <select onchange="tbMeta('group',this.value)" style="width:100%;border:1px solid #e9e4d8;border-radius:11px;padding:9px;font:800 11.5px Cairo;background:#faf8f3">
         ${["كل الفئات",...(TB.GROUPS&&TB.GROUPS.length?TB.GROUPS:["U15","U16","U17","U19","الفريق الأول"])].map(g=>`<option value="${TB.esc(g)}" ${TB.s.meta.group===g?"selected":""}>${TB.esc(g)}</option>`).join("")}</select></label>
   </div>
+  <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:8px;margin-top:9px">
+    <label style="display:block"><span style="display:block;font-size:9.5px;font-weight:900;color:#8a8fa5;margin-bottom:4px">موعد اللوح</span>
+      <input type="date" min="${CO.today()}" value="${TB.s.meta.date||CO.today()}" onchange="tbMeta('date',this.value)" style="width:100%;border:1px solid #e9e4d8;border-radius:11px;padding:9px;font:700 12px Cairo;background:#faf8f3"></label>
+    <label style="display:block"><span style="display:block;font-size:9.5px;font-weight:900;color:#8a8fa5;margin-bottom:4px">الوقت</span>
+      <input type="time" value="${TB.s.meta.time||"18:00"}" onchange="tbMeta('time',this.value)" style="width:100%;border:1px solid #e9e4d8;border-radius:11px;padding:9px;font:700 12px Cairo;background:#faf8f3"></label>
+  </div>
   <label style="display:block;margin-top:8px"><span style="display:block;font-size:9.5px;font-weight:900;color:#8a8fa5;margin-bottom:4px">توجيهك للاعبين</span>
     <textarea oninput="tbMeta('notes',this.value)" placeholder="مثال: الضغط يبدأ من المهاجم — الكرة للجهة الضعيفة ثم إغلاق." style="width:100%;border:1px solid #e9e4d8;border-radius:11px;padding:10px;font:700 11.5px Cairo;line-height:1.9;min-height:64px;background:#faf8f3;resize:vertical">${TB.esc(TB.s.meta.notes)}</textarea></label>`;
 
@@ -304,7 +323,7 @@ window.openBoard = async (id) => {
   if(id){
     const {data} = await sb.from("pi_drills").select("*").eq("id",id).single();
     if(data){ TB.s.pitch=(data.scene&&data.scene.pitch)||"full"; TB.s.frames=(data.scene&&data.scene.frames)||[{objs:[],shapes:[]}];
-      TB.s.meta={title:data.title, aim:data.aim||"tact", minutes:data.minutes||15, group:data.group_name||"كل الفئات", notes:data.notes||""}; }
+      TB.s.meta={title:data.title, aim:data.aim||"tact", minutes:data.minutes||15, group:data.group_name||"كل الفئات", notes:data.notes||"", date:(data.scene&&data.scene.meta&&data.scene.meta.date)||CO.today(), time:(data.scene&&data.scene.meta&&data.scene.meta.time)||"18:00"}; }
   }
   const root=document.createElement("div"); root.id="tb_root";
   root.style.cssText="position:fixed;inset:0;z-index:300;background:#151a2e;display:flex;flex-direction:column;overflow:hidden";
@@ -396,18 +415,31 @@ window.boardDel = async id => {
   await trans("حذف لوحًا تكتيكيًا"); toast("حُذف"); render();
 };
 window.boardPublish = async id => {
+  if(TB._publishing)return toast("يجري النشر الآن",1);
   const {data}=await sb.from("pi_drills").select("*").eq("id",id).single();
-  if(!data) return toast("تعذّر فتح اللوح",1);
-  const roster = await CO.roster();
-  if(!roster.length) return toast("لا لاعبين في كشفك بعد",1);
-  const A=TB.AIM[data.aim]||TB.AIM.tact, nf=((data.scene||{}).frames||[]).length;
-  const rows = roster.map(p=>({player_name:p.name, kind:"training", title:"لوح تكتيكي · "+data.title,
-    subtitle:`${A[0]} · ${data.minutes} دقيقة · ${nf} لقطة${data.notes?" — "+data.notes:""} — رسمه ${ME.name} — مدرب`,
-    at_time:"18:00", on_date:new Date().toISOString().slice(0,10), org:ME.org||"", needs_confirm:false, created_by:ME.name}));
-  const {error}=await sb.from("calendar_items").insert(rows);
-  if(error) return toast("تعذّر النشر: "+error.message,1);
-  await trans(`نشر لوحًا تكتيكيًا لـ${roster.length} لاعبًا — ${data.title}`);
-  toast(`وصل ${roster.length} لاعبًا — يحضرون وهم يعرفون خطتك`);
+  if(!data)return toast("تعذّر فتح اللوح",1);
+  const roster=await CO.roster();
+  if(!roster.length)return toast("لا لاعبين في الفئة المختارة",1);
+  const meta=(data.scene&&data.scene.meta)||{};
+  const plannedDate=meta.date||CO.today(),plannedTime=meta.time||"18:00";
+  if(plannedDate<CO.today())return toast("حدّث موعد اللوح قبل نشره",1);
+  const A=TB.AIM[data.aim]||TB.AIM.tact,nf=((data.scene||{}).frames||[]).length,title="لوح تكتيكي · "+data.title;
+  TB._publishing=true;
+  try{
+    const prior=await q("c",sb.from("calendar_items").select("player_name,title,on_date,at_time,created_by").eq("created_by",ME.name).eq("kind","training").eq("on_date",plannedDate).eq("at_time",plannedTime).eq("title",title).limit(500));
+    const already=new Set(prior.filter(x=>x.title===title&&String(x.on_date||"").slice(0,10)===plannedDate&&x.at_time===plannedTime).map(x=>x.player_name));
+    const recipients=roster.filter(p=>!already.has(p.name));
+    if(!recipients.length)return toast("سبق إرسال هذا اللوح إلى جميع اللاعبين في هذا الموعد",1);
+    const summary="راجع الإرسال قبل التأكيد\n"+data.title+" · "+A[0]+" · "+data.minutes+" دقيقة · "+nf+" لقطات\nالمستلمون: "+recipients.length+" لاعبًا"+(already.size?" · استُبعد "+already.size+" سبق أن وصلهم":"")+"\nالموعد: "+plannedDate+" · "+plannedTime+"\nهل تريد الإرسال؟";
+    if(!confirm(summary))return;
+    const rows=recipients.map(p=>({player_name:p.name,kind:"training",title,
+      subtitle:A[0]+" · "+data.minutes+" دقيقة · "+nf+" لقطات"+(data.notes?" — "+data.notes:"")+" — رسمه "+ME.name+" — مدرب",
+      at_time:plannedTime,on_date:plannedDate,org:ME.org||"",needs_confirm:false,created_by:ME.name}));
+    const {error}=await sb.from("calendar_items").insert(rows);
+    if(error)return toast("تعذّر النشر: "+error.message,1);
+    await trans("نشر لوحًا تكتيكيًا لـ"+recipients.length+" لاعبًا — "+data.title);
+    toast("وصل اللوح إلى "+recipients.length+" لاعبًا"+(already.size?" دون تكرار":""));
+  }finally{TB._publishing=false;}
 };
 
 (function(){
