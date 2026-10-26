@@ -273,23 +273,78 @@ CO.PLAN = [
 ];
 CO.akey = () => "pi_att_" + (ME&&ME.id) + "_" + CO.today();
 CO.attState = () => { try { return JSON.parse(localStorage.getItem(CO.akey())||"{}"); } catch(e){ return {}; } };
+CO.rowDate = row => String((row&&row.session_date)||((row&&row.created_at)||"").slice(0,10)||"").slice(0,10);
+CO.rowState = row => {
+  if(!row) return "none";
+  if(row.present===true || row.status==="present") return "in";
+  const source=String(row.source||row.status||"").toLowerCase();
+  return source==="coach_excused"||source==="excused"||source==="off" ? "off" : "none";
+};
+CO.sessionKey = row => String((row&&row.session_id)||CO.rowDate(row)||"");
 window.coTap = async name => {
-  const s = CO.attState(), cur = s[name] || "none";
-  const nx = cur === "none" ? "in" : cur === "in" ? "off" : "none";
-  s[name] = nx; try{ localStorage.setItem(CO.akey(), JSON.stringify(s)); }catch(e){}
-  if(nx === "in"){
-    const player=(CO._roster||[]).find(p=>p.name===name);
-    const grp = CO.grp() !== "all" ? CO.grp() : (CO.groupOf(player) || "عام");
-    const {error} = await sb.from("attendance").insert({player_name:name, org:ME.org||"", group_name:grp, recorded_by:ME.name, present:true});
-    if(error) toast("تعذّر الحفظ: "+error.message, 1);
-    else toast("سُجّل حضور "+String(name).split(" ")[0]+" — دخل سجله باسمك");
-  }
+  const s=CO.attState();
+  const prior=(CO._attendanceRows||[]).filter(r=>r.player_name===name).sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0))[0];
+  const cur=Object.prototype.hasOwnProperty.call(s,name)?s[name]:CO.rowState(prior);
+  const nx=cur==="none"?"in":cur==="in"?"off":"none";
+  s[name]=nx;
+  try{localStorage.setItem(CO.akey(),JSON.stringify(s));}catch(e){}
+  toast("تم تحديد الحالة. احفظ القائمة لتثبيتها");
   render();
 };
+window.coSaveAttendance = async silent => {
+  const st=CO.attState(), roster=CO._roster||[];
+  const people=roster.filter(p=>Object.prototype.hasOwnProperty.call(st,p.name));
+  if(!people.length){if(!silent)toast("لا توجد حالات جديدة للحفظ");return true;}
+  const {data,error}=await sb.from("attendance").select("*").eq("org",ME.org||"").order("created_at",{ascending:false}).limit(500);
+  if(error){toast("تعذّر تحميل سجل الحضور",1);return false;}
+  const day=CO.today(), dayRows=(data||[]).filter(a=>CO.rowDate(a)===day);
+  const work=people.map(p=>{
+    const rows=dayRows.filter(a=>a.player_name===p.name);
+    const latest=rows[0]||null, next=st[p.name], previous=CO.rowState(latest);
+    return {p,rows,next,previous,correction:!!latest&&previous!==next};
+  }).filter(x=>!x.rows.length||x.previous!==x.next);
+  if(!work.length){
+    const remaining={...st}; people.forEach(p=>delete remaining[p.name]);
+    try{if(Object.keys(remaining).length)localStorage.setItem(CO.akey(),JSON.stringify(remaining));else localStorage.removeItem(CO.akey());}catch(e){}
+    if(!silent)toast("الحالات المسجلة مطابقة للقائمة");
+    render();return true;
+  }
+  const corrections=work.filter(x=>x.correction);
+  let reason="";
+  if(corrections.length){
+    const answer=typeof PI!=="undefined"&&PI.sheet?await PI.sheet({icon:"↺",title:"سبب تصحيح الحضور",sub:"التعديل يحفظ اسمك ووقته في سجل المراجعة.",fields:[{id:"reason",label:"سبب التصحيح",placeholder:"مثال: سُجلت الحالة بالخطأ"}],ok:"سجّل التصحيح"}):null;
+    if(!answer||!String(answer.reason||"").trim())return false;
+    reason=String(answer.reason).trim();
+  }
+  let saved=0;
+  for(const item of work){
+    const p=item.p, state=item.next;
+    const row={player_name:p.name,org:ME.org||"",group_name:CO.groupOf(p)||"عام",session_date:day,recorded_by:ME.name,present:state==="in",source:state==="in"?"coach_present":state==="off"?"coach_excused":"coach_absent"};
+    if(item.rows.length){
+      const ids=item.rows.map(r=>r.id).filter(Boolean);
+      if(!ids.length){toast("تعذّر تحديد سجل اللاعب لتصحيحه",1);return false;}
+      const {data:updated,error:updateError}=await sb.from("attendance").update(row).in("id",ids).select("id");
+      if(updateError||!updated||!updated.length){toast("تعذّر حفظ تصحيح الحضور",1);return false;}
+    }else{
+      const {error:insertError}=await sb.from("attendance").insert(row);
+      if(insertError){toast("تعذّر حفظ الحضور",1);return false;}
+    }
+    saved++;
+  }
+  if(corrections.length) await trans("تصحيح الحضور ("+corrections.map(x=>x.p.name).join("، ")+") · السبب: "+reason);
+  else await trans("حفظ حالات حضور الحصة · "+saved+" لاعبًا");
+  const remaining={...st}; people.forEach(p=>delete remaining[p.name]);
+  try{if(Object.keys(remaining).length)localStorage.setItem(CO.akey(),JSON.stringify(remaining));else localStorage.removeItem(CO.akey());}catch(e){}
+  if(!silent)toast("حُفظت حالات الحضور والتصحيحات باسمك");
+  render();return true;
+};
 window.coStart = async () => {
-  const s = CO.attState(), n = Object.values(s).filter(v => v === "in").length;
-  if(!n) return toast("سجّل الحضور أولًا — نقرة على كل لاعب", 1);
-  await trans(`بدأ حصة اليوم بـ${n} حاضرًا`);
+  const st=CO.attState(), roster=CO._roster||[];
+  const current=name=>Object.prototype.hasOwnProperty.call(st,name)?st[name]:CO.rowState((CO._attendanceRows||[]).find(a=>a.player_name===name));
+  const present=roster.filter(p=>current(p.name)==="in").length;
+  if(!present)return toast("سجّل حضور لاعب واحد على الأقل أولًا",1);
+  if(Object.keys(st).length){const ok=await coSaveAttendance(true);if(!ok)return;}
+  await trans("بدأ حصة اليوم بـ"+present+" حاضرًا");
   toast("بدأت الحصة — وقّعتها باسمك");
 };
 T.session = async () => {
@@ -300,9 +355,11 @@ T.session = async () => {
     q("c", sb.from("calendar_items").select("*").eq("created_by",ME.name).order("on_date",{ascending:true}).limit(40))
   ]);
   const st = CO.attState();
+  CO._attendanceRows=att;
   const today = CO.sessionsOf(cal).find(c => String(c.on_date||"").slice(0,10) === CO.today());
-  const signed = new Set(att.filter(a => String(a.created_at||"").slice(0,10) === CO.today()).map(a => a.player_name));
-  const stOf = n => signed.has(n) ? "in" : (st[n] || "none");
+  const todayRows=att.filter(a=>CO.rowDate(a)===CO.today()), savedToday={};
+  todayRows.forEach(a=>{if(!savedToday[a.player_name])savedToday[a.player_name]=a;});
+  const stOf = n => Object.prototype.hasOwnProperty.call(st,n) ? st[n] : CO.rowState(savedToday[n]);
   const inN  = roster.filter(p => stOf(p.name) === "in").length;
   const offN = roster.filter(p => stOf(p.name) === "off").length;
   const noN  = roster.length - inN - offN;
@@ -344,7 +401,7 @@ T.session = async () => {
           return `<button onclick="coTap('${CO.esn(p.name)}')" style="background:none;border:0;padding:0;cursor:pointer;text-align:center;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:Cairo">
             <span style="width:42px;height:42px;border-radius:50% 50% 12px 50%;padding:2px;background:${RING[s]};display:block">${CO.av(p.name,38,{url:p.avatar_url,dark:true,r:"50% 50% 11px 50%",ring:"2px solid #fff"})}</span>
             <span style="font-size:8.5px;font-weight:900;color:${INK[s]}">${esc(String(p.name).split(" ")[0])}</span></button>`;}).join("")}</div>
-      <span style="display:block;font-size:9.5px;color:#8a8fa5;font-weight:700;margin-top:8px">بنفسجي حاضر · برتقالي اعتذر · رمادي لم يصل — اضغط لتبديل الحالة. الحاضر يُكتب في القاعدة فورًا ولا يُسحب إلا بتصحيح باسمك.</span>`
+      <span style="display:block;font-size:9.5px;color:#8a8fa5;font-weight:700;margin-top:8px">بنفسجي حاضر · برتقالي اعتذر · رمادي غائب — اضغط لاختيار الحالة، ثم احفظ. أي تصحيح يحتاج سببًا ويحفظ باسمك.</span><button onclick="coSaveAttendance()" style="display:block;width:100%;margin-top:10px;background:#4636e3;color:#fff;border:0;border-radius:12px;padding:11px;font:900 11px Cairo;cursor:pointer">احفظ الحضور</button>`
       :CO.empty("لا لاعبين في كشفك بعد")}`)}
 
     ${CO.card(`<div style="display:flex;justify-content:space-between;align-items:baseline">${CO.h("خطة الحصة")}<span style="font-size:10px;color:#8a8fa5;font-weight:800"><span class="ltr">${mins}</span> دقيقة</span></div>
