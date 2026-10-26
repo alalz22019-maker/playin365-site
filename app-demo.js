@@ -6,7 +6,20 @@
 const DEMO = { on:false, uid:null, store:null };
 
 DEMO.isDemoEmail = e => /@demo\.playin365\.app$/i.test(String(e||""));
-DEMO.TABLES = ["matches","match_events","match_joins","transparency","subscriptions","notifications","pi_refs","bookings","pi_media","pi_spaces","pi_faults","pi_gate","pi_sponsors","pi_venue_meta","pi_tours","pi_news","pi_follows","pi_names","pi_consent_req","pi_approvals","pi_slots","pi_comp_teams"];
+DEMO.TABLES = ["profiles","attendance","calendar_items","health_status","matches","match_events","transparency","subscriptions","notifications","pi_refs","bookings","pi_media","pi_spaces","pi_faults","pi_gate","pi_sponsors","pi_venue_meta","pi_tours","pi_news","pi_follows","pi_names","pi_consent_req","pi_approvals","pi_slots","pi_comp_teams","pi_career","pi_certs","pi_alumni","pi_drills","pi_views"];
+DEMO.personas = {
+  player:{name:"سعود القحطاني",role:"player",org:"أكاديمية النخبة"},
+  coach:{name:"عبدالله المطيري",role:"coach",org:"أكاديمية النخبة"},
+  scout:{name:"ناصر الدوسري",role:"scout",org:""},
+  agent:{name:"خالد العنزي",role:"agent",org:""},
+  medical:{name:"د. ريم الحربي",role:"medical",org:"أكاديمية النخبة"},
+  referee:{name:"ماجد السبيعي",role:"referee",org:""},
+  guardian:{name:"فهد الشمري",role:"guardian",org:""},
+  organizer:{name:"تركي الرشيد",role:"organizer",org:"دوري الحي"},
+  admin:{name:"إدارة المنصة",role:"admin",org:"PlayIn365"},
+  academy:{name:"أكاديمية النخبة",role:"academy",org:"أكاديمية النخبة"},
+  venue:{name:"ملعب المروج",role:"venue",org:"ملعب المروج"}
+};
 
 /* ── البذرة: عالم أكاديمية النخبة ودوري الحي ── */
 DEMO.seed = () => {
@@ -209,17 +222,108 @@ DEMO.seed = () => {
     return out;
   })();
   const pi_follows=[{id:"df-1",person:"سعود القحطاني",kind:"tour",target:"دوري الحي",created_at:d(11)}];
-  return {matches,match_events:events,match_joins:joins,transparency,subscriptions,pi_refs,notifications,bookings,pi_spaces,pi_faults,pi_gate,pi_sponsors,pi_venue_meta,pi_tours,pi_news,pi_follows,pi_approvals,pi_slots,pi_comp_teams};
+  /* سجل مدرب وفريق مكتملان — محفوظان في مساحة الحساب المعزولة */
+  const coachOrg = "أكاديمية النخبة";
+  const coachPlayers = [
+    ["سعود القحطاني",6,"براعم 6–8","حارس",1],
+    ["سلطان الحربي",7,"براعم 6–8","مدافع",2],
+    ["محمد العتيبي",8,"براعم 6–8","وسط",8],
+    ["عبدالعزيز الغامدي",8,"براعم 6–8","مهاجم",9],
+    ["فيصل الزهراني",9,"براعم 9–10","حارس",12],
+    ["بندر القرني",10,"براعم 9–10","مدافع",3],
+    ["راشد الدوسري",10,"براعم 9–10","وسط",6],
+    ["نايف الشمري",9,"براعم 9–10","مهاجم",11],
+    ["مشعل العتيبي",11,"ناشئون 11–12","مدافع",4],
+    ["زياد الغامدي",12,"ناشئون 11–12","وسط",8],
+    ["ريان القحطاني",11,"ناشئون 11–12","مهاجم",10],
+    ["مازن الحربي",13,"ناشئون 13–14","حارس",1],
+    ["تركي الزهراني",14,"ناشئون 13–14","مدافع",5],
+    ["فهد الدوسري",13,"ناشئون 13–14","وسط",6],
+    ["عبدالرحمن المطيري",15,"شباب 15–16","مهاجم",9],
+    ["نواف السبيعي",16,"شباب 15–16","وسط",8],
+    ["سلمان الغامدي",17,"شباب 17–18","مدافع",2],
+    ["عمر الشمري",18,"شباب 17–18","مهاجم",11]
+  ].map((p,i)=>({id:"dp-"+(i+1),name:p[0],role:"player",org:coachOrg,pos:p[3],age:p[1],group_name:p[2],shirt:p[4],avatar_url:null}));
+  const profiles = coachPlayers.concat([{id:"demo-coach",name:CO,role:"coach",org:coachOrg,pos:"مدرب"}]);
+  const sessionOffsets = [27,25,23,20,18,16,13,11,9,6,3,1,0];
+  const sessionNames = ["تطوير المهارات الأساسية","بناء اللعب من الخلف","التحول السريع","الإنهاء على المرمى"];
+  const calendar_items = sessionOffsets.map((ago,i)=>{
+    const dt=new Date(Date.now()-ago*864e5); dt.setUTCHours(18,0,0,0);
+    const on=dt.toISOString().slice(0,10);
+    return {id:"dcs-"+i,kind:"training",title:"حصة "+sessionNames[i%sessionNames.length],subtitle:"فريق الأكاديمية · مدة ٨٠ دقيقة",org:coachOrg,created_by:CO,on_date:on,at_time:"18:00",place:"ملعب النخبة",session_id:"coach-session-"+i,created_at:dt.toISOString()};
+  });
+  const attendance=[];
+  sessionOffsets.forEach((ago,si)=>{
+    const dt=new Date(Date.now()-ago*864e5); dt.setUTCHours(18,0,0,0);
+    coachPlayers.forEach((p,pi)=>{
+      const present=ago===0 ? (pi<14&&pi!==1&&pi!==4) : ((pi+si*2)%11!==0);
+      if(!present) return;
+      attendance.push({id:"da-"+si+"-"+pi,player_name:p.name,org:coachOrg,group_name:p.group_name,recorded_by:CO,present:true,status:"present",created_at:dt.toISOString(),session_id:"coach-session-"+si,session_title:"حصة "+sessionNames[si%sessionNames.length],duration_minutes:80,intensity:5+(pi+si)%4});
+    });
+  });
+  const ratings=[0,2,3,5,7,8,10,12].map((pi,i)=>{
+    const p=coachPlayers[pi], day=i+1;
+    return {id:"dcr-"+i,player_name:p.name,kind:"training",title:"تقييم المدرب — متابعة فنية",subtitle:"فني ٨/١٠ · تكتيكي ٧/١٠ · بدني ٨/١٠ · ذهني ٩/١٠ · هدف المتابعة: سرعة القرار",org:coachOrg,created_by:CO,on_date:new Date(Date.now()-day*864e5).toISOString().slice(0,10),at_time:"18:00",needs_confirm:false};
+  });
+  const instructions=coachPlayers.slice(0,4).map((p,i)=>({id:"dci-"+i,player_name:p.name,kind:"training",title:"تعليمات المدرب — الحصة القادمة",subtitle:"أحضر الحذاء المناسب وواقي الساق والماء. أرسلها عبدالله المطيري — مدرب.",org:coachOrg,created_by:CO,on_date:new Date(Date.now()+864e5).toISOString().slice(0,10),at_time:"18:00",needs_confirm:false}));
+  const publishedBoards=[
+    {id:"dcb-1",player_name:"سعود القحطاني",kind:"training",title:"لوح تكتيكي · الضغط بعد فقد الكرة",subtitle:"تكتيكي · ١٥ دقيقة · ٣ لقطات — رسمه عبدالله المطيري — مدرب",org:coachOrg,created_by:CO,on_date:new Date(Date.now()-2*864e5).toISOString().slice(0,10),at_time:"18:00"},
+    {id:"dcb-2",player_name:"تركي الزهراني",kind:"training",title:"لوح تكتيكي · الخروج بالكرة",subtitle:"تكتيكي · ٢٠ دقيقة · ٤ لقطات — رسمه عبدالله المطيري — مدرب",org:coachOrg,created_by:CO,on_date:new Date(Date.now()-5*864e5).toISOString().slice(0,10),at_time:"18:00"}
+  ];
+  calendar_items.push(...ratings,...instructions,...publishedBoards);
+  const health_status=coachPlayers.map((p,i)=>({id:"dhs-"+i,player_name:p.name,state:i===17?"out":i===10?"rehab":i===5?"limited":"available",phase:i===10?"عودة تدريجية":null,updated_at:d(i%5),updated_by:"د. ريم الحربي"}));
+  const pi_career=[
+    {id:"dcv-1",owner_id:"demo-coach",person:CO,org:coachOrg,title:"مدرب فئات سنية",group_name:"شباب 15–16",from_year:2023,to_year:null,note:"قيادة برنامج تطوير المهارات واللعب الجماعي",verified_by:"إدارة أكاديمية النخبة"},
+    {id:"dcv-2",owner_id:"demo-coach",person:CO,org:"مركز المروج الرياضي",title:"مدرب مساعد",group_name:"ناشئون 13–14",from_year:2021,to_year:2023,note:"متابعة تطور اللاعبين والتنسيق مع الطاقم",verified_by:"إدارة مركز المروج الرياضي"},
+    {id:"dcv-3",owner_id:"demo-coach",person:CO,org:"مدرسة كرة القدم",title:"مدرب براعم",group_name:"براعم 6–8",from_year:2019,to_year:2021,note:"تأسيس مهارات الحركة والكرة للمبتدئين",verified_by:"إدارة مدرسة كرة القدم"}
+  ];
+  const pi_certs=[
+    {id:"dct-1",owner_id:"demo-coach",person:CO,title:"رخصة تدريب B",issuer:"الاتحاد السعودي لكرة القدم",level:"B",year:2024,ref_no:"SAFF-B-2024-1180",verified_by:"الاتحاد السعودي لكرة القدم"},
+    {id:"dct-2",owner_id:"demo-coach",person:CO,title:"إعداد الفئات السنية",issuer:"مركز التدريب الرياضي",level:"C",year:2021,ref_no:"CTS-C-2021-0442",verified_by:"مركز التدريب الرياضي"}
+  ];
+  const pi_alumni=[
+    {id:"dal-1",owner_id:"demo-coach",coach_name:CO,player_name:"سامي القحطاني",dest_kind:"club",dest:"نادي العاصمة الرياضي",group_name:"ناشئون 13–14",under_from:2020,under_to:2023,dest_year:2025,note:"انتقل إلى فريق الشباب بعد ثلاثة مواسم",verified_by:"إدارة نادي العاصمة الرياضي"},
+    {id:"dal-2",owner_id:"demo-coach",coach_name:CO,player_name:"بدر الحربي",dest_kind:"nt",dest:"منتخب منطقة الوسطى",group_name:"براعم 9–10",under_from:2019,under_to:2022,dest_year:2024,note:"اختير لبرنامج المنطقة للفئات السنية",verified_by:"إدارة المنتخب"},
+    {id:"dal-3",owner_id:"demo-coach",coach_name:CO,player_name:"مشاري الغامدي",dest_kind:"cup",dest:"بطولة الفئات السنية — المنطقة الوسطى",group_name:"ناشئون 11–12",under_from:2021,under_to:2024,dest_year:2025,note:"وصل إلى نصف نهائي البطولة مع فريقه",verified_by:"اللجنة المنظمة"}
+  ];
+  const boardScene={pitch:"full",frames:[{objs:[],shapes:[]}]};
+  const pi_drills=[
+    {id:"dboard-1",owner_id:"demo-coach",coach_name:CO,org:coachOrg,title:"الضغط بعد فقد الكرة",aim:"tact",minutes:15,group_name:"شباب 15–16",notes:"إغلاق العمق والتحرك كوحدة واحدة",scene:boardScene,updated_at:d(1)},
+    {id:"dboard-2",owner_id:"demo-coach",coach_name:CO,org:coachOrg,title:"الخروج بالكرة من الخلف",aim:"build",minutes:20,group_name:"ناشئون 13–14",notes:"استخدام الطرف البعيد بعد جذب الضغط",scene:boardScene,updated_at:d(3)},
+    {id:"dboard-3",owner_id:"demo-coach",coach_name:CO,org:coachOrg,title:"استقبال وتمرير للمبتدئين",aim:"tech",minutes:12,group_name:"براعم 6–8",notes:"لمسات قصيرة ورفع الرأس قبل التمرير",scene:boardScene,updated_at:d(7)}
+  ];
+  const pi_views=[
+    {id:"dvw-1",subject:"سعود القحطاني",viewer:"ناصر الدوسري",viewer_role:"scout",created_at:d(1)},
+    {id:"dvw-2",subject:"سلطان الحربي",viewer:"مها السبيعي",viewer_role:"agent",created_at:d(2)},
+    {id:"dvw-3",subject:"تركي الزهراني",viewer:"ناصر الدوسري",viewer_role:"scout",created_at:d(4)}
+  ];
+  const pi_media=coachPlayers.slice(0,5).map((p,i)=>({id:"dmedia-"+i,subject:p.name,title:"لقطة تدريبية — "+(i%2?"تمرير تحت الضغط":"إنهاء على المرمى"),kind:"video",created_at:d(i+1),duration_seconds:25+i*7}));
+  events.push(E("dm-05",44,"sub","سلطان الحربي",CO,h(1)));
+  return {matches,match_events:events,match_joins:joins,transparency,subscriptions,pi_refs,notifications,bookings,pi_spaces,pi_faults,pi_gate,pi_sponsors,pi_venue_meta,pi_tours,pi_news,pi_follows,pi_approvals,pi_slots,pi_comp_teams,profiles,attendance,calendar_items,health_status,pi_career,pi_certs,pi_alumni,pi_drills,pi_views,pi_media};
 };
 
 /* ── تخزين لكل حساب: تجربة كل مستخدم تبقى له ── */
-DEMO.key = () => "pi_demo_v9_" + (DEMO.uid||"anon");
+DEMO.key = () => "pi_demo_v10_" + (DEMO.uid||"anon");
 DEMO.load = () => {
   let s=null;
   try{ const raw=localStorage.getItem(DEMO.key()); if(raw) s=JSON.parse(raw); }catch(e){}
   if(!s||!s.matches){ s=DEMO.seed(); DEMO.save(s); }
   DEMO.TABLES.forEach(t=>{ if(!s[t]) s[t]=[]; });
-  DEMO.store=s; return s;
+  const persona=DEMO.personas[DEMO.role]||DEMO.personas.player;
+  let account=s.profiles.find(p=>p.role===persona.role&&p.name===persona.name);
+  if(!account){ account={id:DEMO.uid,name:persona.name,role:persona.role,org:persona.org||""}; s.profiles.push(account); }
+  account.id=DEMO.uid; account.role=persona.role; account.org=persona.org||account.org||"";
+  if(DEMO.role==="coach"){
+    s.pi_drills.forEach(row=>{ row.owner_id=DEMO.uid; row.coach_name=persona.name; });
+    try{
+      const today=new Date().toISOString().slice(0,10);
+      const attKey="pi_att_"+DEMO.uid+"_"+today;
+      if(!localStorage.getItem(attKey)) localStorage.setItem(attKey,JSON.stringify({"سلطان الحربي":"off","فيصل الزهراني":"off"}));
+      const planKey="pi_plan_"+DEMO.uid;
+      if(!localStorage.getItem(planKey)) localStorage.setItem(planKey,JSON.stringify(["rondo","transition","finish","recover"]));
+    }catch(e){}
+  }
+  DEMO.store=s; DEMO.save(s); return s;
 };
 DEMO.save = s => { try{ localStorage.setItem(DEMO.key(), JSON.stringify(s||DEMO.store)); }catch(e){} };
 DEMO.reset = () => { try{ localStorage.removeItem(DEMO.key()); }catch(e){} DEMO.load(); };
@@ -315,6 +419,8 @@ DEMO.wrap = real => ({
 DEMO.begin = (uid,email) => {
   DEMO.on = DEMO.isDemoEmail(email);
   DEMO.uid = uid;
+  const candidate=String(email||"").split("@")[0];
+  DEMO.role=DEMO.on&&DEMO.personas[candidate]?candidate:"player";
   if(DEMO.on) DEMO.load();
 };
 window.DEMO = DEMO;

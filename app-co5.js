@@ -151,7 +151,7 @@ T.coachMe = async () => {
   const mVals = months.map(m => days.filter(d=>d.startsWith(m.k)).length);
 
   /* توزيع الفئات */
-  const gCount = {}; roster.forEach(p=>{ const g=CO.grpOf(p.age)||"غير محدّد"; gCount[g]=(gCount[g]||0)+1; });
+  const gCount = {}; roster.forEach(p=>{ const g=CO.groupOf(p)||"غير محدّد"; gCount[g]=(gCount[g]||0)+1; });
   const GC = ["#4636e3","#f5c518","#2c6e49","#e8531f","#7b5cff"];
   const gParts = Object.entries(gCount).sort().map(([g,n],i)=>[g,n,GC[i%GC.length]]);
 
@@ -162,7 +162,7 @@ T.coachMe = async () => {
     const n = att.filter(a=>a.player_name===p.name).length;
     return {p, n, pct: sessions?Math.round(n/sessions*100):0, rated: rated.indexOf(p.name)>=0, watch: watched.has(p.name)};
   }).sort((a,b)=>b.n-a.n);
-  const byGroup = {}; tree.forEach(t=>{ const g=CO.grpOf(t.p.age)||"غير محدّد"; (byGroup[g]=byGroup[g]||[]).push(t); });
+  const byGroup = {}; tree.forEach(t=>{ const g=CO.groupOf(t.p)||"غير محدّد"; (byGroup[g]=byGroup[g]||[]).push(t); });
 
   const fields = [["الصورة",hasAv,"avatarSheet()"],["الاسم",!!ME.name],["الجهة",!!ME.org,"joinByCode()"],["مسيرتك",career.length>0,"cvAdd('career')"],["شهادة",certs.length>0,"cvAdd('cert')"],["متخرّج",alum.length>0,"cvAlum()"],["كشف مرتبط",roster.length>0,"go('squad')"],["حصص موقّعة",sessions>0,"go('session')"],["تقييم بتوقيعك",rated.length>0,"go('rate')"]];
   const comp = Math.round(fields.filter(f=>f[1]).length/fields.length*100);

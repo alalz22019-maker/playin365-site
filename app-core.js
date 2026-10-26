@@ -34,7 +34,7 @@ async function loadMe(uid,email){
   }catch(e){}
   ME=data?{...data,role:demoRole||data.role,isSyntheticDemo:!!demoRole,roleSet:!!demoRole||picked||DEMO_HINT===data.id||(data.role&&data.role!=="player")||(data.org&&data.pos)}:null;
 }
-function homeFor(){ return ({player:"feed",coach:"orgMatch",organizer:"orgMatch",referee:"refDuty",academy:"acad",venue:"venue",guardian:"guardian",scout:"scout",admin:"owner",medical:"medical",agent:"deals"})[ME.role]||"home"; }
+function homeFor(){ return ({player:"feed",coach:"coachHome",organizer:"orgMatch",referee:"refDuty",academy:"acad",venue:"venue",guardian:"guardian",scout:"scout",admin:"owner",medical:"medical",agent:"deals"})[ME.role]||"home"; }
 async function doSignup(){
   const name=$("#su_name").value.trim(), em=$("#su_em").value.trim(), pw=$("#su_pw").value;
   if(!name||!em||pw.length<8) return toast("أكمل الاسم والبريد وكلمة مرور ٨+ أحرف",1);
@@ -55,16 +55,16 @@ const DEMOS={
 window.demoLogin=async(role,btn)=>{
   if(btn){btn.disabled=true;btn.dataset.t=btn.textContent;btn.textContent="ثوانٍ…";}
   const {data,error}=await sb.auth.signInWithPassword({email:role+"@demo.playin365.app",password:DEMO_PW});
-  if(error){if(btn){btn.disabled=false;btn.textContent=btn.dataset.t;}return toast("تعذّر الدخول التجريبي",1);}
+  if(error){if(btn){btn.disabled=false;btn.textContent=btn.dataset.t;}return toast("تعذّر فتح الحساب",1);}
   DEMO_HINT=data.user.id;
   try{localStorage.setItem("pi_role_"+data.user.id,"1");}catch(e){}
-  toast("دخلت كـ"+roleAr[role]+" — بيانات تجريبية جاهزة");
+  toast("دخلت كـ"+roleAr[role]+" — الحساب جاهز للاستكشاف");
 };
 window.doGuest=async(btn)=>{
   if(btn){ btn.disabled=true; btn.textContent="ثوانٍ — نجهّز جولتك…"; }
   const r=Math.random().toString(36).slice(2,10);
-  const {error}=await sb.auth.signUp({email:`guest_${Date.now()}_${r}@demo.playin365.app`,password:"Gp!"+r+"9x2",options:{data:{name:"زائر تجريبي"}}});
-  if(error){ if(btn){ btn.disabled=false; btn.textContent="ادخل كتجربة — بلا بريد ولا كلمة مرور"; } return toast("تعذّر الدخول التجريبي — جرّب مرة أخرى",1); }
+  const {error}=await sb.auth.signUp({email:`guest_${Date.now()}_${r}@demo.playin365.app`,password:"Gp!"+r+"9x2",options:{data:{name:"زائر"}}});
+  if(error){ if(btn){ btn.disabled=false; btn.textContent="استكشف PlayIn365 — بلا بريد ولا كلمة مرور"; } return toast("تعذّر فتح الحساب — جرّب مرة أخرى",1); }
   toast("دخلت كزائر — رحلة جديدة من البداية");
 };
 async function saveRole(){
@@ -77,7 +77,7 @@ async function saveRole(){
 
 /* ---------- DATA ---------- */
 /* حسابات الزائر السريع لا تظهر كلاعبين في قوائم أحد */
-const GUEST_NAME="زائر تجريبي";
+const GUEST_NAME="زائر";
 async function q(name,builder){ const {data,error}=await builder; if(error){ console.error(name,error); toast("خطأ قراءة "+name,1); return []; }
   let rows=data||[];
   if(Array.isArray(rows)&&rows.length&&rows[0]&&"name" in rows[0]) rows=rows.filter(r=>r.name!==GUEST_NAME);
@@ -123,11 +123,11 @@ T.auth=()=>`<main style="justify-content:center">
       <p class="muted" style="text-align:center;margin:9px 0 0">التسجيل مفتوح للجميع — المصداقية تُكتسب من ملعبك لا عند الباب</p>
     </div>
     <button class="btn ghost" disabled style="margin-top:9px">نفاذ <span class="chip warn" style="margin-inline-start:6px">قريبًا</span></button>
-    <button class="btn dark" style="margin-top:9px" onclick="doGuest(this)">ادخل كتجربة — بلا بريد ولا كلمة مرور</button>
-    <p class="muted" style="text-align:center;margin:7px 0 0">كل دخول تجريبي يبدأ رحلة جديدة من الصفر</p>
+    <button class="btn dark" style="margin-top:9px" onclick="doGuest(this)">استكشف PlayIn365 — بلا بريد ولا كلمة مرور</button>
+    <p class="muted" style="text-align:center;margin:7px 0 0">كل جولة استكشاف تبدأ من نقطة جديدة</p>
   </div>
   <div class="card" style="border-radius:26px">
-    <div style="display:flex;align-items:center;gap:9px;margin-bottom:4px"><span style="width:8px;height:22px;background:#4636e3;border-radius:99px"></span><b class="h2">حسابات تجريبية جاهزة</b></div>
+    <div style="display:flex;align-items:center;gap:9px;margin-bottom:4px"><span style="width:8px;height:22px;background:#4636e3;border-radius:99px"></span><b class="h2">أدوار جاهزة للاستكشاف</b></div>
     <p class="muted" style="margin:0 0 12px">ادخل بأي دور فورًا — بياناته مزروعة لتشوف الرسوم والخدمات مملوءة.</p>
     ${Object.entries(typeof DEMOS!=="undefined"?DEMOS:{}).map(([grp,arr])=>`
       <div style="font-size:11px;font-weight:900;color:#8a8fa5;margin:6px 0 8px">${grp==="افراد"?"أفراد":"جهات"}</div>

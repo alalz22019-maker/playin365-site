@@ -290,7 +290,7 @@ TB.metaBar = () => `
       <input type="number" min="5" max="120" value="${TB.s.meta.minutes}" oninput="tbMeta('minutes',this.value)" class="ltr" style="width:100%;border:1px solid #e9e4d8;border-radius:11px;padding:9px;font:700 12px 'Space Grotesk';background:#faf8f3"></label>
     <label style="display:block"><span style="display:block;font-size:9.5px;font-weight:900;color:#8a8fa5;margin-bottom:4px">الفئة</span>
       <select onchange="tbMeta('group',this.value)" style="width:100%;border:1px solid #e9e4d8;border-radius:11px;padding:9px;font:800 11.5px Cairo;background:#faf8f3">
-        ${["كل الفئات","U15","U16","U17","U19","الفريق الأول"].map(g=>`<option ${TB.s.meta.group===g?"selected":""}>${g}</option>`).join("")}</select></label>
+        ${["كل الفئات",...(TB.GROUPS&&TB.GROUPS.length?TB.GROUPS:["U15","U16","U17","U19","الفريق الأول"])].map(g=>`<option value="${TB.esc(g)}" ${TB.s.meta.group===g?"selected":""}>${TB.esc(g)}</option>`).join("")}</select></label>
   </div>
   <label style="display:block;margin-top:8px"><span style="display:block;font-size:9.5px;font-weight:900;color:#8a8fa5;margin-bottom:4px">توجيهك للاعبين</span>
     <textarea oninput="tbMeta('notes',this.value)" placeholder="مثال: الضغط يبدأ من المهاجم — الكرة للجهة الضعيفة ثم إغلاق." style="width:100%;border:1px solid #e9e4d8;border-radius:11px;padding:10px;font:700 11.5px Cairo;line-height:1.9;min-height:64px;background:#faf8f3;resize:vertical">${TB.esc(TB.s.meta.notes)}</textarea></label>`;
@@ -349,7 +349,11 @@ window.openBoard = async (id) => {
 
 /* ── شاشة: لوحاتي التكتيكية ── */
 T.boards = async () => {
-  const rows = await q("d", sb.from("pi_drills").select("*").eq("owner_id",ME.id).order("updated_at",{ascending:false}).limit(40));
+  const [rows,roster] = await Promise.all([
+    q("d", sb.from("pi_drills").select("*").eq("owner_id",ME.id).order("updated_at",{ascending:false}).limit(40)),
+    CO.roster()
+  ]);
+  TB.GROUPS=[...new Set(roster.map(p=>CO.groupOf(p)).filter(Boolean))];
   return `<div style="padding:18px 18px 0;display:flex;justify-content:space-between;align-items:center">
     <button onclick="go('coachHome')" style="width:40px;height:40px;border-radius:${CO.DROP};background:#fff;border:1px solid #e9e4d8;display:grid;place-items:center;font-size:15px;cursor:pointer;font-family:Cairo">⌂</button>
     <button onclick="go('drills')" style="width:40px;height:40px;border-radius:${CO.DROP};background:#fff;border:1px solid #e9e4d8;display:grid;place-items:center;font-size:15px;cursor:pointer;font-family:Cairo">▤</button>

@@ -29,6 +29,7 @@ CO.today = () => new Date().toISOString().slice(0,10);
 CO.isSession = c => c && c.kind === "training" && !/تقييم المدرب|تعليمات المدرب|خطة راحة/.test(String(c.title||""));
 CO.sessionsOf = cal => (cal||[]).filter(CO.isSession);
 CO.grpOf = a => a ? (a<=13?"U13":a<=14?"U14":a<=15?"U15":a<=16?"U16":a<=17?"U17":a<=19?"U19":a<=23?"U23":"SEN") : null;
+CO.groupOf = p => { const group=p&&(p.group_name||p.age_group||p.cohort); return group?String(group).trim():(p?CO.grpOf(p.age):null); };
 
 /* الفئة المختارة — تبقى مع المدرب */
 CO.gkey = () => "pi_cgrp_" + (ME && ME.id);
@@ -42,7 +43,7 @@ CO.roster = async () => {
   const mine = pf.filter(p => !org || p.org === org);
   const g = CO.grp();
   CO._roster = mine;
-  return g === "all" ? mine : mine.filter(p => CO.grpOf(p.age) === g);
+  return g === "all" ? mine : mine.filter(p => CO.groupOf(p) === g);
 };
 CO.load = (att, name) => {
   const d7  = att.filter(a => a.player_name===name && (Date.now()-new Date(a.created_at))/864e5 <= 7).length;
@@ -184,7 +185,7 @@ T.squad = async () => {
   ]);
   const hMap = {}; hs.forEach(h => hMap[h.player_name] = h);
   const mine = all.filter(p => !org || p.org === org);
-  const groups = {}; mine.forEach(p => { const g = CO.grpOf(p.age); if(g) groups[g] = (groups[g]||0)+1; });
+  const groups = {}; mine.forEach(p => { const g = CO.groupOf(p); if(g) groups[g] = (groups[g]||0)+1; });
   const gsel = CO.grp();
   const dates = [...new Set(att.map(a => String(a.created_at||"").slice(0,10)))].sort().reverse();
   const sessions = dates.length;
@@ -277,7 +278,8 @@ window.coTap = async name => {
   const nx = cur === "none" ? "in" : cur === "in" ? "off" : "none";
   s[name] = nx; try{ localStorage.setItem(CO.akey(), JSON.stringify(s)); }catch(e){}
   if(nx === "in"){
-    const grp = CO.grp() !== "all" ? CO.grp() : (CO.grpOf((CO._roster||[]).find(p=>p.name===name) && (CO._roster||[]).find(p=>p.name===name).age) || "عام");
+    const player=(CO._roster||[]).find(p=>p.name===name);
+    const grp = CO.grp() !== "all" ? CO.grp() : (CO.groupOf(player) || "عام");
     const {error} = await sb.from("attendance").insert({player_name:name, org:ME.org||"", group_name:grp, recorded_by:ME.name, present:true});
     if(error) toast("تعذّر الحفظ: "+error.message, 1);
     else toast("سُجّل حضور "+String(name).split(" ")[0]+" — دخل سجله باسمك");
