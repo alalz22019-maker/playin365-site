@@ -315,5 +315,5 @@ T.pitch = async () => {
   CO.OWN.push("pitch");
   /* الشريط: «فريقي» بدل «لوحاتي» — واللوحات من الاختصارات والمفتاح */
   if(typeof NAV!=="undefined")
-    NAV.coach = [["◉","ملفي","coachMe"],["▦","فريقي","squad"],["FAB","","hub"],["◈","التشكيلة","tactics"],["☰","مهامي","coachTasks"]];
+    NAV.coach = [["home","الرئيسية","coachHome"],["community","فريقي","squad"],["services","الخدمات","hub"],["match","التشكيلة","tactics"],["profile","ملفي","coachMe"]];
 })();

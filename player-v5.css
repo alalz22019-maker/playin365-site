@@ -38,3 +38,5 @@ body.pz-player .pz-top{background:rgba(7,8,18,.86)!important;border-color:rgba(2
 .pz5-event{padding:12px 0}
 .pz5-badges{border-top:1px solid rgba(139,151,205,.18);border-bottom:1px solid rgba(139,151,205,.18)}
 @media(max-width:370px){.pz5-stats{grid-template-columns:repeat(2,1fr)}.pz5-stat:nth-child(3){border-inline-start:0}.pz5-stat:nth-child(n+3){border-top:1px solid rgba(139,151,205,.18)}}
+.pz5-page .pz5-quick-fab,.pz5-profile-page .pz5-quick-fab{display:grid!important}
+.pz5-top>button .pz-icon{width:18px;height:18px;vertical-align:middle}

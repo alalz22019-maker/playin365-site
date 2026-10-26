@@ -424,22 +424,26 @@ T.coachMe = async () => {
     coachHome:"مساحة المدرب", squad:"فريقي", session:"حصة اليوم", drills:"بنك التمارين",
     brief:"تعليمات الحصة", rate:"تقييم بتوقيعك", tactics:"لوح التكتيك", coachTasks:"مهامي", coachMe:"ملفي"
   });
-  /* الشريط السفلي للمدرب — بقطرة المدرب، والزر الأوسط مفتاح التنقّل (قرار المالك) */
+  /* الشريط السفلي موحّد بصريًا مع حساب اللاعب */
   if(typeof NAV !== "undefined")
-    NAV.coach = [["◉","ملفي","coachMe"],["✎","لوحاتي","boards"],["FAB","","hub"],["▤","فريقي","squad"],["☰","مهامي","coachTasks"]];
+    NAV.coach = [["home","الرئيسية","coachHome"],["community","فريقي","squad"],["services","الخدمات","hub"],["match","التشكيلة","tactics"],["profile","ملفي","coachMe"]];
   if(typeof homeFor === "function"){ const _h = homeFor; window.homeFor = function(){ return ME && ME.role === "coach" ? "coachHome" : _h(); }; }
   /* عنوان الشاشة: عمود المدرب يتقدّم على العناوين العامة */
   if(typeof PL3 !== "undefined") Object.assign(PL3.TITLE, CO.TITLE);
 
-  /* ── الشريط السفلي: كبسولة بيضاء وقطرة المدرب أسفل-يمين ── */
   CO.OWN = ["coachHome","squad","session","drills","brief","rate","tactics","coachTasks","coachMe"];
-  CO.nav = () => `<nav style="position:fixed;bottom:12px;inset-inline:12px;max-width:496px;margin:0 auto;background:#fff;border:1px solid #e9e4d8;border-radius:999px;display:flex;justify-content:space-around;align-items:center;padding:8px 10px;box-shadow:0 10px 26px rgba(21,26,46,.07);z-index:50">
-${NAV.coach.map(([g,lb,v])=>{
-  const on = VIEW===v;
-  if(g==="FAB") return `<button onclick="go('${v}')" style="width:58px;height:58px;border-radius:50% 50% 14px 50%;background:${on?"#4636e3":"#151a2e"};color:${on?"#fff":"#faf8f3"};margin-top:-34px;box-shadow:0 10px 22px rgba(21,26,46,.25);display:flex;flex-direction:column;align-items:center;justify-content:center;border:4px solid #faf8f3;cursor:pointer;font-family:Cairo;flex:none"><span style="font-size:18px">⌂</span><span style="font-size:8.5px;font-weight:900">تنقّل</span></button>`;
-  return `<button onclick="go('${v}')" style="background:none;border:0;font-size:9.5px;font-weight:${on?900:800};color:${on?"#4636e3":"#8a8fa5"};display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;font-family:Cairo;padding:0"><span style="font-size:16px">${g}</span>${lb}</button>`;
-}).join("")}
-</nav>`;
+  CO.nav = () => {
+    const items = [["home","الرئيسية","coachHome"],["community","فريقي","squad"],["services","الخدمات","hub"],["match","التشكيلة","tactics"],["profile","ملفي","coachMe"]];
+    return '<nav class="pz5-nav coach-bottom-nav">'+items.map(([g,lb,v])=>{
+      const on = VIEW===v;
+      return '<button class="'+(on?'on':'')+'" aria-label="'+lb+'" onclick="go(&quot;'+v+'&quot;)"><span>'+window.PZ.icon(g)+'</span><b>'+lb+'</b></button>';
+    }).join("")+'</nav><button class="pz-fab pz-basmat-fab coach-quick-fab" aria-label="اختصارات المدرب" title="اختصارات المدرب" onclick="window.CO.toggleFab()">'+window.PZ.icon('plus')+'</button>';
+  };
+  CO.toggleFab = function(){
+    const old=document.getElementById("pzFabMenu");if(old){old.remove();return}
+    const items=[["coach","الحصص والحضور","session"],["profile","فريقي","squad"],["rating","تقييم لاعب","rate"],["match","لوح التكتيك","boards"],["services","كل الخدمات","hub"]];
+    document.body.insertAdjacentHTML("beforeend",'<div class="pz-fab-menu" id="pzFabMenu" role="menu" aria-label="اختصارات المدرب">'+items.map(function(x){return '<button role="menuitem" onclick="go(&quot;'+x[2]+'&quot;)"><span>'+window.PZ.icon(x[0])+'</span><b>'+x[1]+'</b></button>'}).join('')+'</div>');
+  };
   const _nav2 = window.navHtml || navHtml;
   window.navHtml = navHtml = function(){ return (ME && ME.role === "coach") ? CO.nav() : _nav2(); };
 
@@ -452,8 +456,8 @@ ${NAV.coach.map(([g,lb,v])=>{
       /* شاشات المدرب المعتمدة تحمل رأسها معها — الرأس العام يُزال منها فقط */
       if(hd && CO.OWN.indexOf(VIEW) >= 0) hd.remove();
       if(VIEW === "explore" && typeof PL3 !== "undefined") setTimeout(()=>PL3.drawMap && PL3.drawMap(), 60);
-      document.body.style.background = "#eeeae0";
-      const sh = document.querySelector(".shell"); if(sh) sh.style.background = "#faf8f3";
+      document.body.style.removeProperty("background");
+      const sh = document.querySelector(".shell"); if(sh) sh.style.removeProperty("background");
     }catch(e){ console.error("CO", e); }
   };
 })();

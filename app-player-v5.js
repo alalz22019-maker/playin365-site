@@ -41,15 +41,29 @@ function demoPack(today){
  }
 }
 var top5=function(){return '<header class="pz5-top"><button aria-label="الخدمات" onclick="window.PZ.openServices()">☰</button><div class="pz5-brand">Play<span>In</span><sup>365</sup></div><button aria-label="هويتي" title="هويتي" onclick="window.PZ.go(\'publicView\')">'+PZ.icon('profile')+'</button></header>'};
-var routeTrail=[];var basePlayerGo=PZ.go;PZ.go=function(route,param){var next=String(route||'feed'),from=String(window.VIEW||'');if(next!==from&&from&&from!=='auth'&&from!=='role'){routeTrail.push(from);if(routeTrail.length>20)routeTrail.shift()}return basePlayerGo.apply(this,arguments)};PZ.back=function(){var target=routeTrail.pop();if(!target||target==='auth'||target==='role')target='feed';return basePlayerGo.call(PZ,target)};var basePlayerTop=PZ.top;PZ.top=function(back){if(ME&&ME.role==='player'&&(!back||back==="window.PZ.go('feed')"))back='window.PZ.back()';var markup=basePlayerTop.call(PZ,back);if(ME&&ME.role==='player')markup=markup.replace('<button class="pz-side" onclick="window.PZ.back()">','<button class="pz-side" aria-label="رجوع" title="رجوع" onclick="window.PZ.back()">').replace('<button class="pz-side" onclick="window.PZ.openServices()">','<button class="pz-side" aria-label="الخدمات" title="الخدمات" onclick="window.PZ.openServices()">');return markup};
+var routeTrail=[];var basePlayerGo=PZ.go;PZ.go=function(route,param){var next=String(route||'feed'),from=String(window.VIEW||'');if(next!==from&&from&&from!=='auth'&&from!=='role'){routeTrail.push(from);if(routeTrail.length>20)routeTrail.shift()}return basePlayerGo.apply(this,arguments)};PZ.back=function(){var target=routeTrail.pop();if(!target||target==='auth'||target==='role')target='feed';return basePlayerGo.call(PZ,target)};var basePlayerClose=PZ.close;PZ.close=function(){if(typeof basePlayerClose==="function")basePlayerClose.apply(PZ,arguments);var menu=document.getElementById("pzFabMenu");if(menu)menu.remove()};var basePlayerTop=PZ.top;PZ.top=function(back){
+ if(!ME||ME.role!=='player')return basePlayerTop.call(PZ,back);
+ if(!back||back==="window.PZ.go('feed')")back="window.PZ.back()";
+ var isBack=back.indexOf('PZ.back')>=0;
+ var first=isBack?'<button aria-label="رجوع" title="رجوع" onclick="'+back+'">'+PZ.icon('back')+'</button>':'<button aria-label="الخدمات" title="الخدمات" onclick="window.PZ.openServices()">☰</button>';
+ var last=isBack?'<button aria-label="الخدمات" title="الخدمات" onclick="window.PZ.openServices()">'+PZ.icon('services')+'</button>':'<button aria-label="هويتي" title="هويتي" onclick="window.PZ.go(&quot;publicView&quot;)">'+PZ.icon('profile')+'</button>';
+ return '<header class="pz5-top">'+first+'<div class="pz5-brand">Play<span>In</span><sup>365</sup></div>'+last+'</header>'
+};
 PZ.page=function(route,body){
  var markup=String(body||'');
  if(isPreviewDemo()&&markup.indexOf('pz5-demo-banner')<0&&markup.indexOf('pj-demo-banner')<0)markup=demoBanner()+markup;
- return markup
+ if(markup.indexOf('class="pz5-nav"')>=0)return markup;
+ var wrapped=basePlayerPage.call(PZ,route,markup);
+ return wrapped.replace(/<button class="pz-fab pz-basmat-fab" onclick="window\.PZ\.toggleFab\(\)">[\s\S]*?<\/button>/,'')
 };
 PZ.nav=function(active){
- var a=[['home','الرئيسية','feed'],['records','تقدمي','records'],['opps','فرصي وتفاعلي','opps'],['profile','هويتي','publicView']];
- return '<nav class="pz5-nav">'+a.map(function(x){return '<button class="'+(active===x[2]?'on':'')+'" onclick="window.PZ.go(\''+x[2]+'\')"><span>'+PZ.icon(x[0])+'</span><b>'+x[1]+'</b></button>'}).join('')+'<button onclick="window.PZ.openServices()"><span>'+PZ.icon('services')+'</span><b>المزيد</b></button></nav>';
+ var a=[['home','الرئيسية','feed'],['opps','فرصي','opps'],['services','الخدمات','services'],['records','أدائي','records'],['profile','هويتي','publicView']];
+ var nav='<nav class="pz5-nav">'+a.map(function(x){
+  var on=active===x[2]||(x[0]==='services'&&(active==='hub'||active==='services'));
+  if(x[0]==='services')return '<button class="'+(on?'on':'')+'" aria-label="الخدمات" onclick="window.PZ.openServices()"><span>'+PZ.icon(x[0])+'</span><b>'+x[1]+'</b></button>';
+  return '<button class="'+(on?'on':'')+'" aria-label="'+x[1]+'" onclick="window.PZ.go(&quot;'+x[2]+'&quot;)"><span>'+PZ.icon(x[0])+'</span><b>'+x[1]+'</b></button>'
+ }).join('')+'</nav>';
+ return nav+'<button class="pz-fab pz-basmat-fab pz5-quick-fab" aria-label="اختصارات سريعة" title="اختصارات سريعة" onclick="window.PZ.toggleFab()">'+PZ.icon('plus')+'</button>'
 };
 function stat(value,label,accent){return '<div class="pz5-stat"><strong class="'+(accent||'')+'">'+v(value)+'</strong><span>'+label+'</span></div>'}
 function isoInRiyadh(value){
