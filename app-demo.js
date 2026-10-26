@@ -20,6 +20,20 @@ DEMO.personas = {
   academy:{name:"أكاديمية النخبة",role:"academy",org:"أكاديمية النخبة"},
   venue:{name:"ملعب المروج",role:"venue",org:"ملعب المروج"}
 };
+DEMO.COACH_ADDITIONS=[
+  ["نواف الغامدي",7,"براعم 6–8","مدافع",5],
+  ["سامي العتيبي",9,"براعم 9–10","مدافع",5],
+  ["حمد الدوسري",10,"براعم 9–10","وسط",8],
+  ["فارس المطيري",9,"براعم 9–10","جناح",7],
+  ["وليد القحطاني",10,"براعم 9–10","مهاجم",11],
+  ["ياسر الحربي",11,"ناشئون 11–12","حارس",1],
+  ["بدر الزهراني",12,"ناشئون 11–12","مدافع",3],
+  ["طلال الغامدي",11,"ناشئون 11–12","مدافع",4],
+  ["زياد الشمري",12,"ناشئون 11–12","وسط",6],
+  ["أنس السبيعي",11,"ناشئون 11–12","وسط",8],
+  ["سيف المطيري",12,"ناشئون 11–12","مهاجم",9],
+  ["أحمد العنزي",11,"ناشئون 11–12","جناح",10]
+];
 
 /* ── البذرة: عالم أكاديمية النخبة ودوري الحي ── */
 DEMO.seed = () => {
@@ -242,7 +256,8 @@ DEMO.seed = () => {
     ["عبدالرحمن المطيري",15,"شباب 15–16","مهاجم",9],
     ["نواف السبيعي",16,"شباب 15–16","وسط",8],
     ["سلمان الغامدي",17,"شباب 17–18","مدافع",2],
-    ["عمر الشمري",18,"شباب 17–18","مهاجم",11]
+    ["عمر الشمري",18,"شباب 17–18","مهاجم",11],
+    ...DEMO.COACH_ADDITIONS
   ].map((p,i)=>({id:"dp-"+(i+1),name:p[0],role:"player",org:coachOrg,pos:p[3],age:p[1],group_name:p[2],shirt:p[4],avatar_url:null}));
   const profiles = coachPlayers.concat([{id:"demo-coach",name:CO,role:"coach",org:coachOrg,pos:"مدرب"}]);
   const sessionOffsets = [27,25,23,20,18,16,13,11,9,6,3,1,0];
@@ -309,6 +324,23 @@ DEMO.load = () => {
   try{ const raw=localStorage.getItem(DEMO.key()); if(raw) s=JSON.parse(raw); }catch(e){}
   if(!s||!s.matches){ s=DEMO.seed(); DEMO.save(s); }
   DEMO.TABLES.forEach(t=>{ if(!s[t]) s[t]=[]; });
+  if(DEMO.role==="coach"){
+    const org=DEMO.personas.coach.org||"أكاديمية النخبة";
+    const sessions=(s.calendar_items||[]).filter(x=>x.kind==="training"&&x.session_id&&x.org===org);
+    DEMO.COACH_ADDITIONS.forEach((p,ai)=>{
+      const [name,age,group,pos,shirt]=p,playerIndex=18+ai;
+      if(!s.profiles.some(x=>x.role==="player"&&x.name===name))s.profiles.push({id:"dp-extra-"+(ai+1),name,role:"player",org,pos,age,group_name:group,shirt,avatar_url:null});
+      if(!s.health_status.some(x=>x.player_name===name))s.health_status.push({id:"dhs-extra-"+(ai+1),player_name:name,state:"available",phase:null,updated_at:new Date().toISOString(),updated_by:"د. ريم الحربي"});
+      sessions.forEach(session=>{
+        const sessionIndex=Number(String(session.session_id).split("-").pop());
+        if(s.attendance.some(x=>x.player_name===name&&x.session_id===session.session_id))return;
+        const today=String(session.on_date||"").slice(0,10)===new Date().toISOString().slice(0,10);
+        const present=today?((playerIndex*3+sessionIndex)%5!==0):((playerIndex+sessionIndex*2)%11!==0);
+        if(!present)return;
+        s.attendance.push({id:"da-extra-"+sessionIndex+"-"+playerIndex,player_name:name,org,group_name:group,recorded_by:DEMO.personas.coach.name,present:true,status:"present",created_at:session.created_at||new Date().toISOString(),session_id:session.session_id,session_title:session.title,duration_minutes:80,intensity:5+(playerIndex+sessionIndex)%4});
+      });
+    });
+  }
   const persona=DEMO.personas[DEMO.role]||DEMO.personas.player;
   let account=s.profiles.find(p=>p.role===persona.role&&p.name===persona.name);
   if(!account){ account={id:DEMO.uid,name:persona.name,role:persona.role,org:persona.org||""}; s.profiles.push(account); }
