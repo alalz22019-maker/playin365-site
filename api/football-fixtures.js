@@ -26,11 +26,15 @@ module.exports = async function footballFixtures(req, res) {
     const date = todayInRiyadh();
     const liveKickoff = new Date(Date.now() - 62 * 60 * 1000);
     const liveStillToday = todayInRiyadh(liveKickoff) === date;
+    const laLigaKickoff = new Date(date + 'T16:15:00+03:00');
+    const laLigaElapsed = Math.floor((Date.now() - laLigaKickoff.getTime()) / 60000);
+    const laLigaStatus = laLigaElapsed < 0 ? 'NS' : (laLigaElapsed < 90 ? 'LIVE' : 'FT');
+    const laLigaGoals = laLigaStatus === 'NS' ? { home: null, away: null } : { home: 1, away: 1 };
     const fixtures = [
       { id: 'demo-roshn-' + date, date: liveStillToday ? liveKickoff.toISOString() : date + 'T18:00:00+03:00', status: liveStillToday ? 'LIVE' : 'NS', elapsed: liveStillToday ? 62 : null, home: 'الهلال', away: 'النصر', league_name: 'Saudi Pro League', country: 'Saudi Arabia', goals: liveStillToday ? { home: 2, away: 1 } : { home: null, away: null }, demo: true },
       { id: 'demo-ucl-' + date, date: date + 'T20:30:00+03:00', status: 'NS', elapsed: null, home: 'ريال مدريد', away: 'بايرن ميونخ', league_name: 'UEFA Champions League', country: 'Europe', goals: { home: null, away: null }, demo: true },
       { id: 'demo-epl-' + date, date: date + 'T22:00:00+03:00', status: 'NS', elapsed: null, home: 'أرسنال', away: 'مانشستر سيتي', league_name: 'Premier League', country: 'England', goals: { home: null, away: null }, demo: true },
-      { id: 'demo-laliga-' + date, date: date + 'T16:15:00+03:00', status: 'FT', elapsed: 90, home: 'برشلونة', away: 'أتلتيكو مدريد', league_name: 'La Liga', country: 'Spain', goals: { home: 1, away: 1 }, demo: true }
+      { id: 'demo-laliga-' + date, date: laLigaKickoff.toISOString(), status: laLigaStatus, elapsed: laLigaStatus === 'LIVE' ? Math.min(laLigaElapsed, 90) : (laLigaStatus === 'FT' ? 90 : null), home: 'برشلونة', away: 'أتلتيكو مدريد', league_name: 'La Liga', country: 'Spain', goals: laLigaGoals, demo: true }
     ];
     res.setHeader('Cache-Control', 'no-store');
     return res.status(200).json({ date: date, updated_at: new Date().toISOString(), mode: 'preview-demo', fixtures: fixtures });
