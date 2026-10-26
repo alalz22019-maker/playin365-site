@@ -299,7 +299,7 @@ T.coachMe = async () => {
   const corr     = tr.filter(t => /تصحيح/.test(t.action||"")).length;
   const stats    = [["حصة موقّعة",sessions],["لاعبًا",roster.length],["حدثًا باسمك",ev.length],["تصحيحًا",corr]];
   const pid      = "PI-C-2026-" + String(1000 + (String(ME.name).split("").reduce((a,c) => a+c.charCodeAt(0), 0) % 8999));
-  const hasAv    = !!PL3.avUrl(ME.name);
+  const hasAv    = !!ME.avatar_url || CO.hasAvatar(ME.name);
   const fields   = [["الصورة",hasAv,"avatarSheet()"],["الاسم",!!ME.name],["الجهة",!!ME.org],["كشف مرتبط",roster.length>0,"go('squad')"],["حصص موقّعة",sessions>0,"go('session')"],["تقييم بتوقيعك",rated>0,"go('rate')"]];
   const comp     = Math.round(fields.filter(f => f[1]).length / fields.length * 100);
   const missing  = fields.filter(f => !f[1]);
@@ -316,8 +316,8 @@ T.coachMe = async () => {
           <span style="display:inline-flex;align-items:center;gap:6px;background:rgba(245,197,24,.16);border:1px solid rgba(245,197,24,.45);color:#f5c518;border-radius:999px;padding:4px 10px;font-size:9.5px;font-weight:900">★ مدرب${sessions>=5?" موثّق":""}</span>
         </div>
         <div style="display:flex;align-items:flex-end;gap:14px;margin-top:22px">
-          <button onclick="avatarSheet()" title="غيّر صورتك" style="position:relative;flex:none;background:none;border:0;padding:0;cursor:pointer">
-            ${CO.av(ME.name,110,{dark:true,r:"50% 50% 14px 50%",ring:"3px solid #f5c518"})}
+          <button onclick="toast('تعديل صورة الحساب غير متاح حاليًا',1)" title="تعديل صورة الحساب غير متاح حاليًا" style="position:relative;flex:none;background:none;border:0;padding:0;cursor:pointer">
+            ${CO.av(ME.name,110,{url:ME.avatar_url,dark:true,r:"50% 50% 14px 50%",ring:"3px solid #f5c518"})}
             <span style="position:absolute;bottom:-2px;inset-inline-end:-6px;width:28px;height:28px;border-radius:${CO.DROP};background:#f5c518;color:#151a2e;display:grid;place-items:center;font-size:12px;border:2px solid #151a2e">✎</span></button>
           <div style="flex:1;min-width:0;padding-bottom:4px">
             <span style="display:block;font-size:10px;color:#f5c518;font-weight:900">مدرب${CO.grp()!=="all"?` · <span class="ltr">${CO.grp()}</span>`:""}</span>
@@ -337,7 +337,7 @@ T.coachMe = async () => {
             </div>
             <span class="ltr" style="display:block;font-family:'Space Grotesk';font-size:10px;font-weight:700;color:#8f9bff;margin-top:8px">${pid}</span>
           </div>
-          <div style="flex:none;width:74px;height:74px;background:#fff;border-radius:12px;padding:5px"><svg viewBox="0 0 21 21" shape-rendering="crispEdges" style="width:100%;height:100%;display:block"><rect width="21" height="21" fill="#fff"></rect><path d="${PL3.qr(pid)}" fill="#151a2e"></path></svg></div>
+          <div style="flex:none;width:74px;height:74px;background:#fff;border-radius:12px;padding:5px"><img src="${CO.qr(pid,180)}" alt="رمز هوية المدرب" style="width:100%;height:100%;object-fit:contain;display:block"></div>
         </div>
       </div></div>
 
@@ -415,7 +415,7 @@ ${NAV.coach.map(([g,lb,v])=>{
       const app = $("#app"), hd = app.querySelector(".hd");
       /* شاشات المدرب المعتمدة تحمل رأسها معها — الرأس العام يُزال منها فقط */
       if(hd && CO.OWN.indexOf(VIEW) >= 0) hd.remove();
-      if(VIEW === "explore") setTimeout(()=>PL3.drawMap && PL3.drawMap(), 60);
+      if(VIEW === "explore" && typeof PL3 !== "undefined") setTimeout(()=>PL3.drawMap && PL3.drawMap(), 60);
       document.body.style.background = "#eeeae0";
       const sh = document.querySelector(".shell"); if(sh) sh.style.background = "#faf8f3";
     }catch(e){ console.error("CO", e); }

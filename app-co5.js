@@ -141,7 +141,7 @@ T.coachMe = async () => {
   const yrs = career.length ? Math.max(1, career.reduce((s,c)=>s+((c.to_year||new Date().getFullYear())-(c.from_year||new Date().getFullYear())),0)) : null;
   const stats = [["سنة خبرة", yrs],["لاعبًا دربته", new Set([...att.map(a=>a.player_name), ...roster.map(p=>p.name)]).size],["متخرّجًا", alum.length],["شهادة", certs.length]];
   const pid = "PI-C-2026-" + String(1000 + (String(ME.name).split("").reduce((a,c)=>a+c.charCodeAt(0),0) % 8999));
-  const hasAv = !!PL3.avUrl(ME.name);
+  const hasAv = !!ME.avatar_url || CO.hasAvatar(ME.name);
 
   /* حصص آخر ٦ أشهر */
   const MN = ["ينا","فبر","مار","أبر","ماي","يون","يول","أغس","سبت","أكت","نوف","ديس"];
@@ -179,8 +179,8 @@ T.coachMe = async () => {
         <div style="display:flex;justify-content:space-between;align-items:flex-start">${WM(1)}
           <span style="display:inline-flex;align-items:center;gap:6px;background:rgba(245,197,24,.16);border:1px solid rgba(245,197,24,.45);color:#f5c518;border-radius:999px;padding:4px 10px;font-size:9.5px;font-weight:900">★ مدرب${sessions>=5?" موثّق":""}</span></div>
         <div style="display:flex;align-items:flex-end;gap:14px;margin-top:22px">
-          <button onclick="avatarSheet()" style="position:relative;flex:none;background:none;border:0;padding:0;cursor:pointer">
-            ${CO.av(ME.name,110,{dark:true,r:"50% 50% 14px 50%",ring:"3px solid #f5c518"})}
+          <button onclick="toast('تعديل صورة الحساب غير متاح حاليًا',1)" style="position:relative;flex:none;background:none;border:0;padding:0;cursor:pointer">
+            ${CO.av(ME.name,110,{url:ME.avatar_url,dark:true,r:"50% 50% 14px 50%",ring:"3px solid #f5c518"})}
             <span style="position:absolute;bottom:-2px;inset-inline-end:-6px;width:28px;height:28px;border-radius:${CO.DROP};background:#f5c518;color:#151a2e;display:grid;place-items:center;font-size:12px;border:2px solid #151a2e">✎</span></button>
           <div style="flex:1;min-width:0;padding-bottom:4px">
             <span style="display:block;font-size:10px;color:#f5c518;font-weight:900">${esc((career[0]&&career[0].title)||"مدرب")}${certs.length&&certs[0].level?` · رخصة <span class="ltr">${esc(certs[0].level)}</span>`:""}</span>
@@ -196,7 +196,7 @@ T.coachMe = async () => {
               ${org?`<span style="display:inline-flex;align-items:center;gap:6px;height:30px;border-radius:999px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#faf8f3;padding:0 10px 0 4px;font-size:9.5px;font-weight:900"><span style="width:22px;height:22px;border-radius:${CO.DROP};background:#efedff;color:#4636e3;display:grid;place-items:center;font-size:10px">${esc(org.trim()[0])}</span>${esc(org)}</span>`
                 :`<span style="height:30px;border-radius:999px;border:1px dashed rgba(255,255,255,.3);color:#c6cade;display:grid;place-items:center;font-size:9px;font-weight:900;padding:0 10px">تُسجَّل حين تضمّك أكاديمية</span>`}</div>
             <span class="ltr" style="display:block;font-family:'Space Grotesk';font-size:10px;font-weight:700;color:#8f9bff;margin-top:8px">${pid}</span></div>
-          <div style="flex:none;width:74px;height:74px;background:#fff;border-radius:12px;padding:5px"><svg viewBox="0 0 21 21" shape-rendering="crispEdges" style="width:100%;height:100%;display:block"><rect width="21" height="21" fill="#fff"></rect><path d="${PL3.qr(pid)}" fill="#151a2e"></path></svg></div>
+          <div style="flex:none;width:74px;height:74px;background:#fff;border-radius:12px;padding:5px"><img src="${CO.qr(pid,180)}" alt="رمز هوية المدرب" style="width:100%;height:100%;object-fit:contain;display:block"></div>
         </div></div></div>
 
     ${CO.card(`<div style="display:flex;justify-content:space-between;align-items:baseline">${CO.h("مسيرتي")}<button onclick="cvAdd('career')" style="background:#4636e3;color:#fff;border:0;border-radius:10px;padding:7px 12px;font:900 10.5px Cairo;cursor:pointer">＋ محطة</button></div>
