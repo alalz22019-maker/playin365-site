@@ -713,7 +713,7 @@
     if (!who) return '<main><div class="card">لم يُحدّد اللاعب.</div></main>';
     var records = previewDemoMode() ? [] : await safe('journey-profile', sb.from('profiles').select('id,name,role,org,pos,age,shirt,athlete_id,avatar_url,handle,display_name,city,profile_visibility').eq('name', who).eq('role', 'player').eq('profile_visibility', 'public').limit(1));
     var source = records[0];
-    if (!source && previewDemoMode() && ME && ME.role === 'player' && norm(ME.name) === norm(who)) source = Object.assign({}, ME, { profile_visibility: 'public' });
+    if (!source && previewDemoMode() && ME && ME.role === 'player' && ME.isSyntheticDemo === true && norm(ME.name) === norm(who)) source = Object.assign({}, ME, { profile_visibility: 'public' });
     if (!source) return '<div class="pi-id-page">' + P.top("window.PZ.back()") + '<main class="pi-id-main"><div class="pj-not-found"><span>' + icon('academy') + '</span><b>الهوية غير متاحة</b><small>تأكد من الرابط ومن تفعيل نشر الهوية للعامة.</small></div></main></div>';
     var player = Object.assign({}, source, {
       display_name: source.display_name || source.name,
