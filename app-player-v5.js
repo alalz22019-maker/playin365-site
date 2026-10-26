@@ -40,7 +40,8 @@ function demoPack(today){
   ]
  }
 }
-var top5=function(){return '<header class="pz5-top"><button onclick="window.PZ.openServices()">☰</button><div class="pz5-brand">Play<span>In</span><sup>365</sup></div><button onclick="window.PZ.go(\'publicView\')">〈</button></header>'};
+var top5=function(){return '<header class="pz5-top"><button aria-label="الخدمات" onclick="window.PZ.openServices()">☰</button><div class="pz5-brand">Play<span>In</span><sup>365</sup></div><button aria-label="هويتي" title="هويتي" onclick="window.PZ.go(\'publicView\')">'+PZ.icon('profile')+'</button></header>'};
+var routeTrail=[];var basePlayerGo=PZ.go;PZ.go=function(route,param){var next=String(route||'feed'),from=String(window.VIEW||'');if(next!==from&&from&&from!=='auth'&&from!=='role'){routeTrail.push(from);if(routeTrail.length>20)routeTrail.shift()}return basePlayerGo.apply(this,arguments)};PZ.back=function(){var target=routeTrail.pop();if(!target||target==='auth'||target==='role')target='feed';return basePlayerGo.call(PZ,target)};var basePlayerTop=PZ.top;PZ.top=function(back){if(ME&&ME.role==='player'&&(!back||back==="window.PZ.go('feed')"))back='window.PZ.back()';return basePlayerTop.call(PZ,back)};
 PZ.page=function(route,body){
  var markup=String(body||'');
  if(isPreviewDemo()&&markup.indexOf('pz5-demo-banner')<0&&markup.indexOf('pj-demo-banner')<0)markup=demoBanner()+markup;
