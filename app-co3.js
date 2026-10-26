@@ -28,8 +28,8 @@ CO.TITLE = {};
 CO.today = () => new Date().toISOString().slice(0,10);
 CO.isSession = c => c && c.kind === "training" && !/تقييم المدرب|تعليمات المدرب|خطة راحة/.test(String(c.title||""));
 CO.sessionsOf = cal => (cal||[]).filter(CO.isSession);
-CO.grpOf = a => a ? (a<=13?"U13":a<=14?"U14":a<=15?"U15":a<=16?"U16":a<=17?"U17":a<=19?"U19":a<=23?"U23":"SEN") : null;
-CO.groupOf = p => { const group=p&&(p.group_name||p.age_group||p.cohort); return group?String(group).trim():(p?CO.grpOf(p.age):null); };
+CO.grpOf = age => { const a=Number(age); if(!Number.isFinite(a)||a<4||a>70)return null; if(a<6)return "براعم أقل من 6"; if(a<=8)return "براعم 6–8"; if(a<=10)return "براعم 9–10"; if(a<=12)return "ناشئون 11–12"; if(a<=14)return "ناشئون 13–14"; if(a<=16)return "شباب 15–16"; if(a<=18)return "شباب 17–18"; if(a<=23)return "U23"; return "الفريق الأول"; };
+CO.groupOf = p => { const group=p&&(p.group_name||p.age_group||p.cohort); return group?String(group).trim():(p?(CO.grpOf(p.age)||"غير مصنّف"):null); };
 
 /* الفئة المختارة — تبقى مع المدرب */
 CO.gkey = () => "pi_cgrp_" + (ME && ME.id);
