@@ -207,7 +207,7 @@ T.squad=async()=>{
   const overload=rows.filter(r=>r.flag&&r.flag.c==="#e8531f").length;
   return `<main>
   <div class="stat3">
-    <div class="stat"><b class="ltr">${roster.length}</b><span class="muted">لاعبًا</span></div>
+    <div class="stat"><b class="ltr">${roster.length}</b><span class="muted">${CO.playerCount(roster.length)}</span></div>
     <div class="stat"><b class="ltr" style="color:#2c6e49">${ready}</b><span class="muted">جاهز</span></div>
     <div class="stat"><b class="ltr" style="color:#e8531f">${overload}</b><span class="muted">حمل زائد</span></div>
   </div>
@@ -318,8 +318,8 @@ window.tacPublish=async(f)=>{
   const rows=names.map(n=>({player_name:n,kind:"training",title:"تشكيل المباراة — "+f,subtitle:`قرار المدرب ${ME.name}`,at_time:"19:00",on_date:new Date().toISOString().slice(0,10),org,needs_confirm:false,created_by:ME.name}));
   const {error}=await sb.from("calendar_items").insert(rows);
   if(error) return toast("تعذّر: "+error.message,1);
-  await trans(`نشر تشكيل ${f} لـ${names.length} لاعبًا`);
-  toast(`نُشر التشكيل لـ${names.length} لاعبًا`);
+  await trans(`نشر تشكيل ${f} لـ${names.length} ${CO.playerCount(names.length)}`);
+  toast(`نُشر التشكيل لـ${names.length} ${CO.playerCount(names.length)}`);
 };
 
 /* ── سلسلة الثقة: بديل «طلبات التوثيق» الذي يخالف القانون ── */

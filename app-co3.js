@@ -585,7 +585,7 @@ T.drills = async () => {
     <div style="background:#fff;border:1px solid #e9e4d8;border-radius:20px;padding:14px 16px">
       <label style="display:block;font-size:12px;font-weight:900;color:#151a2e">الفئة المستهدفة
         <select onchange="coGrp(this.value)" style="display:block;width:100%;margin-top:8px;border:1px solid #e9e4d8;border-radius:11px;padding:10px;font:800 11.5px Cairo;background:#faf8f3">
-          ${groupOptions.map(([label,value,count])=>'<option value="'+CO.esn(value)+'"'+(CO.grp()===value?' selected':'')+'>'+CO.esn(label)+' · '+count+' لاعب</option>').join("")}
+          ${groupOptions.map(([label,value,count])=>'<option value="'+CO.esn(value)+'"'+(CO.grp()===value?' selected':'')+'>'+CO.esn(label)+' · '+count+' '+CO.playerCount(count)+'</option>').join("")}
         </select>
       </label>
       <span style="display:block;font-size:10px;color:#8a8fa5;font-weight:700;margin-top:7px">تظهر التمارين الملائمة لأعمار المجموعة المختارة.</span>

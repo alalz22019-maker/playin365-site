@@ -257,7 +257,7 @@ T.coachMe = async () => {
     ${sessions?CO.card(`<div style="display:flex;justify-content:space-between;align-items:baseline">${CO.h("حصصك في ستة أشهر")}<span style="font-size:10px;color:#8a8fa5;font-weight:800">كلها بتوقيعك</span></div>
       ${CV.bars(mVals, months.map(m=>m.lb), "#4636e3")}`):""}
 
-    ${gParts.length?CO.card(`<div style="display:flex;justify-content:space-between;align-items:baseline">${CO.h("فئاتك")}<span style="font-size:10px;color:#8a8fa5;font-weight:800"><span class="ltr">${roster.length}</span> لاعبًا</span></div>
+    ${gParts.length?CO.card(`<div style="display:flex;justify-content:space-between;align-items:baseline">${CO.h("فئاتك")}<span style="font-size:10px;color:#8a8fa5;font-weight:800"><span class="ltr">${roster.length}</span> ${CO.playerCount(roster.length)}</span></div>
       ${CV.ring(gParts)}`):""}
 
     ${CO.card(`<div style="display:flex;justify-content:space-between;align-items:baseline">${CO.h("أثرك — بالأرقام")}<span style="font-size:10px;color:#8a8fa5;font-weight:800">من نشاط موثّق</span></div>
@@ -274,7 +274,7 @@ T.coachMe = async () => {
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
           <span style="width:4px;height:14px;border-radius:99px;background:#4636e3;flex:none"></span>
           <b style="font-size:11.5px;font-weight:900"><span class="ltr">${esc(g)}</span></b>
-          <span style="font-size:9.5px;color:#8a8fa5;font-weight:800"><span class="ltr">${arr.length}</span> لاعبًا</span></div>
+          <span style="font-size:9.5px;color:#8a8fa5;font-weight:800"><span class="ltr">${arr.length}</span> ${CO.playerCount(arr.length)}</span></div>
         <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:2px">
           ${arr.map(t=>`<button onclick="sqSheet('${CO.esn(t.p.name)}')" style="flex:none;width:76px;background:#faf8f3;border:1px solid #e9e4d8;border-radius:16px;padding:9px 4px;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;font-family:Cairo;position:relative">
             ${t.watch?`<span style="position:absolute;top:5px;inset-inline-end:6px;width:8px;height:8px;border-radius:50%;background:#e8531f" title="يراقبه كشاف"></span>`:""}
