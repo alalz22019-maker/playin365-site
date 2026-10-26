@@ -72,7 +72,8 @@ T.coachHome = async () => {
   const today = ses.find(c => String(c.on_date||"").slice(0,10) === CO.today()) || ses.find(c => String(c.on_date||"") >= CO.today());
   const live  = mt.find(m => m.status === "live");
   const nextM = mt.find(m => m.status === "today") || mt.find(m => m.status === "open");
-  const conf  = today ? new Set(att.filter(a=>CO.rowDate(a)===String(today.on_date||"").slice(0,10)&&a.present!==false).map(a=>a.player_name)).size : 0;
+  const groupNames = new Set(roster.map(p=>p.name));
+  const conf  = today ? new Set(att.filter(a=>CO.rowDate(a)===String(today.on_date||"").slice(0,10)&&a.present!==false&&groupNames.has(a.player_name)).map(a=>a.player_name)).size : 0;
   const ready = roster.filter(p => !hMap[p.name] || hMap[p.name].state === "available").length;
   const rehab = roster.filter(p => hMap[p.name] && hMap[p.name].state === "rehab").length;
   const out   = roster.filter(p => hMap[p.name] && hMap[p.name].state === "out").length;
