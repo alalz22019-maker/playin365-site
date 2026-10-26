@@ -178,12 +178,12 @@
     body.r-academy::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;background:radial-gradient(ellipse at 10% 4%,rgba(25,92,165,.21),transparent 38%),radial-gradient(ellipse at 90% 38%,rgba(105,61,222,.16),transparent 42%),linear-gradient(180deg,#050711,#080d19 64%,#050711)}
     body.r-academy .shell{position:relative;background:linear-gradient(180deg,#080b17,#090d1b)!important;border-inline:1px solid rgba(77,111,166,.18);box-shadow:0 0 60px rgba(0,0,0,.45)}
     body.r-academy .hd{position:sticky;top:0;z-index:70;min-height:66px;padding:10px 18px;background:rgba(7,10,21,.94)!important;backdrop-filter:blur(18px);border-bottom:1px solid rgba(90,119,169,.2)!important;color:#f4f6ff!important;display:flex;align-items:center;justify-content:space-between}
-    body.r-academy .nav{inset-inline:unset;left:50%;transform:translateX(-50%);bottom:12px;width:min(500px,calc(100% - 24px));max-width:500px;background:rgba(8,10,22,.94)!important;backdrop-filter:blur(18px);border:1px solid rgba(111,88,195,.34)!important;border-radius:28px;box-shadow:0 18px 46px rgba(0,0,0,.55);padding:8px 10px calc(8px + env(safe-area-inset-bottom));justify-content:space-around;gap:2px}
-    body.r-academy .nav button{min-width:50px;color:#9299b6!important;font-size:9.5px;gap:3px}
-    body.r-academy .nav button.on{color:#fff!important}
-    body.r-academy .nav button i{width:33px;height:33px;border-radius:12px;background:transparent;color:inherit}
-    body.r-academy .nav button.on i{background:linear-gradient(135deg,#855fff,#603ce0)!important;color:#fff!important;box-shadow:0 0 24px rgba(120,78,255,.38)}
-    body.r-academy .nav button i svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+    body.r-academy .nav,body.r-academy .pz5-nav{position:fixed!important;inset-inline:unset!important;left:50%!important;right:auto!important;bottom:12px!important;transform:translateX(-50%)!important;width:min(500px,calc(100% - 24px))!important;max-width:500px!important;background:rgba(8,10,22,.96)!important;backdrop-filter:blur(18px);border:1px solid rgba(111,88,195,.4)!important;border-radius:28px!important;box-shadow:0 18px 46px rgba(0,0,0,.55)!important;padding:8px 10px calc(8px + env(safe-area-inset-bottom))!important;justify-content:space-around;align-items:center;gap:2px}
+    body.r-academy .nav button,body.r-academy .pz5-nav button{min-width:50px;color:#9299b6!important;font-size:9.5px!important;gap:3px;background:transparent!important;border:0!important}
+    body.r-academy .nav button.on,body.r-academy .pz5-nav button.on{color:#fff!important}
+    body.r-academy .nav button i,body.r-academy .pz5-nav button span{width:33px;height:33px;border-radius:12px;background:transparent;color:inherit}
+    body.r-academy .nav button.on i,body.r-academy .pz5-nav button.on span{background:linear-gradient(135deg,#855fff,#603ce0)!important;color:#fff!important;box-shadow:0 0 24px rgba(120,78,255,.38)}
+    body.r-academy .nav button i svg,body.r-academy .pz5-nav button span svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
     .a6-brandbar{position:sticky;top:0;z-index:72;height:64px;padding:9px 18px;display:flex;align-items:center;justify-content:space-between;background:rgba(7,10,21,.96);backdrop-filter:blur(18px);border-bottom:1px solid rgba(90,119,169,.2);color:#f4f6ff}
     .a6-brand-mark{flex:1;display:flex;justify-content:center;align-items:center}.a6-brand-mark b{font:900 21px Cairo,sans-serif;letter-spacing:-1px;color:#f5f7ff}.a6-brand-mark b span{color:#e0c346}.a6-brand-mark small{font:700 9px 'Space Grotesk',sans-serif;color:#987bff;vertical-align:top;margin-inline-start:2px}
     .a6-header-side{width:38px;height:38px;border-radius:13px;background:rgba(18,24,43,.92);border:1px solid rgba(111,130,178,.3);color:#e9eeff;display:grid;place-items:center;cursor:pointer}
@@ -228,14 +228,14 @@
     nav.querySelectorAll("button").forEach(b=>{
       const bp={color:b.classList.contains("on")?"#fff":"#9299b6",font:"800 9.5px Cairo",minWidth:"50px",background:"transparent",border:"0",display:"flex",flexDirection:"column",alignItems:"center",gap:"3px"};
       Object.keys(bp).forEach(k=>important(b,k,bp[k]));
-      b.querySelectorAll("i").forEach(i=>{
+      b.querySelectorAll("i,span").forEach(i=>{
         const ip={width:"33px",height:"33px",display:"grid",placeItems:"center",borderRadius:"12px",background:b.classList.contains("on")?"linear-gradient(135deg,#855fff,#603ce0)":"transparent",color:b.classList.contains("on")?"#fff":"#9299b6"};
         Object.keys(ip).forEach(k=>important(i,k,ip[k]));
         i.querySelectorAll("svg").forEach(s=>{important(s,"width","19px");important(s,"height","19px");important(s,"fill","none");important(s,"stroke","currentColor");important(s,"strokeWidth","1.8");important(s,"strokeLinecap","round");important(s,"strokeLinejoin","round")});
       });
     });
   }
-  function syncAcademyNav(){if(!(ME&&ME.role==="academy"))return;document.querySelectorAll(".nav").forEach(styleNav6)}
+  function syncAcademyNav(){if(!(ME&&ME.role==="academy"))return;document.querySelectorAll(".nav,.pz5-nav").forEach(styleNav6)}
   const academyNavObserver=new MutationObserver(syncAcademyNav);
   academyNavObserver.observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["class","style"]});
   const previousRender=window.render;
