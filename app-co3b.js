@@ -437,13 +437,14 @@ T.coachMe = async () => {
     return '<nav class="pz5-nav coach-bottom-nav">'+items.map(([g,lb,v])=>{
       const on = VIEW===v;
       return '<button class="'+(on?'on':'')+'" aria-label="'+lb+'" onclick="go(&quot;'+v+'&quot;)"><span>'+window.PZ.icon(g)+'</span><b>'+lb+'</b></button>';
-    }).join("")+'</nav><button class="pz-fab pz-basmat-fab coach-quick-fab" style="display:grid!important" aria-label="اختصارات المدرب" title="اختصارات المدرب" onclick="window.CO.toggleFab()">'+window.PZ.icon('plus')+'</button>';
+    }).join("")+'</nav><button class="pz-fab pz-basmat-fab coach-quick-fab" style="display:grid!important" aria-label="اختصارات المدرب" title="اختصارات المدرب" onclick="window.coToggleFab()">'+window.PZ.icon('plus')+'</button>';
   };
   CO.toggleFab = function(){
     const old=document.getElementById("pzFabMenu");if(old){old.remove();return}
     const items=[["coach","الحصص والحضور","session"],["profile","فريقي","squad"],["rating","تقييم لاعب","rate"],["match","لوح التكتيك","boards"],["services","كل الخدمات","hub"]];
     document.body.insertAdjacentHTML("beforeend",'<div class="pz-fab-menu" id="pzFabMenu" role="menu" aria-label="اختصارات المدرب">'+items.map(function(x){return '<button role="menuitem" onclick="go(&quot;'+x[2]+'&quot;)"><span>'+window.PZ.icon(x[0])+'</span><b>'+x[1]+'</b></button>'}).join('')+'</div>');
   };
+  window.coToggleFab = CO.toggleFab;
   const _nav2 = window.navHtml || navHtml;
   window.navHtml = navHtml = function(){ return (ME && ME.role === "coach") ? CO.nav() : _nav2(); };
 
