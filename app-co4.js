@@ -14,7 +14,7 @@ TAC.FORMS = {
 };
 TAC.FIT = {"حارس":["حارس"],"دفاع":["مدافع","ظهير"],"ارتكاز":["وسط","مدافع"],"وسط":["وسط","جناح"],"صناعة":["جناح","وسط","مهاجم"],"رأس حربة":["مهاجم"],"هجوم":["مهاجم","جناح"]};
 TAC.key  = () => "pi_line_" + (ME && ME.id) + "_" + (CO.grp ? CO.grp() : "all");
-TAC.get  = () => { try { const raw=localStorage.getItem(TAC.key()); if(raw) return JSON.parse(raw); const prior=JSON.parse(localStorage.getItem("pi_line_"+(ME&&ME.id))||"null"); const current=new Set((CO._roster||[]).map(p=>p.name)); if(prior&&Object.values(prior.slots||{}).every(n=>current.has(n))) return prior; return {f:"4-3-3", slots:{}, out:[]}; } catch(e){ return {f:"4-3-3", slots:{}, out:[]}; } };
+TAC.get  = () => { try { return JSON.parse(localStorage.getItem(TAC.key())||"null") || {f:"4-3-3", slots:{}, out:[]}; } catch(e){ return {f:"4-3-3", slots:{}, out:[]}; } };
 TAC.set  = o => { try{ localStorage.setItem(TAC.key(), JSON.stringify(o)); }catch(e){} };
 TAC.date = st => { const v=String(st&&st.date||""); const d=new Date(v+"T00:00:00Z"); return v.length===10&&!Number.isNaN(d.valueOf())&&d.toISOString().slice(0,10)===v?v:CO.today(); };
 TAC.time = st => { const v=String(st&&st.time||""); const h=+v.slice(0,2),m=+v.slice(3,5); return v.length===5&&v[2]===":"&&h>=0&&h<=23&&m>=0&&m<=59?v:"18:00"; };
@@ -24,8 +24,11 @@ TAC.slots = f => { const out=[]; (TAC.FORMS[f]||TAC.FORMS["4-3-3"]).forEach(([n,
 TAC.pick = null;
 
 TAC.auto = (st, roster) => {
-  const slots = TAC.slots(st.f), used = new Set(Object.values(st.slots||{}));
-  const free = roster.filter(p => !used.has(p.name) && (st.out||[]).indexOf(p.name)<0);
+  const available = new Set(roster.map(p=>p.name));
+  st.slots = Object.fromEntries(Object.entries(st.slots||{}).filter(([,name])=>available.has(name)));
+  st.out = (st.out||[]).filter(name=>available.has(name));
+  const slots = TAC.slots(st.f), used = new Set(Object.values(st.slots));
+  const free = roster.filter(p => !used.has(p.name) && st.out.indexOf(p.name)<0);
   slots.forEach(s => {
     if(st.slots[s.i]) return;
     const want = TAC.FIT[s.lb] || [];
