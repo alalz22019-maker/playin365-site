@@ -63,7 +63,7 @@ PZ.nav=function(active){
   if(x[0]==='services')return '<button class="'+(on?'on':'')+'" aria-label="الخدمات" onclick="window.PZ.openServices()"><span>'+PZ.icon(x[0])+'</span><b>'+x[1]+'</b></button>';
   return '<button class="'+(on?'on':'')+'" aria-label="'+x[1]+'" onclick="window.PZ.go(&quot;'+x[2]+'&quot;)"><span>'+PZ.icon(x[0])+'</span><b>'+x[1]+'</b></button>'
  }).join('')+'</nav>';
- return nav+'<button class="pz-fab pz-basmat-fab pz5-quick-fab" aria-label="اختصارات سريعة" title="اختصارات سريعة" onclick="window.PZ.toggleFab()">'+PZ.icon('plus')+'</button>'
+ return nav+'<button class="pz-fab pz-basmat-fab pz5-quick-fab" style="display:grid!important" aria-label="اختصارات سريعة" title="اختصارات سريعة" onclick="window.PZ.toggleFab()">'+PZ.icon('plus')+'</button>'
 };
 function stat(value,label,accent){return '<div class="pz5-stat"><strong class="'+(accent||'')+'">'+v(value)+'</strong><span>'+label+'</span></div>'}
 function isoInRiyadh(value){

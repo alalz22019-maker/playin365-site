@@ -437,7 +437,7 @@ T.coachMe = async () => {
     return '<nav class="pz5-nav coach-bottom-nav">'+items.map(([g,lb,v])=>{
       const on = VIEW===v;
       return '<button class="'+(on?'on':'')+'" aria-label="'+lb+'" onclick="go(&quot;'+v+'&quot;)"><span>'+window.PZ.icon(g)+'</span><b>'+lb+'</b></button>';
-    }).join("")+'</nav><button class="pz-fab pz-basmat-fab coach-quick-fab" aria-label="اختصارات المدرب" title="اختصارات المدرب" onclick="window.CO.toggleFab()">'+window.PZ.icon('plus')+'</button>';
+    }).join("")+'</nav><button class="pz-fab pz-basmat-fab coach-quick-fab" style="display:grid!important" aria-label="اختصارات المدرب" title="اختصارات المدرب" onclick="window.CO.toggleFab()">'+window.PZ.icon('plus')+'</button>';
   };
   CO.toggleFab = function(){
     const old=document.getElementById("pzFabMenu");if(old){old.remove();return}
