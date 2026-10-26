@@ -14,7 +14,7 @@ CH.DRILLS=[
 ];
 CH.AIM={tactic:{ar:"تكتيكي",c:"#4636e3"},tech:{ar:"مهاري",c:"#c78c00"},phys:{ar:"بدني",c:"#e8531f"},recover:{ar:"استشفاء",c:"#2c6e49"}};
 CH.ageOf=p=>{const n=Number(p&&p.age);if(Number.isFinite(n)&&n>=4&&n<=60)return n;const raw=String(p&&(p.group_name||p.age_group||p.cohort)||"").replace(/[٠-٩]/g,c=>String("٠١٢٣٤٥٦٧٨٩".indexOf(c)));const m=raw.match(/[0-9]+/);return m?Number(m[0]):null;};
-CH.suitable=(d,roster)=>{const team=roster||[];if(d.grp==="كل الفئات")return true;if(d.grp==="حرّاس")return team.some(p=>String(p.pos||"").includes("حارس"));const m=String(d.grp||"").match(/^U([0-9]+)/i);if(!m)return true;const ages=team.map(CH.ageOf).filter(n=>n!==null);return !ages.length||Math.min(...ages)>=Number(m[1]);};
+CH.suitable=(d,roster)=>{const team=roster||[];if(d.grp==="كل الفئات")return true;if(d.grp==="حرّاس")return team.some(p=>String(p.pos||"").includes("حارس"));const m=String(d.grp||"").match(/^U([0-9]+)/i);if(!m)return true;const ages=team.map(CH.ageOf).filter(n=>n!==null);return ages.length>0&&Math.min(...ages)>=Number(m[1]);};
 
 /* ── مخطط الحصة المحلي (يبقى مع المدرب) ── */
 CH.pkey=()=>`pi_plan_${ME.id}`;
@@ -44,7 +44,7 @@ window.chPublish=async()=>{
   const roster=await CO.roster();
   const names=[...new Set(roster.map(x=>String(x.name||"").trim()).filter(Boolean))];
   if(!names.length)return toast("لا يوجد لاعبون في الفئة المختارة",1);
-  if(items.some(d=>!CH.suitable(d,roster)))return toast("بعض التمارين لا تناسب الفئة المختارة؛ أزلها أو اختر الفئة المناسبة",1);
+  if(items.some(d=>!CH.suitable(d,roster)))return toast("بعض التمارين لا تناسب الفئة المختارة أو تعذّر التأكد من العمر؛ أزلها أو اختر الفئة المناسبة",1);
   CH._publishing=true;
   try{
     const prior=await q("c",sb.from("calendar_items").select("player_name,title,on_date,created_by").eq("created_by",ME.name).eq("on_date",plannedDate).eq("kind","training").eq("title",title).limit(500));
