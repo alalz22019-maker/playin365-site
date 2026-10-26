@@ -184,19 +184,22 @@
   ids.forEach(id=>{
     const original=T[id];
     if(typeof original!=="function")return;
-    T[id]=async function(...args){
-      const html=await original.apply(this,args);
-      if(typeof ME==="undefined"||!ME||ME.role!=="academy"||typeof html!=="string")return html;
-      setTimeout(()=>{
-        const root=document.querySelector(".academy-shared-skin");
-        if(!root)return;
-        root.querySelectorAll("img").forEach(img=>{
-          const hide=()=>{img.style.display="none"};
-          img.addEventListener("error",hide,{once:true});
-          if(img.complete&&img.naturalWidth===0)hide();
-        });
-      },0);
-      return '<div class="academy-shared-skin">'+html+'</div>'+css;
+    T[id]=function(...args){
+      const skin=html=>{
+        if(typeof ME==="undefined"||!ME||ME.role!=="academy"||typeof html!=="string")return html;
+        setTimeout(()=>{
+          const root=document.querySelector(".academy-shared-skin");
+          if(!root)return;
+          root.querySelectorAll("img").forEach(img=>{
+            const hide=()=>{img.style.display="none"};
+            img.addEventListener("error",hide,{once:true});
+            if(img.complete&&img.naturalWidth===0)hide();
+          });
+        },0);
+        return '<div class="academy-shared-skin">'+html+'</div>'+css;
+      };
+      const result=original.apply(this,args);
+      return result&&typeof result.then==="function"?result.then(skin):skin(result);
     };
   });
 })();
