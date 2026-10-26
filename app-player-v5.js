@@ -9,10 +9,23 @@ function isPreviewDemo(){try{return location.hostname.endsWith('.vercel.app')&&l
 function demoBanner(){return isPreviewDemo()?'<aside class="pz5-demo-banner" role="status"><span>PREVIEW</span><b>بيانات تجريبية</b><small>للاختبار فقط · لا تمثل مباريات أو تفاعلات حقيقية</small></aside>':''}
 function demoPack(today){
  var matchId='demo-player-match-'+today;
+ var comps=['دوري الناشئين التجريبي','بطولة الرياض التجريبية','كأس الأكاديميات التجريبي'];
+ var matches=[{id:matchId,title:'أكاديمية النخبة × أكاديمية الرياض',comp:'مباراة تجريبية U14',match_date:today,match_time:'19:15',status:'NS',team_a:'أكاديمية النخبة',team_b:'أكاديمية الرياض التجريبية',venue:'ملعب تجريبي',demo:true}];
+ var events=[],joins=[];
+ [5,3,2,0].forEach(function(i){
+  var date=new Date(today+'T12:00:00+03:00');
+  date.setUTCDate(1);
+  date.setUTCMonth(date.getUTCMonth()-i);
+  date.setUTCDate(6+(i%3)*5);
+  var played=date.toISOString().slice(0,10),id='demo-player-history-'+i;
+  var match={id:id,title:'مباراة تجريبية · الجولة '+(6-i),comp:comps[i%comps.length],match_date:played+'T18:30:00+03:00',status:'FT',score_a:i%2?2:3,score_b:1,team_a:ME.org||'أكاديمية النخبة التجريبية',team_b:'فريق تجريبي',demo:true};
+  matches.push(match);
+  joins.push({id:'demo-player-join-'+i,player_id:ME.id,player_name:ME.name,match_id:id,attended:true,demo:true});
+  events.push({id:'demo-player-goal-'+i,who:ME.name,match_id:id,type:'goal',minute:14+i*7,recorded_by:'demo',created_at:played+'T20:00:00+03:00',demo:true});
+  if(i%2===0)events.push({id:'demo-player-assist-'+i,who:ME.name,match_id:id,type:'assist',minute:61,recorded_by:'demo',created_at:played+'T20:20:00+03:00',demo:true});
+ });
  return {
-  matches:[{id:matchId,title:'أكاديمية النخبة × أكاديمية الرياض',comp:'مباراة تجريبية U14',match_date:today,match_time:'19:15',status:'NS',team_a:'أكاديمية النخبة',team_b:'أكاديمية الرياض التجريبية',venue:'ملعب تجريبي',demo:true}],
-  events:[{id:'demo-goal-'+today,who:ME.name,match_id:matchId,type:'goal',minute:27,recorded_by:'demo',created_at:today+'T19:42:00+03:00'},{id:'demo-assist-'+today,who:ME.name,match_id:matchId,type:'assist',minute:63,recorded_by:'demo',created_at:today+'T20:18:00+03:00'}],
-  joins:[{id:'demo-join-'+today,player_id:ME.id,player_name:ME.name,match_id:matchId,attended:true}],
+  matches:matches,events:events,joins:joins,
   opps:[{id:'demo-interest-'+today,title:'اهتمام استكشافي تجريبي',created_at:new Date().toISOString()}],
   health:[{state:'ready',phase:'جاهز للتدريب',note:'تقييم يومي تجريبي — النوم جيد، الإجهاد منخفض.',updated_at:new Date().toISOString()}],
   calendar:[
@@ -21,9 +34,9 @@ function demoPack(today){
    {id:'demo-session-3',on_date:addIsoDays(today,5),at_time:'19:15',title:'مباراة ودية · تجريبي',org:'ملعب تجريبي'}
   ],
   badges:[
-   {id:'demo-badge-1',title:'أفضل لاعب في جولة تجريبية',person:ME.name},
-   {id:'demo-badge-2',title:'سجل هدفين — بيانات تجريبية',person:ME.name},
-   {id:'demo-badge-3',title:'مشاركة كاملة — بيانات تجريبية',person:ME.name}
+   {id:'demo-badge-1',title:'إنجاز تجريبي · أول هدف',person:ME.name},
+   {id:'demo-badge-2',title:'إنجاز تجريبي · لاعب الجولة',person:ME.name},
+   {id:'demo-badge-3',title:'إنجاز تجريبي · هدف وصناعة في مباراة',person:ME.name}
   ]
  }
 }
@@ -56,6 +69,7 @@ function isLiveMatch(m){return /^(1H|2H|HT|ET|BT|P|LIVE)$/.test(matchState(m))}
 function isEndedMatch(m){return /^(FT|AET|PEN|FINAL|FINISHED|COMPLETED|COMPLETE)$/.test(matchState(m))}
 function isCancelledMatch(m){return /^(CANC|PST|ABD|SUSP|INT|TBD|WO|AWD)$/.test(matchState(m))}
 function matchClock(m){
+ if(isLiveMatch(m)&&m.elapsed!=null)return String(m.elapsed)+'′';
  if(m.match_time||m.time||m.at_time)return String(m.match_time||m.time||m.at_time);
  var raw=m.date||m.kickoff_at||m.starts_at;if(!raw)return '—';
  var d=new Date(raw);if(!Number.isFinite(d.getTime()))return '—';
@@ -77,7 +91,7 @@ function matchRow(m){
  var teams=m.teams||{},title=String(m.title||''),sides=title.split('×');
  var home=m.home||m.home_team||(teams.home&&teams.home.name)||m.team_a||(sides[0]||'').replace(/\s+—.*$/,'').trim();
  var away=m.away||m.away_team||(teams.away&&teams.away.name)||m.team_b||(sides[1]||'').split('—')[0].trim();
- var status=isLiveMatch(m)?'مباشر':(isEndedMatch(m)?'انتهت':(matchDay(m)===todayRiyadh()?'اليوم':'قادمة'));
+ var status=m.demo&&isLiveMatch(m)?'مباشر · تجريبي':(isLiveMatch(m)?'مباشر':(isEndedMatch(m)?'انتهت':(matchDay(m)===todayRiyadh()?'اليوم':'قادمة')));
  var goals=m.goals||{};
  var score=(goals.home!=null&&goals.away!=null)?goals.home+' : '+goals.away:((m.score_a!=null&&m.score_b!=null)?m.score_a+' : '+m.score_b:'×');
  var comp=m.league_name||m.competition||m.comp||'';
@@ -126,7 +140,7 @@ PZ.home=async function(){
  ]);
  var matches=d[0]||[],ev=d[1]||[],joins=d[2]||[],opps=d[3]||[],health=d[4]||[],cal=d[5]||[],badges=d[6]||[];
  var coachRating='—',coachMeta='لا يوجد تقييم حديث';
- if(demo){var sample=demoPack(today);matches=sample.matches;ev=sample.events;joins=sample.joins;opps=sample.opps;health=sample.health;cal=sample.calendar;badges=sample.badges;coachRating='7.8';coachMeta='تقييم تجريبي · آخر حصة'}
+ if(demo){var sample=demoPack(today);matches=sample.matches;ev=sample.events;joins=sample.joins;opps=sample.opps;health=sample.health;cal=sample.calendar;badges=sample.badges;coachRating='6.8';coachMeta='تقييم تجريبي · آخر حصة'}
  var trustedEvents=ev.filter(function(e){return !!e.recorded_by});
  var goals=trustedEvents.filter(function(e){return e.type==='goal'}).length;
  var assists=trustedEvents.filter(function(e){return e.type==='assist'}).length;
@@ -145,7 +159,7 @@ PZ.home=async function(){
  var body='<div class="pz5-page">'+top5()+demoBanner()+
  '<div class="pz5-rails"><div class="pz5-rail alert"><b>تنبيهاتك</b><div><span>'+alertText+'</span><span>'+alertText+'</span></div></div><div class="pz5-rail games"><b>مباريات اليوم</b><div><span>جارٍ جلب المباريات الموثوقة…</span><span>جارٍ جلب المباريات الموثوقة…</span></div></div></div>'+
  '<main class="pz5-main">'+
- '<section class="pz5-hero"><div class="pz5-hero-orbit"></div><div class="pz5-eyebrow">PLAYER COMMAND CENTER <span>● LIVE</span></div><h1>يا '+v(ME.display_name||ME.name,'اللاعب')+'،<br><mark>خلّ يومك يلعب لصالحك.</mark></h1><p>جاهزيتك، خطتك، مبارياتك، وفرصك في مكان واحد.</p><div class="pz5-hero-bottom"><div class="pz5-score"><span>تقييم المدرب</span><strong>'+v(coachRating)+'</strong><small>'+v(coachMeta)+'</small></div><div class="pz5-hero-action"><button onclick="window.PZ.go(\'health\')">سجّل جاهزيتك <b>+</b></button><small>'+v(readiness)+'</small></div></div></section>'+
+ '<section class="pz5-hero"><div class="pz5-hero-orbit"></div><div class="pz5-eyebrow">PLAYER COMMAND CENTER <span>● TODAY</span></div><h1>يا '+v(ME.display_name||ME.name,'اللاعب')+'،<br><mark>خلّ يومك يلعب لصالحك.</mark></h1><p>جاهزيتك، خطتك، مبارياتك، وفرصك في مكان واحد.</p><div class="pz5-hero-bottom"><div class="pz5-score"><span>تقييم المدرب</span><strong>'+v(coachRating)+'</strong><small>'+v(coachMeta)+'</small></div><div class="pz5-hero-action"><button onclick="window.PZ.go(\'health\')">سجّل جاهزيتك <b>+</b></button><small>'+v(readiness)+'</small></div></div></section>'+
  '<section class="pz5-readiness"><div class="pz5-section-head"><div><span class="pz5-label">TODAY CHECK-IN</span><h2>جاهزيتك اليوم</h2></div><button onclick="window.PZ.go(\'health\')">'+(healthToday?'عدّل التقييم':'سجّل اليوم')+'</button></div><div class="pz5-readiness-row"><div class="pz5-ring"><div><strong>'+(healthToday?'✓':'+')+'</strong><span>فحص اليوم</span></div></div><div class="pz5-readiness-copy"><b>'+v(readiness)+'</b><p>'+v(healthNote)+'</p><button onclick="window.PZ.go(\'health\')">'+(healthToday?'عدّل تقييم اليوم':'ابدأ التقييم السريع ↗')+'</button></div></div></section>'+
  '<section class="pz5-snapshot"><div class="pz5-section-head"><div><span class="pz5-label">YOUR SNAPSHOT</span><h2>أداؤك المسجل</h2></div><button onclick="window.PZ.go(\'records\')">كل التقدم</button></div><div class="pz5-stats">'+stat(verified,demo?'مباراة تجريبية':'مباراة موثقة','gold')+stat(goals,demo?'هدف تجريبي':'هدف مسجل','purple')+stat(coachRating,demo?'تقييم تجريبي':'تقييم المدرب','teal')+stat(badges.length,demo?'إنجاز تجريبي':'إنجاز مسجل','orange')+'</div><div class="pz5-achievements"><div><b>إنجازاتك</b><span>'+v(badges.length?(demo?'آخر مثال تجريبي':'آخر إنجاز مسجل'):'تظهر هنا بعد تسجيل أول إنجاز')+'</span></div><strong>'+v(badges.length)+'</strong></div></section>'+
  '<section class="pz5-radar"><div class="pz5-section-head"><div><span class="pz5-label">LIVE RADAR</span><h2>مباريات اليوم</h2></div><button onclick="window.PZ.go(\'explore\')">تخصيص</button></div><div class="pz5-filter"><button class="on" type="button" data-kind="all" aria-pressed="true" onclick="window.PZ.filterMatches(\'all\')">الكل</button><button type="button" data-kind="roshn" aria-pressed="false" onclick="window.PZ.filterMatches(\'roshn\')">روشن</button><button type="button" data-kind="champions" aria-pressed="false" onclick="window.PZ.filterMatches(\'champions\')">الأبطال</button><button type="button" data-kind="global" aria-pressed="false" onclick="window.PZ.filterMatches(\'global\')">عالمي</button></div><div class="pz5-matches">'+matchList+'</div></section>'+
