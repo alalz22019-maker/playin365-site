@@ -760,7 +760,7 @@
         var demoTarget = sharedPlayer;
         sharedPlayer = '';
         if (!ME || ME.role !== 'player' || norm(ME.name) !== norm(demoTarget)) {
-          ME = { id: '89a89d4d-6792-48ff-9017-086532d128b0', role: 'player', roleSet: true, name: demoTarget, display_name: demoTarget, profile_visibility: 'public', org: 'أكاديمية النخبة — بيانات تجريبية', age: 14, age_group: 'U14', shirt: '18', jersey_number: '18', pos: 'RB', position_code: 'RB', preferred_foot: 'Right foot', foot: 'Right foot' };
+          ME = { id: '89a89d4d-6792-48ff-9017-086532d128b0', role: 'player', roleSet: true, name: demoTarget, display_name: demoTarget, profile_visibility: 'public', athlete_id: 'PI-89A89D4D', org: 'أكاديمية النخبة — بيانات تجريبية', age: 14, age_group: 'U14', shirt: '18', jersey_number: '18', pos: 'RB', position_code: 'RB', preferred_foot: 'Right foot', foot: 'Right foot' };
         }
         P.go('profile', demoTarget);
         return;
