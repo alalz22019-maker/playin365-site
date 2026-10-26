@@ -317,7 +317,7 @@ T.session = async () => {
   const mins = plan.reduce((s,p) => s+p.min, 0);
   const RING = {in:"#4636e3", off:"#e8531f", none:"#e9e4d8"};
   const INK  = {in:"#4636e3", off:"#e8531f", none:"#8a8fa5"};
-  const four = [...roster].sort(() => 0).slice(0, 16);
+  const four = [...roster];
   const gsz  = Math.max(1, Math.ceil(four.length/4));
   const gr   = [0,1,2,3].map(i => four.slice(i*gsz, (i+1)*gsz)).filter(g => g.length);
 
