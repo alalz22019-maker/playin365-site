@@ -94,7 +94,7 @@ T.acadHome = async () => {
 
     ${poll.length?ACD.card(`<div style="display:flex;justify-content:space-between;align-items:baseline">${ACD.h("لاعب الشهر")}<span style="font-size:10px;color:#8a8fa5;font-weight:800">من أحداث موثّقة · لا يدخل التقييم</span></div>
       ${poll.map(([n,c],i)=>`<div style="display:flex;gap:11px;align-items:center;padding:10px 0;border-top:1px solid #f0ece2">
-        ${PL3.av(n,40,{dark:true,r:"50% 50% 50% 10px",ring:i===0?"2px solid #f5c518":""})}
+        ${ACD.av(n,40,{dark:true,r:"50% 50% 50% 10px",ring:i===0?"2px solid #f5c518":""})}
         <div style="flex:1;min-width:0"><div style="display:flex;justify-content:space-between;align-items:baseline;font-size:11.5px;font-weight:900"><span>${esc(n)}</span><span style="font-size:9.5px;color:#8a8fa5;font-weight:800"><b class="ltr" style="color:${i===0?"#4636e3":"#b9b0f5"};font-size:11px">${c}</b> ${c===1?"حدث موثّق":"أحداث موثّقة"}</span></div><div style="height:7px;background:#f0ece2;border-radius:99px;overflow:hidden;margin-top:6px"><div style="height:100%;background:${i===0?"#4636e3":"#b9b0f5"};width:${Math.round(c/(poll[0][1]||1)*100)}%"></div></div></div>
         <button onclick="clapPlayer('${ACD.esn(n)}')" style="background:#efedff;color:#4636e3;border:0;border-radius:10px;padding:8px 10px;font:900 11px Cairo;cursor:pointer;flex:none">👏</button></div>`).join("")}`):""}
 
@@ -116,7 +116,7 @@ T.acadHome = async () => {
     ${D.alumni.length?ACD.card(`<div style="display:flex;justify-content:space-between;align-items:baseline">${ACD.h(`من خرّجناهم — <span class="ltr">${D.alumni.length}</span>`)}<button onclick="go('acadPride','${ACD.esn(org)}')" style="background:none;border:0;font:900 11px Cairo;color:#4636e3;cursor:pointer">الكل ←</button></div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">${Object.entries(kinds).map(([k,n])=>{const K=ACD.KD[k]||ACD.KD.club; return `<span style="background:${K[2]};color:${K[1]};border-radius:999px;padding:5px 11px;font-size:10px;font-weight:900">${K[3]} <span class="ltr">${n}</span> ${K[0]}</span>`;}).join("")}</div>
       <div style="display:flex;gap:8px;overflow-x:auto;margin-top:10px;padding-bottom:2px">
-        ${D.alumni.slice(0,6).map(a=>{const K=ACD.KD[a.dest_kind]||ACD.KD.club; return `<div style="flex:none;width:80px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:5px">${PL3.av(a.player_name,48,{dark:true,r:"50% 50% 50% 12px",ring:a.dest_kind==="nt"?"2px solid #f5c518":""})}<span style="font-size:9.5px;font-weight:900;line-height:1.3">${esc(String(a.player_name).split(" ")[0])}</span><span style="font-size:8.5px;font-weight:800;color:${K[1]};line-height:1.3">${esc(String(a.dest).split("—")[0].trim())}</span></div>`;}).join("")}
+        ${D.alumni.slice(0,6).map(a=>{const K=ACD.KD[a.dest_kind]||ACD.KD.club; return `<div style="flex:none;width:80px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:5px">${ACD.av(a.player_name,48,{dark:true,r:"50% 50% 50% 12px",ring:a.dest_kind==="nt"?"2px solid #f5c518":""})}<span style="font-size:9.5px;font-weight:900;line-height:1.3">${esc(String(a.player_name).split(" ")[0])}</span><span style="font-size:8.5px;font-weight:800;color:${K[1]};line-height:1.3">${esc(String(a.dest).split("—")[0].trim())}</span></div>`;}).join("")}
       </div>`):""}
 
     ${ACD.card(`${ACD.h("أنت هنا لأنك…")}
