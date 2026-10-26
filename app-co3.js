@@ -477,10 +477,15 @@ CO.diaKey = `<div style="display:flex;gap:11px;flex-wrap:wrap;margin-top:8px;fon
 
 /* ═══════════ 4f · بنك التمارين ═══════════ */
 T.drills = async () => {
+  const roster = await CO.roster(), allRoster = CO._roster || [];
+  const groups = [...new Set(allRoster.map(p=>CO.groupOf(p)).filter(Boolean))];
+  const groupOptions = [["كل الفئات","all",allRoster.length],...groups.map(g=>[g,g,allRoster.filter(p=>CO.groupOf(p)===g).length])];
+  const eligible = CH.DRILLS.filter(d=>CH.suitable(d,roster));
   const plan = CH.plan().map(k => CH.DRILLS.find(d => d.k === k)).filter(Boolean);
+  const incompatible = plan.filter(d=>!CH.suitable(d,roster));
   const mins = plan.reduce((s,d) => s+d.min, 0);
   const filt = (()=>{ try{ return localStorage.getItem("pi_drill_f")||"all"; }catch(e){ return "all"; } })();
-  const shown = filt === "all" ? CH.DRILLS : CH.DRILLS.filter(d => d.aim === filt);
+  const shown = filt === "all" ? eligible : eligible.filter(d => d.aim === filt);
   const byAim = {}; plan.forEach(d => byAim[d.aim] = (byAim[d.aim]||0)+d.min);
 
   return `<div style="padding:18px 18px 0;display:flex;justify-content:space-between;align-items:center">
@@ -498,7 +503,7 @@ T.drills = async () => {
           <div><span style="display:block;font-size:10px;color:#b9b0f5;font-weight:900">مخطط حصتك</span>
             <b class="ltr" style="display:block;font-size:32px;font-weight:700;margin-top:4px">${plan.length?mins:CO.dash}</b>
             <span style="display:block;font-size:10.5px;color:#c6cade;font-weight:700">${plan.length?`دقيقة · <span class="ltr">${plan.length}</span> تمرين`:"فارغ — اضغط ＋ على أي تمرين"}</span></div>
-          ${plan.length?`<button onclick="chPublish()" style="background:#fff;color:#151a2e;border:0;border-radius:14px;padding:12px 14px;font:900 12px Cairo;cursor:pointer;flex:none">انشرها ←</button>`:""}
+          ${plan.length?`<button onclick="chPublish()" ${incompatible.length?"disabled":""} style="background:#fff;color:#151a2e;border:0;border-radius:14px;padding:12px 14px;font:900 12px Cairo;cursor:pointer;flex:none;${incompatible.length?"opacity:.5;":""}">انشرها ←</button>`:""}
         </div>
         ${plan.length?`<div style="display:flex;gap:3px;margin-top:14px;height:10px;border-radius:999px;overflow:hidden">
           ${Object.entries(byAim).map(([a,m])=>`<span style="flex:${m};background:${CH.AIM[a].c}" title="${CH.AIM[a].ar}"></span>`).join("")}</div>`:""}
@@ -512,7 +517,23 @@ T.drills = async () => {
         <button onclick="chRm('${d.k}')" style="background:none;border:0;color:#a83b25;font:900 15px Cairo;cursor:pointer;flex:none;padding:4px 8px">×</button></div>
         ${CO.dia(d.k)}`).join("")}`):""}
 
-    <div style="display:flex;gap:6px;flex-wrap:wrap">
+    <div style="background:#fff;border:1px solid #e9e4d8;border-radius:20px;padding:14px 16px">
+      <label style="display:block;font-size:12px;font-weight:900;color:#151a2e">الفئة المستهدفة
+        <select onchange="coGrp(this.value)" style="display:block;width:100%;margin-top:8px;border:1px solid #e9e4d8;border-radius:11px;padding:10px;font:800 11.5px Cairo;background:#faf8f3">
+          \${groupOptions.map(([label,value,count])=>'<option value="'+CO.esn(value)+'"'+(CO.grp()===value?' selected':'')+'>'+CO.esn(label)+' · '+count+' لاعب</option>').join("")}
+        </select>
+      </label>
+      <span style="display:block;font-size:10px;color:#8a8fa5;font-weight:700;margin-top:7px">تظهر التمارين الملائمة لأعمار المجموعة المختارة.</span>
+    </div>
+    \${plan.length?CO.card(\`<div style="display:grid;grid-template-columns:1.2fr 1fr;gap:8px">
+      <label style="font-size:10px;font-weight:900;color:#5b6078">موعد الحصة
+        <input type="date" value="\${CH.date()}" min="\${CH.today()}" onchange="chDate(this.value)" style="display:block;width:100%;margin-top:5px;border:1px solid #e9e4d8;border-radius:11px;padding:9px 8px;font:800 11px Cairo;background:#faf8f3;color:#151a2e"></label>
+      <label style="font-size:10px;font-weight:900;color:#5b6078">الوقت
+        <input type="time" value="\${CH.time()}" onchange="chTime(this.value)" style="display:block;width:100%;margin-top:5px;border:1px solid #e9e4d8;border-radius:11px;padding:9px 8px;font:800 11px Cairo;background:#faf8f3;color:#151a2e"></label>
+    </div>
+    \${incompatible.length?\`<div style="background:#fff8df;border:1px solid #f0e2b4;border-radius:13px;padding:10px;font-size:10px;color:#8a6912;font-weight:800;line-height:1.8;margin-top:9px">أزل تمارين الفئات الأكبر قبل النشر: \${incompatible.map(d=>CO.esn(d.ar)).join("، ")}</div>\`:""}
+    <span style="display:block;font-size:10px;color:#8a8fa5;font-weight:700;margin-top:7px">سيصل المخطط إلى <span class="ltr">\${roster.length}</span> لاعبًا في \${CO.grp()!=="all"?CO.esn(CO.grp()):"كل الفئات"}.</span>\`):""}
+\n    <div style="display:flex;gap:6px;flex-wrap:wrap">
       <button onclick="drillFilt('all')" style="background:${filt==="all"?"#151a2e":"#fff"};color:${filt==="all"?"#faf8f3":"#5b6078"};border:1px solid ${filt==="all"?"#151a2e":"#e9e4d8"};border-radius:999px;padding:7px 13px;font:900 10.5px Cairo;cursor:pointer">الكل</button>
       ${Object.entries(CH.AIM).map(([k,a])=>`<button onclick="drillFilt('${k}')" style="background:${filt===k?a.c:"#fff"};color:${filt===k?"#fff":"#5b6078"};border:1px solid ${filt===k?a.c:"#e9e4d8"};border-radius:999px;padding:7px 13px;font:900 10.5px Cairo;cursor:pointer">${a.ar}</button>`).join("")}
     </div>
@@ -523,7 +544,7 @@ T.drills = async () => {
         <span style="display:block;font-size:10.5px;color:#c6cade;font-weight:700;margin-top:2px">لوح كامل بإصبعك — ويُحفظ في بنكك باسمك</span></div>
       <span style="position:relative;color:#f5c518">←</span></button>
     ${CO.card(`${CO.h("مفتاح التخطيط")}${CO.sub("كل تمرين مرسوم على العشب — الأقمع والحركة، لا وصفًا نصيًّا")}${CO.diaKey}`)}
-    ${shown.map(d=>{ const inP = CH.plan().includes(d.k), A = CH.AIM[d.aim];
+    ${shown.length?shown.map(d=>{ const inP = CH.plan().includes(d.k), A = CH.AIM[d.aim];
       return `<div style="background:#fff;border:1px solid ${inP?"#ddd8fb":"#e9e4d8"};border-radius:20px;padding:14px 16px;display:flex;gap:12px;align-items:center">
         ${CO.ic("▤", inP?"#efedff":"#faf8f3", A.c, "50% 50% 8px 50%")}
         <div style="flex:1;min-width:0"><b style="display:block;font-size:12.5px">${esc(d.ar)}</b>
@@ -533,7 +554,7 @@ T.drills = async () => {
             <span style="background:#faf8f3;border:1px solid #e9e4d8;color:#8a8fa5;border-radius:999px;padding:3px 9px;font-size:9.5px;font-weight:800"><span class="ltr">${d.min}</span> د</span>
             <span style="background:#faf8f3;border:1px solid #e9e4d8;color:#8a8fa5;border-radius:999px;padding:3px 9px;font-size:9.5px;font-weight:800">${esc(d.grp)}</span></div>
           ${CO.dia(d.k)}</div>
-        <button onclick="chAdd('${d.k}')" ${inP?"disabled":""} style="width:36px;height:36px;flex:none;border-radius:50% 50% 8px 50%;background:${inP?"#efedff":"#4636e3"};color:${inP?"#4636e3":"#fff"};border:0;font:900 17px Cairo;cursor:${inP?"default":"pointer"}">${inP?"✓":"＋"}</button></div>`;}).join("")}
+        <button onclick="chAdd('${d.k}')" ${inP?"disabled":""} style="width:36px;height:36px;flex:none;border-radius:50% 50% 8px 50%;background:${inP?"#efedff":"#4636e3"};color:${inP?"#4636e3":"#fff"};border:0;font:900 17px Cairo;cursor:${inP?"default":"pointer"}">${inP?"✓":"＋"}</button></div>`;}).join(""):CO.empty("لا توجد تمارين مناسبة لهذه الفئة والغرض")}
 
     ${CO.note("التمارين مرجع فنّي لك — ونشرها يكتب في تقويم كل لاعب سطرًا باسمك وصفتك. لا يمسّ تقييم أحد.")}
   </main>`;
