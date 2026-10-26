@@ -27,6 +27,8 @@
     var who = player && player.name || 'Player';
     var events = [], joins = [], badges = [], matches = [], comps = ['دوري الناشئين التجريبي', 'بطولة الرياض التجريبية', 'كأس الأكاديميات التجريبي'];
     for (var i = 5; i >= 0; i--) {
+      // Leave two quiet months in the sample so the expandable timeline can be reviewed honestly.
+      if (i === 4 || i === 1) continue;
       var date = demoDate(-i, 6 + (i % 3) * 5), id = 'preview-match-' + i;
       var match = { id: id, title: 'مباراة تجريبية · الجولة ' + (6 - i), comp: comps[i % comps.length], match_date: date + 'T18:30:00+03:00', status: 'FT', score_a: i % 2 ? 2 : 3, score_b: 1, team_a: player && player.org || 'أكاديمية تجريبية', team_b: 'فريق تجريبي', demo: true };
       matches.push(match);
@@ -654,7 +656,7 @@
       event.stopImmediatePropagation();
       if (!maySharePublic(ME)) return shareNotice('الهوية غير منشورة للعامة بعد.');
       var playerName = String(ME.name || '').trim();
-      var shareUrl = location.origin + location.pathname + '?player=' + encodeURIComponent(playerName);
+      var shareUrl = location.origin + location.pathname + '?player=' + encodeURIComponent(playerName) + (previewDemoMode() ? '&demo=1' : '');
       if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(shareUrl).then(function () { shareNotice('تم نسخ رابط الهوية العامة.'); }).catch(function () { shareNotice('تعذر نسخ الرابط من هذا المتصفح.'); });
       else shareNotice('النسخ غير متاح في هذا المتصفح.');
       return;
