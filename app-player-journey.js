@@ -714,7 +714,7 @@
     var records = previewDemoMode() ? [] : await safe('journey-profile', sb.from('profiles').select('id,name,role,org,pos,age,shirt,athlete_id,avatar_url,handle,display_name,city,profile_visibility').eq('name', who).eq('role', 'player').eq('profile_visibility', 'public').limit(1));
     var source = records[0];
     if (!source && previewDemoMode() && ME && ME.role === 'player' && norm(ME.name) === norm(who)) source = Object.assign({}, ME, { profile_visibility: 'public' });
-    if (!source) return '<div class="pi-id-page"><header class="pz5-top">' + P.brand() + '</header><main class="pi-id-main"><div class="pj-not-found"><span>' + icon('academy') + '</span><b>الهوية غير متاحة</b><small>تأكد من الرابط ومن تفعيل نشر الهوية للعامة.</small></div></main></div>';
+    if (!source) return '<div class="pi-id-page">' + P.top("window.PZ.back()") + '<main class="pi-id-main"><div class="pj-not-found"><span>' + icon('academy') + '</span><b>الهوية غير متاحة</b><small>تأكد من الرابط ومن تفعيل نشر الهوية للعامة.</small></div></main></div>';
     var player = Object.assign({}, source, {
       display_name: source.display_name || source.name,
       age_group: source.age_group || (source.age ? 'U' + source.age : ''),
@@ -730,7 +730,7 @@
     try { ME = player; card = P.identityCard(history.events, history.joins, history.badges); }
     finally { ME = previous; }
     var demoNotice = previewDemoMode() ? '<aside class="pj-demo-banner" role="status"><span>PREVIEW</span><b>بيانات تجريبية</b><small>سجل عرض فقط · لا يُحفظ في قاعدة البيانات</small></aside>' : '';
-    return '<div class="pi-id-page pj-public-page">' + P.top("history.back()") + '<main class="pi-id-main">' + demoNotice + '<div class="pj-public-heading"><span class="pj-label">PLAYER IDENTITY</span><h1>هوية اللاعب</h1><p>البطاقة، المسيرة، والإنجازات.</p></div>' + card + '<div class="pi-id-actions pj-public-actions"><button class="primary" onclick="window.PZ.share(\'' + e(player.name) + '\')">شارك الهوية ↗</button><button class="pj-contact-trigger" type="button" data-pj-contact-open data-target-id="' + e(player.id) + '">طلب تواصل</button></div>' + contactModalMarkup(player) + '<div class="pj-mount">' + journeyView(player, history, false) + '</div></main></div>';
+    return '<div class="pi-id-page pj-public-page">' + P.top("window.PZ.back()") + '<main class="pi-id-main">' + demoNotice + '<div class="pj-public-heading"><span class="pj-label">PLAYER IDENTITY</span><h1>هوية اللاعب</h1><p>البطاقة، المسيرة، والإنجازات.</p></div>' + card + '<div class="pi-id-actions pj-public-actions"><button class="primary" onclick="window.PZ.share(\'' + e(player.name) + '\')">شارك الهوية ↗</button><button class="pj-contact-trigger" type="button" data-pj-contact-open data-target-id="' + e(player.id) + '">طلب تواصل</button></div>' + contactModalMarkup(player) + '<div class="pj-mount">' + journeyView(player, history, false) + '</div></main></div>';
   }
 
   var originalPublicProfile = P.publicProfile;
@@ -756,6 +756,15 @@
   if (sharedPlayer) {
     var priorRender = window.render;
     window.render = render = async function () {
+      if (previewDemoMode() && sharedPlayer) {
+        var demoTarget = sharedPlayer;
+        sharedPlayer = '';
+        if (!ME || ME.role !== 'player' || norm(ME.name) !== norm(demoTarget)) {
+          ME = { id: '89a89d4d-6792-48ff-9017-086532d128b0', role: 'player', roleSet: true, name: demoTarget, display_name: demoTarget, profile_visibility: 'public', org: 'أكاديمية النخبة — بيانات تجريبية', age: 14, age_group: 'U14', shirt: '18', jersey_number: '18', pos: 'RB', position_code: 'RB', preferred_foot: 'Right foot', foot: 'Right foot' };
+        }
+        P.go('profile', demoTarget);
+        return;
+      }
       if (ME && VIEW !== 'auth' && VIEW !== 'role' && sharedPlayer) {
         var target = sharedPlayer;
         sharedPlayer = '';
