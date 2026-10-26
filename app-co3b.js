@@ -5,10 +5,10 @@
 CO.bkey = () => "pi_brief_" + (ME&&ME.id);
 CO.bdateKey = () => "pi_brief_date_" + (ME&&ME.id);
 CO.btimeKey = () => "pi_brief_time_" + (ME&&ME.id);
-CO.briefDate = () => { try { const v=localStorage.getItem(CO.bdateKey())||""; return /^\\d{4}-\\d{2}-\\d{2}$/.test(v)?v:CO.today(); } catch(e) { return CO.today(); } };
-CO.briefTime = () => { try { const v=localStorage.getItem(CO.btimeKey())||""; return /^\\d{2}:\\d{2}$/.test(v)?v:"18:00"; } catch(e) { return "18:00"; } };
-window.coBriefDate = v => { if(/^\\d{4}-\\d{2}-\\d{2}$/.test(String(v||"")))try{localStorage.setItem(CO.bdateKey(),v)}catch(e){} };
-window.coBriefTime = v => { if(/^\\d{2}:\\d{2}$/.test(String(v||"")))try{localStorage.setItem(CO.btimeKey(),v)}catch(e){} };
+CO.briefDate = () => { try { const v=localStorage.getItem(CO.bdateKey())||""; return /^\d{4}-\d{2}-\d{2}$/.test(v)?v:CO.today(); } catch(e) { return CO.today(); } };
+CO.briefTime = () => { try { const v=localStorage.getItem(CO.btimeKey())||""; return /^\d{2}:\d{2}$/.test(v)?v:"18:00"; } catch(e) { return "18:00"; } };
+window.coBriefDate = v => { if(/^\d{4}-\d{2}-\d{2}$/.test(String(v||"")))try{localStorage.setItem(CO.bdateKey(),v)}catch(e){} };
+window.coBriefTime = v => { if(/^\d{2}:\d{2}$/.test(String(v||"")))try{localStorage.setItem(CO.btimeKey(),v)}catch(e){} };
 CO.brief = () => { try { return JSON.parse(localStorage.getItem(CO.bkey())||"{}"); } catch(e){ return {}; } };
 CO.setBrief = o => { try{ localStorage.setItem(CO.bkey(), JSON.stringify(Object.assign(CO.brief(), o))); }catch(e){} };
 CO.KIT = [["ماء قبل الحصة","water"],["واقي الساق","shin"],["حذاء عشب طبيعي","boots"],["ملابس تبديل","kit"]];
