@@ -235,7 +235,7 @@
       });
     });
   }
-  function syncAcademyNav(){if(!(ME&&ME.role==="academy"))return;document.querySelectorAll(".nav,.pz5-nav").forEach(styleNav6)}
+  function syncAcademyNav(){if(!document.querySelector(".a6-brandbar"))return;document.querySelectorAll(".nav,.pz5-nav").forEach(styleNav6)}
   const academyNavObserver=new MutationObserver(syncAcademyNav);
   academyNavObserver.observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:["class","style"]});
   const previousRender=window.render;
