@@ -41,7 +41,8 @@ function demoPack(today){
  }
 }
 var top5=function(){return '<header class="pz5-top"><button aria-label="الخدمات" onclick="window.PZ.openServices()">☰</button><div class="pz5-brand">Play<span>In</span><sup>365</sup></div><button aria-label="هويتي" title="هويتي" onclick="window.PZ.go(\'publicView\')">'+PZ.icon('profile')+'</button></header>'};
-var routeTrail=[];var basePlayerGo=PZ.go;PZ.go=function(route,param){var next=String(route||'feed'),from=String(window.VIEW||'');if(next!==from&&from&&from!=='auth'&&from!=='role'){routeTrail.push(from);if(routeTrail.length>20)routeTrail.shift()}return basePlayerGo.apply(this,arguments)};PZ.back=function(){var target=routeTrail.pop();if(!target||target==='auth'||target==='role')target='feed';return basePlayerGo.call(PZ,target)};var basePlayerClose=PZ.close;PZ.close=function(){if(typeof basePlayerClose==="function")basePlayerClose.apply(PZ,arguments);var menu=document.getElementById("pzFabMenu");if(menu)menu.remove()};var basePlayerTop=PZ.top;PZ.top=function(back){
+var routeTrail=[];var basePlayerGo=PZ.go;PZ.go=function(route,param){var next=String(route||'feed'),from=String(window.VIEW||'');if(next!==from&&from&&from!=='auth'&&from!=='role'){routeTrail.push(from);if(routeTrail.length>20)routeTrail.shift()}return basePlayerGo.apply(this,arguments)};PZ.back=function(){var target=routeTrail.pop();if(!target||target==='auth'||target==='role')target='feed';return basePlayerGo.call(PZ,target)};var basePlayerClose=PZ.close;PZ.close=function(){if(typeof basePlayerClose==="function")basePlayerClose.apply(PZ,arguments);var menu=document.getElementById("pzFabMenu");if(menu)menu.remove()};var basePlayerTop=PZ.top;var basePlayerPage=PZ.page;
+PZ.top=function(back){
  if(!ME||ME.role!=='player')return basePlayerTop.call(PZ,back);
  if(!back||back==="window.PZ.go('feed')")back="window.PZ.back()";
  var isBack=back.indexOf('PZ.back')>=0;
