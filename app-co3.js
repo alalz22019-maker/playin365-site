@@ -115,7 +115,7 @@ T.coachHome = async () => {
   CO._sessionOptions=sessionChoices; CO._currentSession=activeHomeSession;
   CO._allowLegacyAttendance=sessionChoices[0]&&activeHomeSession.id===sessionChoices[0].id;
   const today=activeHomeSession&&activeHomeSession.planned?activeHomeSession:nextScheduled;
-  const homeRows=att.filter(a=>CO.rowDate(a)===CO.today()&&(a.session_id===activeHomeSession.id||(!a.session_id&&CO._allowLegacyAttendance))&&a.present===true&&groupNames.has(a.player_name));
+  const homeRows=att.filter(a=>CO.rowDate(a)===CO.today()&&a.present===true&&groupNames.has(a.player_name));
   const conf=new Set(homeRows.map(a=>a.player_name)).size;
   const ready = roster.filter(p => !hMap[p.name] || hMap[p.name].state === "available").length;
   const rehab = roster.filter(p => hMap[p.name] && hMap[p.name].state === "rehab").length;
