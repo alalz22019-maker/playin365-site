@@ -165,12 +165,13 @@
   AC6.saveGeneric=kind=>{const name=(document.getElementById("ac6Name")||{}).value||"";if(!name.trim())return toast6("أدخل البيانات المطلوبة");const s=state();if(kind==="session"){s.sessions.push({day:"غدًا",time:"6:30 م",group:name.trim(),place:"الملعب الرئيسي",focus:"حصة تدريبية"});saveState(s)}AC6.closeModal();toast6("تم حفظ المعلومات");render()};
 
   T.acad=async()=>home();
+  T.acadHome=async()=>home();
   T.acadSquads=async()=>squads();
   T.acadSessions=async()=>sessions();
   T.acadPerformance=async()=>performance();
   T.acadProfile=async()=>profile();
-  if(typeof NAV!=="undefined")NAV.academy=[[svg("home"),"الرئيسية","acad"],[svg("team"),"فريقنا","acadSquads"],[svg("grid"),"الخدمات","hub"],[svg("calendar"),"الحصص","acadSessions"],[svg("user"),"ملفي","acadProfile"]];
-  if(typeof TITLES!=="undefined"){TITLES.acad="مساحة الأكاديمية";TITLES.acadSquads="الفئات والفرق";TITLES.acadSessions="الحصص والحضور";TITLES.acadPerformance="التطوير والتقارير";TITLES.acadProfile="ملف الأكاديمية";}
+  if(typeof NAV!=="undefined")NAV.academy=[[svg("home"),"الرئيسية","acadHome"],[svg("team"),"فريقنا","acadSquads"],[svg("grid"),"الخدمات","hub"],[svg("calendar"),"الحصص","acadSessions"],[svg("user"),"ملفي","acadProfile"]];
+  if(typeof TITLES!=="undefined"){TITLES.acad="مساحة الأكاديمية";TITLES.acadHome="مساحة الأكاديمية";TITLES.acadSquads="الفئات والفرق";TITLES.acadSessions="الحصص والحضور";TITLES.acadPerformance="التطوير والتقارير";TITLES.acadProfile="ملف الأكاديمية";}
 
   const css=`
     body.r-academy{background:#050711!important;color:#f2f5ff!important}
@@ -225,7 +226,7 @@
       document.body.classList.toggle("r-academy",academy);
       if(!academy){document.getElementById("ac6Fab")?.remove();AC6.closeQuick();return;}
       const hd=document.querySelector("#app .hd");
-      if(hd){const current=VIEW||"acad";const home=current==="acad";hd.innerHTML=`<button class="a6-header-side" onclick="${home?"go('hub')":"go('acad')"}" aria-label="${home?"الخدمات":"رجوع"}">${svg(home?"menu":"back")}</button><div style="display:flex;align-items:center;justify-content:center;flex:1">${typeof WM==="function"?WM(1):'<b class="wm">Play<span style="color:#e0c346">In</span><small>365</small></b>'}</div><button class="a6-header-avatar" onclick="go('acadProfile')" aria-label="ملف الأكاديمية">ن</button>`;}
+      if(hd){const current=VIEW||"acadHome";const home=current==="acad"||current==="acadHome";hd.innerHTML=`<button class="a6-header-side" onclick="${home?"go('hub')":"go('acadHome')"}" aria-label="${home?"الخدمات":"رجوع"}">${svg(home?"menu":"back")}</button><div style="display:flex;align-items:center;justify-content:center;flex:1">${typeof WM==="function"?WM(1):'<b class="wm">Play<span style="color:#e0c346">In</span><small>365</small></b>'}</div><button class="a6-header-avatar" onclick="go('acadProfile')" aria-label="ملف الأكاديمية">ن</button>`;}
       let fab=document.getElementById("ac6Fab");if(!fab){fab=document.createElement("button");fab.id="ac6Fab";fab.className="ac6-fab";fab.setAttribute("aria-label","اختصارات الأكاديمية");fab.title="اختصارات الأكاديمية";fab.innerHTML=svg("plus");fab.onclick=()=>AC6.openQuick();document.body.appendChild(fab);}
     }catch(e){console.error("Academy shell:",e)}
   };
