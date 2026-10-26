@@ -1,12 +1,12 @@
 'use strict';
 
-function todayInRiyadh() {
+function todayInRiyadh(value) {
   const parts = new Intl.DateTimeFormat('en-CA', {
     timeZone: 'Asia/Riyadh',
     year: 'numeric',
     month: '2-digit',
     day: '2-digit'
-  }).formatToParts(new Date());
+  }).formatToParts(value || new Date());
   const values = {};
   parts.forEach(function (part) { values[part.type] = part.value; });
   return values.year + '-' + values.month + '-' + values.day;
@@ -24,8 +24,10 @@ module.exports = async function footballFixtures(req, res) {
   const demoMode = process.env.VERCEL_ENV === 'preview' && String((req.query && req.query.demo) || '') === '1';
   if (demoMode) {
     const date = todayInRiyadh();
+    const liveKickoff = new Date(Date.now() - 62 * 60 * 1000);
+    const liveStillToday = todayInRiyadh(liveKickoff) === date;
     const fixtures = [
-      { id: 'demo-roshn-' + date, date: date + 'T18:00:00+03:00', status: 'LIVE', elapsed: 62, home: 'الهلال', away: 'النصر', league_name: 'Saudi Pro League', country: 'Saudi Arabia', goals: { home: 2, away: 1 }, demo: true },
+      { id: 'demo-roshn-' + date, date: liveStillToday ? liveKickoff.toISOString() : date + 'T18:00:00+03:00', status: liveStillToday ? 'LIVE' : 'NS', elapsed: liveStillToday ? 62 : null, home: 'الهلال', away: 'النصر', league_name: 'Saudi Pro League', country: 'Saudi Arabia', goals: liveStillToday ? { home: 2, away: 1 } : { home: null, away: null }, demo: true },
       { id: 'demo-ucl-' + date, date: date + 'T20:30:00+03:00', status: 'NS', elapsed: null, home: 'ريال مدريد', away: 'بايرن ميونخ', league_name: 'UEFA Champions League', country: 'Europe', goals: { home: null, away: null }, demo: true },
       { id: 'demo-epl-' + date, date: date + 'T22:00:00+03:00', status: 'NS', elapsed: null, home: 'أرسنال', away: 'مانشستر سيتي', league_name: 'Premier League', country: 'England', goals: { home: null, away: null }, demo: true },
       { id: 'demo-laliga-' + date, date: date + 'T16:15:00+03:00', status: 'FT', elapsed: 90, home: 'برشلونة', away: 'أتلتيكو مدريد', league_name: 'La Liga', country: 'Spain', goals: { home: 1, away: 1 }, demo: true }
