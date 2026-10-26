@@ -77,7 +77,8 @@ T.coachHome = async () => {
   const ready = roster.filter(p => !hMap[p.name] || hMap[p.name].state === "available").length;
   const rehab = roster.filter(p => hMap[p.name] && hMap[p.name].state === "rehab").length;
   const out   = roster.filter(p => hMap[p.name] && hMap[p.name].state === "out").length;
-  const stat  = [["جاهز", ready||CO.dash, "#2c6e49"],["تأهيل", rehab||CO.dash, "#c78c00"],["غير متاح", out||CO.dash, "#a83b25"]];
+  const limited = roster.filter(p => hMap[p.name] && hMap[p.name].state === "limited").length;
+  const stat  = [["جاهز", ready||CO.dash, "#2c6e49"],["تأهيل", rehab||CO.dash, "#c78c00"],["بقيود", limited||CO.dash, "#c78c00"],["غير متاح", out||CO.dash, "#a83b25"]];
   const flags = roster.map(p => {
     const h = hMap[p.name], lv = CO.load(att, p.name);
     const last = att.find(a => a.player_name === p.name&&a.present!==false);
