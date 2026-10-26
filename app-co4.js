@@ -160,7 +160,7 @@ T.tactics = async () => {
 };
 
 /* ── فريقي: خيارات تفيد المدرب فعلًا ── */
-CO.SORT = [["load","الأحمال"],["att","الالتزام"],["name","الاسم"],["pos","المركز"]];
+CO.SORT = [["load","انتظام الحضور"],["att","عدد الحصص"],["name","الاسم"],["pos","المركز"]];
 CO.sk = () => "pi_sq_"+(ME&&ME.id);
 CO.sq = () => { try{ return JSON.parse(localStorage.getItem(CO.sk())||"null")||{sort:"load",q:""}; }catch(e){ return {sort:"load",q:""}; } };
 CO.setSq = o => { try{ localStorage.setItem(CO.sk(), JSON.stringify(Object.assign(CO.sq(),o))); }catch(e){} };

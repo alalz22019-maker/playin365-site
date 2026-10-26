@@ -46,12 +46,14 @@ CO.roster = async () => {
   return g === "all" ? mine : mine.filter(p => CO.groupOf(p) === g);
 };
 CO.load = (att, name) => {
-  const d7  = att.filter(a => a.player_name===name && (Date.now()-new Date(a.created_at))/864e5 <= 7).length;
-  const d28 = att.filter(a => a.player_name===name && (Date.now()-new Date(a.created_at))/864e5 <= 28).length;
-  if(!d28) return null;
-  return +(d7 / (d28/4)).toFixed(2);
+  const sessions=new Map();
+  att.filter(a=>a.player_name===name&&a.present!==false).forEach(a=>{const key=CO.sessionKey(a),day=CO.rowDate(a);if(key&&day)sessions.set(key,day);});
+  const ages=[...sessions.values()].map(day=>(Date.now()-Date.parse(day+"T00:00:00Z"))/864e5).filter(days=>days>=0&&days<=28);
+  const d7=ages.filter(days=>days<=7).length,d28=ages.length;
+  if(!d28)return null;
+  return +(d7/(d28/4)).toFixed(2);
 };
-CO.loadInk = v => v==null ? "#b0b5c6" : v>1.3 ? "#e8531f" : v<0.8 ? "#c78c00" : "#2c6e49";
+CO.loadInk = v => v==null ? "#b0b5c6" : v>1.3 ? "#4636e3" : v<0.8 ? "#c78c00" : "#2c6e49";
 CO.HS = {available:["متاح","#2c6e49"],rehab:["تأهيل","#c78c00"],limited:["بقيود","#c78c00"],out:["غير متاح","#a83b25"]};
 
 /* ═══════════ 4a · مساحة المدرب ═══════════ */
@@ -87,7 +89,7 @@ T.coachHome = async () => {
   }).filter(Boolean).slice(0,3);
   const SC = [
     ["✎","أرسل تعليمات","للاعبيك","brief","#efedff","#4636e3"],
-    ["▦","فريقي","الكشف والأحمال","squad","#efedff","#4636e3"],
+    ["▦","فريقي","الكشف والانتظام","squad","#efedff","#4636e3"],
     ["◈","حصة اليوم","الحضور بنقرة","session","#eaf5ee","#2c6e49"],
     ["★","قيّم لاعبًا","بتوقيعك","rate","#fff6d6","#c78c00"],
     ["▤","بنك التمارين","وخطة الحصة","drills","#efedff","#4636e3"],
@@ -187,17 +189,17 @@ T.squad = async () => {
   const mine = all.filter(p => !org || p.org === org);
   const groups = {}; mine.forEach(p => { const g = CO.groupOf(p); if(g) groups[g] = (groups[g]||0)+1; });
   const gsel = CO.grp();
-  const dates = [...new Set(att.map(a => String(a.created_at||"").slice(0,10)))].sort().reverse();
-  const sessions = dates.length;
-  const last2 = dates.slice(0,2);
+  const sessionKeys = [...new Set(att.filter(a=>a.present!==false).map(CO.sessionKey).filter(Boolean))];
+  const sessions = sessionKeys.length;
+  const last2 = sessionKeys.slice(0,2);
   const hex = roster.map(p => {
-    const days = new Set(att.filter(a=>a.player_name===p.name).map(a=>String(a.created_at||"").slice(0,10)));
+    const days = new Set(att.filter(a=>a.player_name===p.name&&a.present!==false).map(CO.sessionKey).filter(Boolean));
     const n = days.size, pct = sessions ? n/sessions : 0;
     const gone = n>0 && last2.length===2 && last2.every(d=>!days.has(d));
     return {n:p.name, v:(p.shirt||String(p.name).trim()[0]), bg: !n?"#f2f0ea": gone?"#fdeee8": pct>=0.9?"#151a2e":"#efedff", ink: !n?"#b0b5c6": gone?"#a83b25": pct>=0.9?"#f5c518":"#4636e3"};
   });
   const SQ = (typeof CO.sq==="function") ? CO.sq() : {sort:"load",q:""};
-  const nAtt = n => att.filter(x=>x.player_name===n).length;
+  const nAtt = n => new Set(att.filter(x=>x.player_name===n&&x.present!==false).map(CO.sessionKey).filter(Boolean)).size;
   let rows = roster.map(p => {
     const h = hMap[p.name], lv = CO.load(att, p.name), st = CO.HS[h?h.state:"available"] || CO.HS.available;
     return {p, st, lv, n:nAtt(p.name), pct: lv==null?0:Math.min(100, Math.round(lv/2*100)), ink: CO.loadInk(lv)};
@@ -214,7 +216,7 @@ T.squad = async () => {
   </div>
   <div style="text-align:center;padding:6px 18px 0">
     <b style="display:block;font-size:26px;font-weight:900;line-height:1.3">فريقي</b>
-    <span style="display:block;font-size:11px;color:#8a8fa5;font-weight:700;margin-top:2px">الكشف: الحالة والشدة لكل لاعب — والأحمال بألوانها</span>
+    <span style="display:block;font-size:11px;color:#8a8fa5;font-weight:700;margin-top:2px">الحالة الطبية المسجلة ومؤشر انتظام الحضور لكل لاعب</span>
   </div>
   <main style="flex:1;padding:16px 18px 118px;display:flex;flex-direction:column;gap:12px">
     ${Object.keys(groups).length?`<div style="display:flex;gap:6px;flex-wrap:wrap">
@@ -228,7 +230,7 @@ T.squad = async () => {
       <span style="display:block;font-size:9.5px;color:#8a8fa5;font-weight:700;margin-top:8px">داكن = التزام فوق <span class="ltr">90%</span> · فاتح = دونه · برتقالي = غياب متتالٍ · رمادي = بلا حصة موقّعة</span>`
       :CO.empty("لا كشف بعد — أنشئ مجموعتك الأولى أو اقبل دعوة أكاديمية")}`)}
 
-    ${CO.card(`<div style="display:flex;justify-content:space-between;align-items:baseline">${CO.h("الكشف والأحمال")}<span style="font-size:10px;color:#8a8fa5;font-weight:800">المنطقة الآمنة <span class="ltr">0.8 – 1.3</span></span></div>
+    ${CO.card(`<div style="display:flex;justify-content:space-between;align-items:baseline">${CO.h("الكشف والانتظام")}<span style="font-size:10px;color:#8a8fa5;font-weight:800">مقارنة بمتوسط آخر ٤ أسابيع <span class="ltr">0.8 – 1.3</span></span></div>
       <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
         <input value="${CO.esn(SQ.q)}" oninput="sqFind(this.value)" placeholder="ابحث باسم أو مركز" style="flex:1;min-width:120px;border:1px solid #e9e4d8;border-radius:11px;padding:8px 11px;font:700 11px Cairo;background:#faf8f3">
         ${(CO.SORT||[]).map(([k,lb])=>`<button onclick="sqSort('${k}')" style="flex:none;background:${SQ.sort===k?"#151a2e":"#faf8f3"};color:${SQ.sort===k?"#faf8f3":"#5b6078"};border:1px solid ${SQ.sort===k?"#151a2e":"#e9e4d8"};border-radius:999px;padding:7px 11px;font:900 10px Cairo;cursor:pointer">${lb}</button>`).join("")}
@@ -246,7 +248,7 @@ T.squad = async () => {
         <button onclick="sqSheet('${CO.esn(r.p.name)}')" style="background:#faf8f3;border:1px solid #e9e4d8;border-radius:10px;color:#4636e3;font:900 12px Cairo;cursor:pointer;flex:none;padding:7px 10px">⋯</button></div>`).join("")
       :CO.empty(SQ.q?"لا نتيجة لبحثك":"لا لاعبين في هذه الفئة")}`)}
 
-    ${bench.length?CO.card(`<div style="display:flex;justify-content:space-between;align-items:baseline">${CO.h(`الاحتياط · <span class="ltr">${bench.length}</span>`)}<span style="font-size:10px;color:#8a8fa5;font-weight:800">أقلّهم حملًا — جاهزون</span></div>
+    ${bench.length?CO.card(`<div style="display:flex;justify-content:space-between;align-items:baseline">${CO.h(`الاحتياط · <span class="ltr">${bench.length}</span>`)}<span style="font-size:10px;color:#8a8fa5;font-weight:800">أقل حضورًا مؤخرًا — راجع الحالة</span></div>
       <div style="display:flex;gap:8px;margin-top:10px;overflow-x:auto">
         ${bench.map(b=>`<div style="flex:none;width:64px;text-align:center;background:#faf8f3;border:1px solid #e9e4d8;border-radius:16px;padding:8px 4px">
           <b class="ltr" style="display:block;font-size:16px;color:#4636e3">${b.p.shirt||CO.dash}</b>
@@ -260,7 +262,7 @@ T.squad = async () => {
       <button onclick="go('brief')" style="background:#fff;color:#151a2e;border:1px solid #e9e4d8;border-radius:14px;padding:12px;font:900 12px Cairo;cursor:pointer">تعليمات للكشف</button>
       <button onclick="go('rate')" style="background:#fff;color:#151a2e;border:1px solid #e9e4d8;border-radius:14px;padding:12px;font:900 12px Cairo;cursor:pointer">قيّم لاعبًا</button>
     </div>
-    ${CO.note("الحمل محسوب من حصص موقّعة: نسبة أسبوعك إلى متوسط أربعة أسابيع. والحالة الطبية يكتبها المختص — يظهر لك أثرها التشغيلي لا سببها.")}
+    ${CO.note("مؤشر انتظام الحضور يقارن آخر ٧ أيام بمتوسط أربعة أسابيع؛ ولا يعبّر عن شدة التدريب أو حالة طبية. الحالة الطبية يحدّثها المختص.")}
   </main>`;
 };
 
@@ -384,7 +386,7 @@ T.session = async () => {
   </div>
   <div style="text-align:center;padding:6px 18px 0">
     <b style="display:block;font-size:26px;font-weight:900;line-height:1.3">حصة اليوم</b>
-    <span style="display:block;font-size:11px;color:#8a8fa5;font-weight:700;margin-top:2px">الحضور بنقرة · التقسيمات · الأحمال</span>
+    <span style="display:block;font-size:11px;color:#8a8fa5;font-weight:700;margin-top:2px">الحضور بنقرة · تقسيم الفريق · سجل الحضور</span>
   </div>
   <main style="flex:1;padding:16px 18px 118px;display:flex;flex-direction:column;gap:12px">
     <div style="position:relative;overflow:hidden;background:#151a2e;border-radius:22px;padding:18px;color:#faf8f3">${CO.disc()}
@@ -414,21 +416,21 @@ T.session = async () => {
         <span style="font-size:9.5px;font-weight:900;border-radius:999px;padding:3px 8px;flex:none;background:${p.tagBg};color:${p.tagInk}">${p.tag}</span></div>`).join("")}</div>
       <button onclick="go('drills')" style="display:block;width:100%;margin-top:8px;background:none;border:0;text-align:center;font:900 11px Cairo;color:#4636e3;cursor:pointer">+ تمرين من البنك ←</button>`)}
 
-    ${gr.length>1?CO.card(`<div style="display:flex;justify-content:space-between;align-items:baseline">${CO.h(`التقسيمات · <span class="ltr">${gr.length}</span> مجموعات`)}<span style="font-size:10px;color:#8a8fa5;font-weight:800">موازنة بالحمل</span></div>
+    ${gr.length>1?CO.card(`<div style="display:flex;justify-content:space-between;align-items:baseline">${CO.h(`التقسيمات · <span class="ltr">${gr.length}</span> مجموعات`)}<span style="font-size:10px;color:#8a8fa5;font-weight:800">تقسيم يشمل كامل الكشف</span></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
         ${gr.map((g,i)=>`<div style="background:#faf8f3;border:1px solid #e9e4d8;border-radius:15px;padding:10px">
           <div style="display:flex;justify-content:space-between"><b style="font-size:11px;font-weight:900">مجموعة ${["أ","ب","ج","د"][i]}</b><b class="ltr" style="font-size:10.5px;color:#4636e3">${g.length}</b></div>
           <span style="display:block;font-size:9.5px;color:#5b6078;font-weight:700;margin-top:4px;line-height:1.6">${g.map(p=>esc(String(p.name).split(" ")[0])).join(" · ")}</span></div>`).join("")}
       </div>`):""}
 
-    ${CO.card(`<div style="display:flex;justify-content:space-between;align-items:baseline">${CO.h("أحمال ما بعد الحصة")}<span style="font-size:10px;color:#8a8fa5;font-weight:800">اللاعب يسجّل شدّته <span class="ltr">1 – 10</span></span></div>
-      ${(()=>{ const wk=[...Array(8)].map((_,i)=>att.filter(a=>{const d=(Date.now()-new Date(a.created_at))/864e5; return d>=(7-i)*7 && d<(8-i)*7;}).length);
+    ${CO.card(`<div style="display:flex;justify-content:space-between;align-items:baseline">${CO.h("سجل حضور الفريق")}<span style="font-size:10px;color:#8a8fa5;font-weight:800">عدد المشاركات المسجلة خلال آخر ٨ أسابيع <span class="ltr">1 – 10</span></span></div>
+      ${(()=>{ const wk=[...Array(8)].map((_,i)=>{const seen=new Set();att.forEach(a=>{const age=(Date.now()-Date.parse(CO.rowDate(a)+"T00:00:00Z"))/864e5;if(a.present!==false&&age>=(7-i)*7&&age<(8-i)*7)seen.add(CO.sessionKey(a)+"|"+a.player_name);});return seen.size;});
         const mx=Math.max(...wk,1), X=i=>10+i*(320/7), Y=v=>78-(v/mx)*56;
-        if(!att.length) return CO.empty("يظهر المنحنى بعد أول حصص توقّعها");
+        if(!att.length) return CO.empty("يظهر المنحنى بعد تسجيل أول حضور");
         return `<svg viewBox="0 0 340 90" style="width:100%;height:90px;display:block;margin-top:8px">
           <polyline points="${wk.map((v,i)=>X(i).toFixed(0)+","+Y(v).toFixed(0)).join(" ")}" fill="none" stroke="#4636e3" stroke-width="2.5" stroke-linejoin="round"></polyline>
           <line x1="10" y1="84" x2="330" y2="84" stroke="#e9e4d8"></line></svg>
-        <span style="display:block;font-size:9.5px;color:#8a8fa5;font-weight:700;margin-top:4px">حصص جهتك في ثمانية أسابيع — أعلى أسبوع <span class="ltr">${mx}</span></span>`; })()}`)}
+        <span style="display:block;font-size:9.5px;color:#8a8fa5;font-weight:700;margin-top:4px">مشاركات اللاعبين خلال ثمانية أسابيع — أعلى أسبوع <span class="ltr">${mx}</span></span>`; })()}`)}
   </main>`;
 };
 
@@ -540,6 +542,6 @@ T.drills = async () => {
 Object.assign(CO.TITLE, {
   coachHome: ["مساحة المدرب","فريقك اليوم — من يحضر ومن يحتاجك"],
   squad:     ["فريقي","الحالة والشدة لكل لاعب"],
-  session:   ["حصة اليوم","الحضور بنقرة · التقسيمات · الأحمال"],
+  session:   ["حصة اليوم","الحضور بنقرة · تقسيم الفريق · سجل الحضور"],
   drills:    ["بنك التمارين","ابنِ حصتك وانشرها باسمك"]
 });
