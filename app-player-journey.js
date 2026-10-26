@@ -221,6 +221,31 @@
       shareNotice('الهوية غير منشورة للعامة بعد.');
       return;
     }
+    if (previewDemoMode()) {
+      var playerName = String(name || (ME && ME.name) || '').trim();
+      var shareUrl = location.origin + location.pathname + '?player=' + encodeURIComponent(playerName) + '&demo=1';
+      try {
+        if (navigator.share) {
+          await navigator.share({ title: 'PlayIn365 — هوية اللاعب التجريبية', url: shareUrl });
+          return;
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(shareUrl);
+          shareNotice('تم نسخ رابط الهوية التجريبية.');
+          return;
+        }
+      } catch (_) {
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(shareUrl);
+            shareNotice('تم نسخ رابط الهوية التجريبية.');
+            return;
+          }
+        } catch (__) {}
+      }
+      shareNotice('تعذرت مشاركة رابط المعاينة من هذا المتصفح.');
+      return;
+    }
     return baseShare.apply(this, arguments);
   };
   function isAttended(row) { return !!(row && (row.attended === true || row.attended === 'true' || row.attended === 1)); }
