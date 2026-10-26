@@ -13,6 +13,19 @@ ACD.disc  = (c,o) => `<div style="position:absolute;inset-inline-start:62%;top:-
 ACD.sq    = (t,bg,ink,sz) => `<span style="width:${sz||36}px;height:${sz||36}px;border-radius:${Math.round((sz||36)*.3)}px;background:${bg||"#efedff"};color:${ink||"#4636e3"};display:grid;place-items:center;font-size:${Math.round((sz||36)*.4)}px;font-weight:900;flex:none">${t}</span>`;
 ACD.grpOf = a => a ? (a<=13?"U13":a<=14?"U14":a<=15?"U15":a<=16?"U16":a<=17?"U17":a<=19?"U19":a<=23?"U23":"SEN") : null;
 ACD.ini   = s => { const t=String(s||"").replace("أكاديمية","").trim(); return (t.indexOf("ال")===0?t.slice(2):t).trim()[0] || "أ"; };
+ACD.av = (name, size=36, opts={}) => {
+  if (typeof PL3!=="undefined" && PL3 && typeof PL3.av==="function") return PL3.av(name,size,opts);
+  const label=String(name||"").trim();
+  const initials=(label.split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join("")||"أ");
+  const px=Math.max(18,Number(size)||36);
+  const radius=opts.r||Math.round(px*.3)+"px";
+  const ring=opts.ring||"1px solid rgba(123,92,255,.28)";
+  const url=String(opts.url||"");
+  const image=(url.startsWith("https://")||url.startsWith("http://"))
+    ? '<img src="'+ACD.esn(url)+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit">'
+    : ACD.esn(initials);
+  return '<span aria-hidden="true" style="display:grid;place-items:center;overflow:hidden;flex:none;width:'+px+'px;height:'+px+'px;border-radius:'+radius+';background:'+(opts.dark?"linear-gradient(145deg,#28265d,#151a2e)":"#efedff")+';color:'+(opts.dark?"#f5c518":"#4636e3")+';border:'+ring+';font:900 '+Math.round(px*.42)+'px Cairo">'+image+'</span>';
+};
 ACD.who   = () => (typeof PARAM!=="undefined" && PARAM) || (ME && ME.org) || "";
 ACD.mine  = () => ME && ME.role==="academy" && (!PARAM || PARAM===ME.org);
 ACD.back  = v => `<button onclick="${v?`go('${v}','${ACD.esn(ACD.who())}')`:"back()"}" style="width:40px;height:40px;border-radius:12px;background:#fff;border:1px solid #e9e4d8;display:grid;place-items:center;font-size:15px;cursor:pointer;font-family:Cairo">→</button>`;
@@ -164,7 +177,7 @@ T.acadPride = async () => {
         <rect x="140" y="96" width="60" height="20" rx="8" fill="#151a2e"></rect><text x="170" y="110" text-anchor="middle" font-family="Cairo" font-weight="900" font-size="9" fill="#f5c518">${esc(org.replace("أكاديمية","").trim())}</text></svg>
       ${D.alumni.slice(0,4).map(a=>{const K=KD[a.dest_kind]||KD.club;
         return `<div style="display:flex;gap:11px;align-items:center;padding:10px 0;border-top:1px solid #f0ece2">
-          ${PL3.av(a.player_name,40,{dark:true,r:"50% 50% 50% 10px"})}
+          ${ACD.av(a.player_name,40,{dark:true,r:"50% 50% 50% 10px"})}
           <div style="flex:1;min-width:0"><b style="display:block;font-size:12px">${esc(a.player_name)}</b><span style="display:block;font-size:10px;color:#8a8fa5;font-weight:700;margin-top:2px">${a.group_name?`<span class="ltr">${esc(a.group_name)}</span> · `:""}انتقل <span class="ltr">${a.dest_year||ACD.dash}</span> · أشرف عليه ${esc(a.coach_name)}</span></div>
           <span style="flex:none;background:${K[2]};color:${K[1]};border-radius:999px;padding:5px 10px;font-size:9.5px;font-weight:900">${esc(a.dest).split("—")[0].trim()}</span></div>`;}).join("")}
       <span style="display:block;font-size:9.5px;color:#8a8fa5;font-weight:700;margin-top:9px;line-height:1.8">يظهر الخرّيج هنا بشهادة المدرب الذي أشرف عليه — ويظهر في «متخرّجون من تحت إدارتك» في ملفه.</span>`
@@ -203,14 +216,14 @@ T.acadTeams = async () => {
         <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><b style="font-size:12.5px;font-weight:900">${t.t}</b><span style="font-size:10px;font-weight:900;color:${t.seatInk}">${t.seats}</span></div>
         <span style="display:block;font-size:10px;color:#8a8fa5;font-weight:700;margin-top:2px">${t.s}</span>
         <div style="display:flex;align-items:center;gap:8px;margin-top:7px">
-          ${t.coach?PL3.av(t.coach.name,22,{role:"coach",url:t.coach.avatar_url,dark:true,r:"50% 50% 6px 50%"}):""}
+          ${t.coach?ACD.av(t.coach.name,22,{role:"coach",url:t.coach.avatar_url,dark:true,r:"50% 50% 6px 50%"}):""}
           <span style="font-size:9.5px;font-weight:800;color:#5b6078">${t.coach?esc(t.coach.name)+(t.cert?" · "+t.cert:""):"يُعلَن — معتمد فقط"}</span>
           <button onclick="acApply('${ACD.esn(org)}','${t.g}')" style="margin-inline-start:auto;background:none;border:0;font:900 10px Cairo;color:#4636e3;cursor:pointer;padding:0">${t.cta} ←</button></div></div></div>`).join("")
     :ACD.empty("لا فئات مسجّلة بعد — تظهر من كشوف الأكاديمية")}
     ${gk.length?`<div style="background:#fff;border:1px solid #e9e4d8;border-radius:20px;padding:14px 15px;display:flex;gap:12px;align-items:center">
       <span style="width:54px;height:54px;border-radius:14px;display:grid;place-items:center;flex:none;background:#efedff;color:#4636e3"><span class="ltr" style="font-size:15px;font-weight:700">GK</span></span>
       <div style="flex:1;min-width:0"><b style="display:block;font-size:12.5px;font-weight:900">مدرسة الحراس — كل الفئات</b><span style="display:block;font-size:10px;color:#8a8fa5;font-weight:700;margin-top:2px">حصتان تخصصيتان</span>
-        <div style="display:flex;align-items:center;gap:8px;margin-top:7px">${PL3.av(gk[0].name,22,{role:"coach",dark:true,r:"50% 50% 6px 50%"})}<span style="font-size:9.5px;font-weight:800;color:#5b6078">${esc(gk[0].name)} · مدرب حراس</span></div></div></div>`:""}
+        <div style="display:flex;align-items:center;gap:8px;margin-top:7px">${ACD.av(gk[0].name,22,{role:"coach",dark:true,r:"50% 50% 6px 50%"})}<span style="font-size:9.5px;font-weight:800;color:#5b6078">${esc(gk[0].name)} · مدرب حراس</span></div></div></div>`:""}
     <div style="position:relative;overflow:hidden;background:#151a2e;border-radius:22px;padding:18px;color:#faf8f3">${ACD.disc()}
       <div style="position:relative">
         <span style="display:block;font-size:10px;color:#b9b0f5;font-weight:900">تجربة أداء ${nextTry?"مفتوحة":""}</span>
@@ -310,7 +323,7 @@ T.acadHub = async () => {
       </div></div>`:""}
     ${false?ACD.card(`<div style="display:flex;justify-content:space-between;align-items:baseline">${ACD.h("لاعب الشهر — من الأحداث الموثّقة")}<span style="font-size:10px;color:#8a8fa5;font-weight:800">اجتماعي · لا يدخل التقييم</span></div>
       ${poll.length?poll.map(([n,c],i)=>`<div style="display:flex;gap:11px;align-items:center;padding:10px 0;border-top:1px solid #f0ece2">
-        ${PL3.av(n,40,{dark:true,r:"50% 50% 50% 10px"})}
+        ${ACD.av(n,40,{dark:true,r:"50% 50% 50% 10px"})}
         <div style="flex:1;min-width:0"><div style="display:flex;justify-content:space-between;font-size:11.5px;font-weight:900"><span>${esc(n)}</span><b class="ltr" style="color:${i===0?"#4636e3":"#b9b0f5"}">${Math.round(c/tot*100)}%</b></div><div style="height:7px;background:#f0ece2;border-radius:99px;overflow:hidden;margin-top:6px"><div style="height:100%;background:${i===0?"#4636e3":"#b9b0f5"};width:${Math.round(c/tot*100)}%"></div></div><span style="display:block;font-size:9.5px;color:#8a8fa5;font-weight:700;margin-top:4px"><span class="ltr">${c}</span> ${c===1?"حدث موثّق":"أحداث موثّقة"} هذا الشهر</span></div>
         <button onclick="clapPlayer('${ACD.esn(n)}')" style="background:#efedff;color:#4636e3;border:0;border-radius:10px;padding:8px 10px;font:900 11px Cairo;cursor:pointer;flex:none">👏</button></div>`).join("")
       :`<div style="margin-top:10px">${ACD.empty("لا أحداث موثّقة هذا الشهر بعد — المرشّحون يظهرون من الأهداف والصناعات التي يوقّعها الحكّام")}</div>`}
@@ -319,7 +332,7 @@ T.acadHub = async () => {
     ${ACD.card(`<div style="display:flex;justify-content:space-between;align-items:baseline">${ACD.h("الساحة — ما جرى حول "+esc(short))}<span style="font-size:10px;color:#8a8fa5;font-weight:800">كل سطر باسم صاحبه</span></div>
       ${wall.length?wall.map(w=>{const R=(w.role==="مدرب"?ROLE.coach:ROLE.player);
         return `<div style="display:flex;gap:10px;align-items:flex-start;padding:11px 0;border-top:1px solid #f0ece2">
-          ${PL3.av(w.who,36,{role:w.role==="مدرب"?"coach":"",dark:true,r:w.role==="مدرب"?"50% 50% 9px 50%":"50% 50% 50% 9px"})}
+          ${ACD.av(w.who,36,{role:w.role==="مدرب"?"coach":"",dark:true,r:w.role==="مدرب"?"50% 50% 9px 50%":"50% 50% 50% 9px"})}
           <div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap"><b style="font-size:11.5px">${esc(w.who)}</b><span style="background:${R[1]};color:${R[2]};border-radius:999px;padding:2px 8px;font-size:8.5px;font-weight:900">${esc(w.role)}</span><span style="font-size:9px;color:#8a8fa5;font-weight:700">${VW.rel(w.at)}</span></div>
             <span style="display:block;font-size:11px;font-weight:700;color:#151a2e;line-height:1.75;margin-top:4px">${esc(w.txt)}</span></div></div>`;}).join("")
       :`<div style="margin-top:10px">${ACD.empty("الساحة تمتلئ من نشاط موثّق — حضور، أحداث، تصحيحات")}</div>`}`)}
