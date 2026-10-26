@@ -13,6 +13,8 @@ CH.DRILLS=[
   {k:"gk",ar:"حراسة — تصدٍّ وتوزيع",aim:"tech",min:20,grp:"حرّاس",d:"ردة الفعل والتوزيع الأول"}
 ];
 CH.AIM={tactic:{ar:"تكتيكي",c:"#4636e3"},tech:{ar:"مهاري",c:"#c78c00"},phys:{ar:"بدني",c:"#e8531f"},recover:{ar:"استشفاء",c:"#2c6e49"}};
+CH.ageOf=p=>{const n=Number(p&&p.age);if(Number.isFinite(n)&&n>=4&&n<=60)return n;const raw=String(p&&(p.group_name||p.age_group||p.cohort)||"").replace(/[٠-٩]/g,c=>String("٠١٢٣٤٥٦٧٨٩".indexOf(c)));const m=raw.match(/[0-9]+/);return m?Number(m[0]):null;};
+CH.suitable=(d,roster)=>{const team=roster||[];if(d.grp==="كل الفئات")return true;if(d.grp==="حرّاس")return team.some(p=>String(p.pos||"").includes("حارس"));const m=String(d.grp||"").match(/^U([0-9]+)/i);if(!m)return true;const ages=team.map(CH.ageOf).filter(n=>n!==null);return !ages.length||Math.min(...ages)>=Number(m[1]);};
 
 /* ── مخطط الحصة المحلي (يبقى مع المدرب) ── */
 CH.pkey=()=>`pi_plan_${ME.id}`;
@@ -42,6 +44,7 @@ window.chPublish=async()=>{
   const roster=await CO.roster();
   const names=[...new Set(roster.map(x=>String(x.name||"").trim()).filter(Boolean))];
   if(!names.length)return toast("لا يوجد لاعبون في الفئة المختارة",1);
+  if(items.some(d=>!CH.suitable(d,roster)))return toast("بعض التمارين لا تناسب الفئة المختارة؛ أزلها أو اختر الفئة المناسبة",1);
   CH._publishing=true;
   try{
     const prior=await q("c",sb.from("calendar_items").select("player_name,title,on_date,created_by").eq("created_by",ME.name).eq("on_date",plannedDate).eq("kind","training").eq("title",title).limit(500));
@@ -67,7 +70,12 @@ T.sessions=async()=>{
     q("a",sb.from("attendance").select("*").eq("recorded_by",ME.name).order("created_at",{ascending:false}).limit(200)),
     q("c",sb.from("calendar_items").select("*").eq("created_by",ME.name).order("on_date",{ascending:false}).limit(40))
   ]);
+  const allRoster=CO._roster||roster;
+  const groups=[...new Set(allRoster.map(p=>CO.groupOf(p)).filter(Boolean))];
+  const groupOptions=[["كل الفئات","all",allRoster.length],...groups.map(g=>[g,g,allRoster.filter(p=>CO.groupOf(p)===g).length])];
+  const eligible=CH.DRILLS.filter(d=>CH.suitable(d,roster));
   const plan=CH.plan().map(k=>CH.DRILLS.find(d=>d.k===k)).filter(Boolean);
+  const incompatible=plan.filter(d=>!CH.suitable(d,roster));
   const mins=plan.reduce((s,d)=>s+d.min,0);
   const byAim={};plan.forEach(d=>{byAim[d.aim]=(byAim[d.aim]||0)+d.min});
   const validAtt=att.filter(a=>a.present!==false);
@@ -77,7 +85,7 @@ T.sessions=async()=>{
   const uniqueSessions=new Set((CO.sessionsOf?CO.sessionsOf(cal):cal.filter(c=>c.kind==="training")).map(c=>String(c.on_date||"").slice(0,10)+"|"+c.title+"|"+(c.at_time||""))).size;
   const recipients=[...new Set(roster.map(x=>String(x.name||"").trim()).filter(Boolean))];
   const filt=(()=>{try{return localStorage.getItem("pi_drill_f")||"all"}catch(e){return "all"}})();
-  const shown=filt==="all"?CH.DRILLS:CH.DRILLS.filter(d=>d.aim===filt);
+  const shown=filt==="all"?eligible:eligible.filter(d=>d.aim===filt);
   
   return `<main>
   <div class="stage" style="border-radius:26px">
@@ -86,6 +94,14 @@ T.sessions=async()=>{
         <span style="display:block;font-size:11.5px;color:#c6cade;font-weight:500;line-height:1.85;margin-top:5px">ابنِ الحصة من مكتبة التمارين، راجع الفئة والموعد، ثم أرسلها إلى لاعبيك باسمك.</span></div>
       <div style="text-align:center;flex:none"><b class="ltr" style="display:block;font-family:'Space Grotesk';font-size:22px;color:#f5c518">${uniqueSessions}</b><span style="font-size:8.5px;color:#9aa0b8;font-weight:800">حصة منشورة</span></div>
     </div>
+  </div>
+
+  <div class="card" style="border-radius:26px">
+    <b class="h2" style="color:#4636e3;display:block;margin-bottom:9px">الفئة المستهدفة</b>
+    <div style="display:flex;gap:6px;overflow-x:auto;padding:2px 0">
+      ${groupOptions.map(([label,value,count])=>`<button onclick="coGrp('${CO.esn(value)}')" style="flex:none;background:${CO.grp()===value?"#151a2e":"#faf8f3"};color:${CO.grp()===value?"#fff":"#5b6078"};border:1px solid ${CO.grp()===value?"#151a2e":"#e9e4d8"};border-radius:999px;padding:7px 11px;font:900 10px Cairo;cursor:pointer">${CO.esn(label)} · <span class="ltr">${count}</span></button>`).join("")}
+    </div>
+    <span class="muted" style="display:block;margin-top:7px">تعرض المكتبة التمارين الملائمة لأعمار المجموعة المختارة.</span>
   </div>
 
   <div class="card" style="border-radius:26px">
@@ -102,6 +118,7 @@ T.sessions=async()=>{
           <span style="width:28px;height:28px;flex:none;border-radius:9px;background:${CH.AIM[d.aim].c};color:#fff;display:grid;place-items:center;font-family:'Space Grotesk';font-weight:700;font-size:12px">${i+1}</span>
           <div style="flex:1;min-width:0"><b style="font-size:12px;display:block">${esc(d.ar)}</b><span class="muted"><span class="ltr">${d.min}</span> دقيقة · ${esc(d.grp)}</span></div>
           <button onclick="chRm('${d.k}')" style="background:none;border:0;color:#a83b25;font:900 15px Cairo;cursor:pointer;flex:none;padding:4px 8px">×</button></div>`).join("")}</div>
+      ${incompatible.length?`<div style="background:#fff8df;border:1px solid #f0e2b4;border-radius:13px;padding:10px;font-size:10px;color:#8a6912;font-weight:800;line-height:1.8">أزل التمرين غير الملائم للفئة قبل النشر: ${incompatible.map(d=>esc(d.ar)).join("، ")}</div>`:""}
       <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:8px;margin-top:12px">
         <label style="font-size:10px;font-weight:900;color:#5b6078">تاريخ الحصة
           <input type="date" value="${CH.date()}" min="${CH.today()}" onchange="chDate(this.value)" style="display:block;width:100%;margin-top:5px;border:1px solid #e9e4d8;border-radius:11px;padding:9px 8px;font:800 11px Cairo;background:#faf8f3;color:#151a2e"></label>
@@ -110,7 +127,7 @@ T.sessions=async()=>{
       </div>
       <span class="muted" style="display:block;margin-top:7px">ستصل إلى <span class="ltr">${recipients.length}</span> لاعبًا في ${CO.grp&&CO.grp()!=="all"?CO.grp():"كل الفئات"}</span>
       <div style="display:flex;gap:8px;margin-top:13px">
-        <button class="btn" style="flex:1" onclick="chPublish()">انشر في تقويم لاعبيك</button>
+        <button class="btn" ${incompatible.length?"disabled":""} style="flex:1;${incompatible.length?"opacity:.5;":""}" onclick="chPublish()">انشر في تقويم لاعبيك</button>
         <button class="btn ghost" style="flex:none;width:auto;padding:13px 17px" onclick="chClear()">أفرغ</button></div>
     `:`<div style="border:1.5px dashed #d5d0c4;border-radius:16px;padding:20px;text-align:center">
       <b style="font-size:12.5px">ابنِ حصتك من المكتبة أدناه</b>
@@ -120,13 +137,13 @@ T.sessions=async()=>{
   <div class="card" style="border-radius:26px">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:11px">
       <b class="h2" style="color:#4636e3">مكتبة التمارين</b>
-      <span class="muted"><span class="ltr">${CH.DRILLS.length}</span> تمرين</span></div>
+      <span class="muted"><span class="ltr">${eligible.length}</span> تمرين مناسب</span></div>
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
       <button onclick="drillFilt('all')" style="background:${filt==="all"?"#4636e3":"#faf8f3"};color:${filt==="all"?"#fff":"#565d78"};border:1px solid ${filt==="all"?"#4636e3":"#e9e4d8"};border-radius:999px;padding:7px 15px;font:900 11px Cairo;cursor:pointer">الكل</button>
       ${Object.entries(CH.AIM).map(([k,a])=>`<button onclick="drillFilt('${k}')" style="background:${filt===k?a.c:"#faf8f3"};color:${filt===k?"#fff":"#565d78"};border:1px solid ${filt===k?a.c:"#e9e4d8"};border-radius:999px;padding:7px 15px;font:900 11px Cairo;cursor:pointer">${a.ar}</button>`).join("")}
     </div>
     <div style="display:flex;flex-direction:column;gap:8px">
-      ${shown.map(d=>{const inPlan=CH.plan().includes(d.k);const A=CH.AIM[d.aim];
+      ${shown.length?shown.map(d=>{const inPlan=CH.plan().includes(d.k);const A=CH.AIM[d.aim];
         return `<div style="display:flex;align-items:center;gap:11px;background:${inPlan?"#f6f5ff":"#faf8f3"};border:1px solid ${inPlan?"#ddd8fb":"#e9e4d8"};border-radius:16px;padding:11px 13px">
           <span style="width:5px;height:38px;flex:none;border-radius:99px;background:${A.c}"></span>
           <div style="flex:1;min-width:0">
@@ -136,7 +153,7 @@ T.sessions=async()=>{
               <span style="background:#fff;border:1px solid #e9e4d8;color:${A.c};border-radius:6px;padding:2px 9px;font-size:9.5px;font-weight:900">${A.ar}</span>
               <span style="background:#fff;border:1px solid #e9e4d8;color:#8a8fa5;border-radius:6px;padding:2px 9px;font-size:9.5px;font-weight:800"><span class="ltr">${d.min}</span> د</span>
               <span style="background:#fff;border:1px solid #e9e4d8;color:#8a8fa5;border-radius:6px;padding:2px 9px;font-size:9.5px;font-weight:800">${esc(d.grp)}</span></div></div>
-          <button onclick="chAdd('${d.k}')" ${inPlan?"disabled":""} style="width:34px;height:34px;flex:none;border-radius:11px;background:${inPlan?"#efedff":"#4636e3"};color:${inPlan?"#4636e3":"#fff"};border:0;font:900 17px Cairo;cursor:${inPlan?"default":"pointer"}">${inPlan?"✓":"+"}</button></div>`}).join("")}
+          <button onclick="chAdd('${d.k}')" ${inPlan?"disabled":""} style="width:34px;height:34px;flex:none;border-radius:11px;background:${inPlan?"#efedff":"#4636e3"};color:${inPlan?"#4636e3":"#fff"};border:0;font:900 17px Cairo;cursor:${inPlan?"default":"pointer"}">${inPlan?"✓":"+"}</button></div>`}).join(""):CO.empty("لا توجد تمارين مناسبة في هذا الغرض والفئة")}
     </div>
   </div>
 
