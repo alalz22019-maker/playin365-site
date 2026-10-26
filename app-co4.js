@@ -2,6 +2,9 @@
    يُحمَّل بعد app-co3b.js فيتقدّم عليه. قطرة المدرب أسفل-يمين. */
 const TAC = {};
 TAC.FORMS = {
+  "5 لاعبين": [[1,"حارس"],[2,"دفاع"],[2,"هجوم"]],
+  "7 لاعبين": [[1,"حارس"],[2,"دفاع"],[3,"وسط"],[1,"هجوم"]],
+  "9 لاعبين": [[1,"حارس"],[3,"دفاع"],[3,"وسط"],[2,"هجوم"]],
   "4-3-3":  [[1,"حارس"],[4,"دفاع"],[3,"وسط"],[3,"هجوم"]],
   "4-4-2":  [[1,"حارس"],[4,"دفاع"],[4,"وسط"],[2,"هجوم"]],
   "4-2-3-1":[[1,"حارس"],[4,"دفاع"],[2,"ارتكاز"],[3,"صناعة"],[1,"رأس حربة"]],
@@ -100,6 +103,7 @@ T.tactics = async () => {
   const start = slots.map(s=>st.slots[s.i]).filter(Boolean);
   const bench = roster.filter(p => start.indexOf(p.name)<0 && (st.out||[]).indexOf(p.name)<0 && ok(p));
   const unav = roster.filter(p => !ok(p));
+  const incomplete = start.length < slots.length;
   const rest = roster.filter(p => (st.out||[]).indexOf(p.name)>=0);
   const load = n => CO.load(att, n);
   const chip = (p,sel,on) => `<button onclick="${on}" style="flex:none;width:74px;background:${sel?"#efedff":"#fff"};border:1.5px solid ${sel?"#4636e3":"#e9e4d8"};border-radius:16px;padding:9px 4px;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;font-family:Cairo">
@@ -114,7 +118,7 @@ T.tactics = async () => {
   </div>
   <div style="text-align:center;padding:6px 18px 0">
     <b style="display:block;font-size:26px;font-weight:900;line-height:1.3">التشكيلة والاحتياط</b>
-    <span style="display:block;font-size:11px;color:#8a8fa5;font-weight:700;margin-top:2px">اضغط لاعبين ليتبادلا · واضغط احتياطيًّا ثم مركزًا ليدخل</span>
+    <span style="display:block;font-size:11px;color:#8a8fa5;font-weight:700;margin-top:2px">للفئات الصغيرة اختر 5 أو 7 لاعبين · بدّل المراكز بالسحب والاختيار</span>
   </div>
   <main style="flex:1;padding:16px 18px 118px;display:flex;flex-direction:column;gap:12px">
     <div style="display:flex;gap:6px;overflow-x:auto">
@@ -173,7 +177,7 @@ T.tactics = async () => {
         <input type="time" value="${TAC.time(st)}" onchange="tacTime(this.value)" style="display:block;width:100%;margin-top:5px;border:1px solid #e9e4d8;border-radius:11px;padding:9px 8px;font:800 11px Cairo;background:#fff;color:#151a2e"></label>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-      <button onclick="tacPub2()" style="background:#4636e3;color:#fff;border:0;border-radius:14px;padding:13px 10px;font:900 12px Cairo;cursor:pointer;box-shadow:0 8px 18px rgba(70,54,227,.3)">أعلن التشكيلة</button>
+      <button onclick="tacPub2()" ${incomplete?"disabled":""} style="background:#4636e3;color:#fff;border:0;border-radius:14px;padding:13px 10px;font:900 12px Cairo;cursor:${incomplete?"not-allowed":"pointer"};${incomplete?"opacity:.5;":"box-shadow:0 8px 18px rgba(70,54,227,.3)"}">${incomplete?"أكمل الأساسيين ("+start.length+"/"+slots.length+")":"أعلن التشكيلة"}</button>
       <button onclick="openBoard()" style="background:#fff;color:#151a2e;border:1px solid #e9e4d8;border-radius:14px;padding:13px 10px;font:900 12px Cairo;cursor:pointer">✎ ارسم لوحًا</button></div>
     ${CO.note("الإعلان يصل كل لاعب: الأساسي يعرف مركزه والاحتياطي يعرف موقعه — بتأكيد حضور. والجاهزية الطبية تمنع الإقحام ولا تُتجاوز من الشاشة.")}
   </main>`;
