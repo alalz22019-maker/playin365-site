@@ -36,9 +36,9 @@
       events.push({ id: 'preview-goal-' + i, who: who, match_id: id, type: 'goal', minute: 14 + i * 7, created_at: date + 'T20:00:00+03:00', matches: match, demo: true });
       if (i % 2 === 0) events.push({ id: 'preview-assist-' + i, who: who, match_id: id, type: 'assist', minute: 61, created_at: date + 'T20:20:00+03:00', matches: match, demo: true });
     }
-    [-4, -2, 0].forEach(function (offset, index) {
+    [-5, -2, 0].forEach(function (offset, index) {
       var earned = demoDate(offset, 18);
-      badges.push({ id: 'preview-badge-' + index, title: ['إنجاز تجريبي · أول هدف', 'إنجاز تجريبي · لاعب الجولة', 'إنجاز تجريبي · 1000 دقيقة'][index], earned_at: earned + 'T12:00:00+03:00', demo: true });
+      badges.push({ id: 'preview-badge-' + index, title: ['إنجاز تجريبي · أول هدف', 'إنجاز تجريبي · لاعب الجولة', 'إنجاز تجريبي · هدف وصناعة في مباراة'][index], earned_at: earned + 'T12:00:00+03:00', demo: true });
     });
     return { events: events, joins: joins, badges: badges, career: [], certs: [{ title: 'بطولة اختبار الناشئين — تجريبي', issuer: 'جهة اختبارية · بيانات تجريبية', year: '2026', created_at: demoDate(-2, 20), demo: true }], alumni: [], media: [], matches: matches };
   }
@@ -482,8 +482,11 @@
       var newerStamp = monthStamp(group), olderStamp = older && monthStamp(older);
       var emptyMonths = newerStamp !== null && olderStamp !== null ? newerStamp - olderStamp - 1 : 0;
       if (older && emptyMonths > 0) {
-        var gapHeight = Math.min(62, 12 + emptyMonths * 8);
-        stream += '<div class="pj-time-gap" data-pj-gap-year="' + e(group.year || 'غير مؤرخ') + '" style="--pj-gap-height:' + gapHeight + 'px" title="فترة بين السجلات"><i></i><small>فترة بين السجلات</small></div>';
+        for (var quietStamp = newerStamp - 1; quietStamp > olderStamp; quietStamp--) {
+          var quietYear = Math.floor(quietStamp / 12);
+          var quietMonth = monthNames[((quietStamp % 12) + 12) % 12];
+          stream += '<div class="pj-time-gap" data-pj-gap-year="' + e(quietYear) + '" style="--pj-gap-height:20px" title="' + e(quietMonth + ' ' + quietYear + ' دون سجل') + '"><i></i><small>' + e(quietMonth + ' · ' + quietYear + ' · دون سجل') + '</small></div>';
+        }
       }
     });
     return '<div class="pj-atlas-head"><span class="pj-atlas-line"></span><div class="pj-year-orbit" role="tablist" aria-label="تصفية الرحلة حسب السنة"><button class="pj-year-node is-selected" role="tab" type="button" data-pj-year="all" aria-selected="true" aria-pressed="true"><i>الكل</i><small>المسيرة</small></button>' + years.map(function (year) { return '<button class="pj-year-node" role="tab" type="button" data-pj-year="' + e(year) + '" aria-selected="false" aria-pressed="false"><i>' + e(year) + '</i><small>الموسم</small></button>'; }).join('') + '</div></div><div class="pj-month-stream">' + stream + '</div>';
