@@ -168,7 +168,7 @@ T.hub = async () => {
   const RN = (typeof roleAr!=="undefined"&&roleAr[r])||r;
   const own = HUB.ROLE[r] || HUB.ROLE.player;
   const seen = new Set([...HUB.SHARED,...own].map(x=>x[2]));
-  const markup = `<main style="flex:1;padding:16px 18px 100px;display:flex;flex-direction:column;gap:20px">
+  const markup = `<main style="flex:1;padding:16px 18px 160px;display:flex;flex-direction:column;gap:20px">
     <div style="position:relative;overflow:hidden;background:#151a2e;border-radius:22px;padding:18px;color:#faf8f3">
       <div style="position:absolute;inset-inline-start:62%;top:-70%;width:70%;height:230%;background:linear-gradient(200deg,#4636e3,#7b5cff);border-radius:50%;opacity:.5"></div>
       <div style="position:relative;display:flex;align-items:center;gap:14px">
@@ -185,7 +185,9 @@ T.hub = async () => {
     ${HUB.group("كل الخدمات","ALL SURFACES","#243244",HUB.ALL.filter(x=>!seen.has(x[2])))}
     <div style="background:#fff8df;border:1px solid #f0e2b4;border-radius:16px;padding:13px;font-size:11px;color:#8a6912;font-weight:700;line-height:1.85">ما لا يظهر هنا لا تملك صلاحيته — والصلاحية في القاعدة لا في الشاشة.</div>
   </main>`;
-  return r==="player"&&window.PZ&&typeof window.PZ.page==="function" ? window.PZ.page("hub",markup) : markup;
+  if(r==="player"&&window.PZ&&typeof window.PZ.page==="function") return window.PZ.page("hub",markup);
+  if(r==="coach") return '<header class="pz5-top"><button aria-label="الرئيسية" title="الرئيسية" onclick="go(&quot;coachHome&quot;)">'+window.PZ.icon('back')+'</button><div class="pz5-brand">Play<span>In</span><sup>365</sup></div><button aria-label="ملفي" title="ملفي" onclick="go(&quot;coachMe&quot;)">'+window.PZ.icon('profile')+'</button></header>'+markup;
+  return markup;
 };
 
 (function(){

@@ -50,6 +50,7 @@ PZ.top=function(back){
  var last=isBack?'<button aria-label="الخدمات" title="الخدمات" onclick="window.PZ.go(&quot;hub&quot;)">'+PZ.icon('services')+'</button>':'<button aria-label="هويتي" title="هويتي" onclick="window.PZ.go(&quot;publicView&quot;)">'+PZ.icon('profile')+'</button>';
  return '<header class="pz5-top">'+first+'<div class="pz5-brand">Play<span>In</span><sup>365</sup></div>'+last+'</header>'
 };
+PZ.meta.hub=['services','PLAYIN365 · SHARED NAVIGATION','تنقّل سريع','كل خدمات PlayIn في مكان واحد'];
 PZ.page=function(route,body){
  var markup=String(body||'');
  if(isPreviewDemo()&&markup.indexOf('pz5-demo-banner')<0&&markup.indexOf('pj-demo-banner')<0)markup=demoBanner()+markup;

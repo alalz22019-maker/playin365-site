@@ -431,7 +431,7 @@ T.coachMe = async () => {
   /* عنوان الشاشة: عمود المدرب يتقدّم على العناوين العامة */
   if(typeof PL3 !== "undefined") Object.assign(PL3.TITLE, CO.TITLE);
 
-  CO.OWN = ["coachHome","squad","session","drills","brief","rate","tactics","coachTasks","coachMe"];
+  CO.OWN = ["coachHome","squad","session","drills","brief","rate","tactics","coachTasks","coachMe","hub"];
   CO.nav = () => {
     const items = [["home","الرئيسية","coachHome"],["community","فريقي","squad"],["services","الخدمات","hub"],["match","التشكيلة","tactics"],["profile","ملفي","coachMe"]];
     return '<nav class="pz5-nav coach-bottom-nav">'+items.map(([g,lb,v])=>{
