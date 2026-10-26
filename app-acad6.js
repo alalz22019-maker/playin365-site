@@ -172,6 +172,14 @@
   T.acadProfile=async()=>profile();
   if(typeof NAV!=="undefined")NAV.academy=[[svg("home"),"الرئيسية","acadHome"],[svg("team"),"فريقنا","acadSquads"],[svg("grid"),"الخدمات","hub"],[svg("calendar"),"الحصص","acadSessions"],[svg("user"),"ملفي","acadProfile"]];
   if(typeof TITLES!=="undefined"){TITLES.acad="مساحة الأكاديمية";TITLES.acadHome="مساحة الأكاديمية";TITLES.acadSquads="الفئات والفرق";TITLES.acadSessions="الحصص والحضور";TITLES.acadPerformance="التطوير والتقارير";TITLES.acadProfile="ملف الأكاديمية";}
+  const previousNavHtml6=window.navHtml;
+  const academyNavHtml6=function(){
+    if(!(ME&&ME.role==="academy"))return typeof previousNavHtml6==="function"?previousNavHtml6():"";
+    const items=(typeof NAV!=="undefined"&&NAV.academy)||[];
+    return `<nav class="nav">${items.map(([ic,lb,v])=>`<button class="${VIEW===v?"on":""}" aria-label="${lb}" onclick="go('${v}')"><i>${ic}</i><b>${lb}</b></button>`).join("")}</nav>`;
+  };
+  window.navHtml=academyNavHtml6;
+  if(typeof navHtml==="function")navHtml=academyNavHtml6;
 
   const css=`
     body.r-academy{background:#050711!important;color:#f2f5ff!important}
