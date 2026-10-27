@@ -120,7 +120,7 @@ T.venuePage = async () => {
             ${ext.map(x=>`<span style="background:#fff6d6;border:1px solid #f0e2b4;color:#8a6912;border-radius:9px;padding:6px 10px;font-size:10px;font-weight:800;white-space:nowrap">${esc(x.k)}${x.n?` <span class="ltr">×${x.n}</span>`:""}</span>`).join("")}
           </div>`:""}
           ${!svc.length?`<span style="display:block;font-size:10.5px;font-weight:700;color:${VP.MU};line-height:1.8;margin-top:10px">خدمات هذه المساحة لم تُسجَّل بعد — ولا تُذكر خدمة غير مسجَّلة</span>`:""}
-          ${s.open?`<button onclick="vpBook('${esc(v)}','${esc(s.name)}',${+s.price_hour||0})" style="width:100%;margin-top:13px;background:${VP.P};color:#fff;border:0;border-radius:13px;padding:12px;font:900 12px Cairo;cursor:pointer">اطلب حجز هذه المساحة</button>`:""}
+          ${s.open&&locationReady?`<button onclick="vpBook('${esc(v)}','${esc(s.name)}',${+s.price_hour||0})" style="width:100%;margin-top:13px;background:${VP.P};color:#fff;border:0;border-radius:13px;padding:12px;font:900 12px Cairo;cursor:pointer">اطلب حجز هذه المساحة</button>`:""}
         </div>
       </div>`;}).join("")
       :VP.card(`<div style="text-align:center;padding:8px"><b style="display:block;font-size:13px">لم تُسجَّل مساحات بعد</b>${VP.sub("صفحة الملعب تُبنى من مساحاته — تظهر هنا لحظة يسجّلها")}</div>`)}
@@ -178,7 +178,7 @@ T.venuePage = async () => {
         <div style="position:relative">
           <b style="display:block;font-size:14px;font-weight:900;color:${VP.G}">أرقام هذه الصفحة من السجل لا من الإعلان</b>
           <span style="display:block;font-size:11.5px;font-weight:500;color:#c6cade;line-height:1.9;margin-top:7px">كل رقم هنا محسوب من حجوزات ومباريات مسجَّلة بأسماء أصحابها${M.accredited?" · والاعتماد من رخصة سارية في القاعدة":" · ولا ختم اعتماد بلا رخصة سارية"}. والخدمة غير المسجَّلة لا تُذكر.</span>
-          ${D.free.length?`<button onclick="vpBook('${esc(v)}','',0)" style="margin-top:14px;background:${VP.P};color:#fff;border:0;border-radius:13px;padding:12px 20px;font:900 12px Cairo;cursor:pointer;box-shadow:0 8px 18px rgba(70,54,227,.3)"><span class="ltr">${D.free.length}</span> ساعة شاغرة — احجز الآن</button>`:""}
+          ${canBook&&D.free.length?`<button onclick="vpBook('${esc(v)}','',0)" style="margin-top:14px;background:${VP.P};color:#fff;border:0;border-radius:13px;padding:12px 20px;font:900 12px Cairo;cursor:pointer;box-shadow:0 8px 18px rgba(70,54,227,.3)"><span class="ltr">${D.free.length}</span> ساعة شاغرة — احجز الآن</button>`:""}
         </div>
       </div>
     </div>
