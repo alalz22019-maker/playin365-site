@@ -142,11 +142,11 @@ T.auth=()=>`<main style="justify-content:center">
 window.swTab=i=>{ $("#pnL").style.display=i?"none":"block"; $("#pnS").style.display=i?"block":"none"; $("#tabL").className=i?"btn ghost":"btn"; $("#tabS").className=i?"btn":"btn ghost"; $("#tabL").style.flex=$("#tabS").style.flex="1"; };
 
 T.role=()=>`<main>
-  <div class="stage"><b style="font-size:15px;color:#f5c518">هلا ${esc(ME.name)} 👋</b><p style="margin:7px 0 0;font-size:12px;color:#c6cade;font-weight:600;line-height:1.9">اختر دورك الأساسي — هوية واحدة وأدوار متعددة، وتضيف غيره لاحقًا.</p></div>
+  <div class="stage"><b style="font-size:15px;color:#f5c518">هلا ${esc(ME.name)} 👋</b><p style="margin:7px 0 0;font-size:12px;color:#c6cade;font-weight:600;line-height:1.9">${ME.roleSet?`دورك الحالي ${esc(roleAr[ME.role]||"")}. يمكنك تغييره وقت الحاجة.`:"اختر دورك الأساسي — هوية واحدة وأدوار متعددة، وتضيف غيره لاحقًا."}</p></div>
   <div class="card">
-    <div class="fld"><label>الدور</label><select id="rl">${Object.entries(roleAr).map(([k,v])=>`<option value="${k}">${v}</option>`).join("")}</select></div>
-    <div class="fld"><label>جهتك (اختياري)</label><input id="rl_org" placeholder="مثال: أكاديمية النخبة / ملعب المروج"></div>
-    <button class="btn" onclick="saveRole()">ابدأ</button>
+    <div class="fld"><label>الدور</label><select id="rl">${Object.entries(roleAr).map(([k,v])=>`<option value="${k}"${k===ME.role?" selected":""}>${v}</option>`).join("")}</select></div>
+    <div class="fld"><label>جهتك (اختياري)</label><input id="rl_org" value="${esc(ME.org||"")}" placeholder="مثال: أكاديمية النخبة / ملعب المروج"></div>
+    <button class="btn" onclick="saveRole()">${ME.roleSet?"حفظ الدور":"ابدأ"}</button>
   </div></main>`;
 
 T.newMatch=()=>`<main>

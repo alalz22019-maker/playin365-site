@@ -154,16 +154,16 @@ async function render(){ try{ await _render(); }catch(e){ console.error(e); _piF
 async function _render(){
   const app=$("#app");
   if(!ME||VIEW==="auth"){ app.innerHTML=T.auth(); return; }
-  if(VIEW==="role"){ app.innerHTML=`<header class="hd">${WM()}<span class="muted">${esc(ME.name)}</span></header>`+T.role(); return; }
-  app.innerHTML=`<header class="hd">${WM()}<div style="display:flex;align-items:center;gap:9px"><span class="muted">${TITLES[VIEW]||""}</span><button onclick="sb.auth.signOut()" style="background:#fff;border:1px solid #e9e4d8;border-radius:999px;padding:6px 12px;font:900 10.5px Cairo;color:#565d78;cursor:pointer">خروج</button></div></header><main><div class="skel" style="height:120px"></div><div class="skel" style="height:80px"></div></main>${navHtml()}`;
+  if(VIEW==="role"){ app.innerHTML=`<header class="hd">${WM()}<div style="display:flex;align-items:center;gap:9px"><span class="muted">${esc(ME.name)}</span><button onclick="signOut(this)" style="background:#fff;border:1px solid #e9e4d8;border-radius:999px;padding:6px 12px;font:900 10.5px Cairo;color:#565d78;cursor:pointer">خروج</button></div></header>`+T.role(); return; }
+  app.innerHTML=`<header class="hd">${WM()}<div style="display:flex;align-items:center;gap:9px"><span class="muted">${TITLES[VIEW]||""}</span><button onclick="signOut(this)" style="background:#fff;border:1px solid #e9e4d8;border-radius:999px;padding:6px 12px;font:900 10.5px Cairo;color:#565d78;cursor:pointer">خروج</button></div></header><main><div class="skel" style="height:120px"></div><div class="skel" style="height:80px"></div></main>${navHtml()}`;
   const fn=T[VIEW]||T.home;
   const html=await fn();
-  app.innerHTML=`<header class="hd">${WM()}<div style="display:flex;align-items:center;gap:9px"><span class="muted">${TITLES[VIEW]||""}</span><button onclick="sb.auth.signOut()" style="background:#fff;border:1px solid #e9e4d8;border-radius:999px;padding:6px 12px;font:900 10.5px Cairo;color:#565d78;cursor:pointer">خروج</button></div></header>${html}${navHtml()}`;
+  app.innerHTML=`<header class="hd">${WM()}<div style="display:flex;align-items:center;gap:9px"><span class="muted">${TITLES[VIEW]||""}</span><button onclick="signOut(this)" style="background:#fff;border:1px solid #e9e4d8;border-radius:999px;padding:6px 12px;font:900 10.5px Cairo;color:#565d78;cursor:pointer">خروج</button></div></header>${html}${navHtml()}`;
 }
 function navHtml(){
   const items=NAV[ME.role]||NAV.player;
   return `<nav class="nav">${items.map(([ic,lb,v])=>ic==="FAB"?`<button class="fab" onclick="go('${v}')">+</button>`:`<button class="${VIEW===v?"on":""}" onclick="go('${v}')"><i>${ic}</i>${lb}</button>`).join("")}</nav>`;
 }
 window.go=go; window.render=render; window.toast=toast;
-window.signOut=async()=>{ try{ await sb.auth.signOut(); }catch(e){} location.hash=""; location.reload(); };
+window.signOut=async(btn)=>{ const label=btn?.textContent||"خروج"; if(btn){btn.disabled=true;btn.textContent="جارٍ الخروج…";} try{ const {error}=await sb.auth.signOut(); if(error) throw error; location.hash=""; }catch(e){ if(btn){btn.disabled=false;btn.textContent=label;} toast("تعذّر تسجيل الخروج: "+(e&&e.message||"حاول مرة أخرى"),1); } };
 if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",boot);}else{boot();}
