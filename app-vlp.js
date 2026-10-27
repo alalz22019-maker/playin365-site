@@ -31,6 +31,8 @@ T.venuePage = async () => {
   const mxH = Math.max(1,...byHour.map(x=>x.v));
   const occ = D.bk.length ? Math.round(D.ok.length/D.bk.length*100) : null;
   const openSp = D.sp.filter(s=>s.open);
+  const locationReady = [M.city,M.district,M.address].some(value=>String(value||"").trim());
+  const canBook = openSp.length > 0 && locationReady;
   const amen = Array.isArray(M.amenities)?M.amenities:[];
   const hours = Array.isArray(M.hours)?M.hours:[];
   const prices = D.sp.filter(s=>s.price_hour).map(s=>+s.price_hour);
@@ -54,7 +56,7 @@ T.venuePage = async () => {
         <b style="display:block;font-size:26px;font-weight:900;color:#fff;line-height:1.35">${esc(v)}</b>
         <span style="display:block;font-size:11.5px;font-weight:700;color:#c6cade;line-height:1.8;margin-top:6px">${[M.city,M.district,M.address].filter(Boolean).map(esc).join(" · ")||"الموقع لم يُسجَّل بعد"}</span>
         <div style="display:flex;gap:9px;margin-top:15px;flex-wrap:wrap">
-          <button onclick="vpBook('${esc(v)}','',0)" style="background:${VP.P};color:#fff;border:0;border-radius:14px;padding:13px 20px;font:900 12.5px Cairo;cursor:pointer;box-shadow:0 8px 18px rgba(70,54,227,.35);white-space:nowrap">احجز ساعتك${minP?` — من <span class="ltr">${minP}</span> ر.س`:""}</button>
+          ${canBook?`<button onclick="vpBook('${esc(v)}','',0)" style="background:${VP.P};color:#fff;border:0;border-radius:14px;padding:13px 20px;font:900 12.5px Cairo;cursor:pointer;box-shadow:0 8px 18px rgba(70,54,227,.35);white-space:nowrap">احجز ساعتك${minP?` — من <span class="ltr">${minP}</span> ر.س`:""}</button>`:`<button type="button" disabled aria-disabled="true" title="سجّل موقع الملعب وافتح مساحة للحجز" style="background:rgba(255,255,255,.12);color:#c6cade;border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:13px 20px;font:900 12.5px Cairo;cursor:not-allowed;opacity:.6;white-space:nowrap">الحجز غير متاح</button>`}
           <button onclick="vpFollow('${esc(v)}')" style="background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:14px;padding:13px 18px;font:900 12.5px Cairo;cursor:pointer;white-space:nowrap">تابع الملعب</button>
         </div>
       </div>
@@ -215,6 +217,9 @@ window.vpFollow = async v => {
 /* طلب حجز حقيقي من صفحة الزوار — يصل بوابة الملعب بحالة requested */
 window.vpBook = async (venue, space, price) => {
   if(!ME){ toast("سجّل دخولك أولًا لتحجز",1); return; }
+  const venueData=await VP.load(venue),venueMeta=venueData.meta||{};
+  const hasLocation=[venueMeta.city,venueMeta.district,venueMeta.address].some(value=>String(value||"").trim());
+  if(!hasLocation||!(venueData.sp||[]).some(item=>item.open)){toast("الحجز يتطلب موقعًا مسجلًا ومساحة مفتوحة",1);return;}
   const hour = prompt("الساعة المطلوبة (مثال 19):",""); if(!hour) return;
   const slot = "اليوم "+String(+hour)+":00–"+String(+hour+1)+":00";
   const row = {venue, slot, who:ME.name, status:"requested", price:+price||null}; if(space) row.space=space;
