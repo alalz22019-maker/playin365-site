@@ -65,6 +65,7 @@ HUB.ROLE = {
     ["▦","ملف الأكاديمية","acadProfile","#e7ecf1","#243244"],
     ["▥","الأكاديمية","acad","#e7ecf1","#243244"],
     ["◍","الفئات والفرق","acadSquads"],
+    ["⚽","مباريات الأكاديمية","acadMatches","#fdeee8","#e8531f"],
     ["✎","اختبارات القبول","acadTryouts","#fff6d6","#c78c00"],
     ["⇪","استيراد القوائم","acadRosterImport"]
   ],
@@ -132,7 +133,7 @@ HUB.ROLE_OK = {
   referee:["pitch","explore","messages","refDuty","orgMatch","reports","role","settings"],
   scout:["pitch","explore","messages","market","scout","reports","deals","role","settings"],
   guardian:["pitch","explore","messages","guardian","updates","medical","role","settings"],
-  academy:["pitch","market","acad","acadProfile","acadSquads","acadTryouts","acadRosterImport","acadPerformance","deals","role"],
+  academy:["pitch","market","acad","acadProfile","acadSquads","acadTryouts","acadRosterImport","acadPerformance","acadMatches","deals","role"],
   venue:["explore","messages","venue","pitches","reports","role","settings"],
   club:["pitch","explore","messages","market","club","erp","tournament","reports","deals","role","settings"],
   fed:["explore","messages","accredit","tournament","reports","role","settings"],
