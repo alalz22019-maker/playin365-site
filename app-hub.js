@@ -132,7 +132,7 @@ HUB.ROLE_OK = {
   referee:["pitch","explore","messages","refDuty","orgMatch","reports","role","settings"],
   scout:["pitch","explore","messages","market","scout","reports","deals","role","settings"],
   guardian:["pitch","explore","messages","guardian","updates","medical","role","settings"],
-  academy:["pitch","explore","messages","market","erp","acad","teams","tryouts","importPlayers","acadProfile","acadSquads","acadTryouts","acadRosterImport","acadPerformance","reports","deals","role","settings"],
+  academy:["pitch","market","acad","acadProfile","acadSquads","acadTryouts","acadRosterImport","acadPerformance","deals","role"],
   venue:["explore","messages","venue","pitches","reports","role","settings"],
   club:["pitch","explore","messages","market","club","erp","tournament","reports","deals","role","settings"],
   fed:["explore","messages","accredit","tournament","reports","role","settings"],
@@ -147,10 +147,11 @@ HUB.dest = v => {
   return v;
 };
 HUB.has = v => {
-  if(typeof T[v] !== "function") return false;
-  if(HUB.OPEN.indexOf(v) >= 0) return true;
+  const route = HUB.dest(v);
+  if(typeof T[route] !== "function") return false;
+  if(HUB.OPEN.indexOf(v) >= 0 || HUB.OPEN.indexOf(route) >= 0) return true;
   const ok = HUB.ROLE_OK[(ME&&ME.role)||"player"];
-  return !ok || ok.indexOf(v) >= 0;
+  return !ok || ok.indexOf(route) >= 0;
 };
 HUB.icon = route => {
   const names = {
@@ -225,7 +226,7 @@ T.hub = async () => {
   const r = (ME&&ME.role)||"player";
   const RN = (typeof roleAr!=="undefined"&&roleAr[r])||r;
   const own = HUB.ROLE[r] || HUB.ROLE.player;
-  const seen = new Set([...HUB.SHARED,...own].map(x=>x[2]));
+  const seen = new Set([...HUB.SHARED,...own].map(x=>HUB.dest(x[2])));
   const markup = `<main style="flex:1;padding:16px 18px 160px;display:flex;flex-direction:column;gap:20px">
     <div style="position:relative;overflow:hidden;background:#151a2e;border-radius:22px;padding:18px;color:#faf8f3">
       <div style="position:absolute;inset-inline-start:62%;top:-70%;width:70%;height:230%;background:linear-gradient(200deg,#4636e3,#7b5cff);border-radius:50%;opacity:.5"></div>
@@ -238,9 +239,9 @@ T.hub = async () => {
         <button onclick="go('role')" style="background:#fff;color:#151a2e;border:0;border-radius:999px;padding:8px 12px;font:900 10.5px Cairo;cursor:pointer;flex:none">⇄ غيّر</button>
       </div>
     </div>
-    ${HUB.group("لكل الأدوار","SHARED","#4636e3",HUB.SHARED)}
+    ${HUB.group("مشتركة","SHARED","#4636e3",HUB.SHARED)}
     ${HUB.group("خاص بدورك","ROLE · "+String(r).toUpperCase(),"#c78c00",own)}
-    ${HUB.group("كل الخدمات","ALL SURFACES","#243244",HUB.ALL.filter(x=>!seen.has(x[2])))}
+    ${HUB.group("كل الخدمات","ALL SURFACES","#243244",HUB.ALL.filter(x=>!seen.has(HUB.dest(x[2]))))}
     <div style="background:#fff8df;border:1px solid #f0e2b4;border-radius:16px;padding:13px;font-size:11px;color:#8a6912;font-weight:700;line-height:1.85">تظهر هنا الخدمات المناسبة لحسابك ودورك.</div>
   </main>`;
   if(r==="player"&&window.PZ&&typeof window.PZ.page==="function") return window.PZ.page("hub",markup);
