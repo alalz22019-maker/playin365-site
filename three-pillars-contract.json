@@ -1,20 +1,105 @@
 {
   "version": "2026.10.28-three-pillars-v1",
   "principle": "No capability is removed; legacy routes remain reachable through the service hub while the new home, identity and event entry points are added.",
-  "pillars": ["individuals", "organizations", "events"],
-  "foundationRoutes": ["smartHome", "identityHub", "organizationIdentity", "eventHub", "hub"],
+  "pillars": [
+    "individuals",
+    "organizations",
+    "events"
+  ],
+  "foundationRoutes": [
+    "smartHome",
+    "identityHub",
+    "organizationIdentity",
+    "eventHub",
+    "hub",
+    "myHome",
+    "myIdentity"
+  ],
   "roles": {
     "academy": {
       "legacyRouteCount": 34,
-      "requiredRoutes": ["opsHome", "opsCustomers", "opsSubscriptions", "opsCashier", "opsOrders", "opsReservations", "opsAttendance", "opsReports", "opsIntegrations", "messages", "settings", "acadProfile", "acad", "acadSquads", "acadMatches", "acadTryouts", "acadRosterImport", "opsOffers", "opsEngagement", "opsBranches", "opsForms", "opsMobile", "opsAssistant", "opsInbox", "pitch", "market", "acadPerformance", "deals", "role", "opsStaff", "opsFinance", "opsMarketing", "opsWebsite", "opsDocuments"]
+      "requiredRoutes": [
+        "opsHome",
+        "opsCustomers",
+        "opsSubscriptions",
+        "opsCashier",
+        "opsOrders",
+        "opsReservations",
+        "opsAttendance",
+        "opsReports",
+        "opsIntegrations",
+        "messages",
+        "settings",
+        "acadProfile",
+        "acad",
+        "acadSquads",
+        "acadMatches",
+        "acadTryouts",
+        "acadRosterImport",
+        "opsOffers",
+        "opsEngagement",
+        "opsBranches",
+        "opsForms",
+        "opsMobile",
+        "opsAssistant",
+        "opsInbox",
+        "pitch",
+        "market",
+        "acadPerformance",
+        "deals",
+        "role",
+        "opsStaff",
+        "opsFinance",
+        "opsMarketing",
+        "opsWebsite",
+        "opsDocuments"
+      ]
     },
     "coach": {
       "legacyRouteCount": 20,
-      "requiredRoutes": ["coachHome", "squad", "session", "sessions", "drills", "brief", "rate", "tactics", "boards", "pitch", "chain", "coachTasks", "coachMe", "reports", "orgMatch", "explore", "messages", "market", "role", "settings"]
+      "requiredRoutes": [
+        "coachHome",
+        "squad",
+        "session",
+        "sessions",
+        "drills",
+        "brief",
+        "rate",
+        "tactics",
+        "boards",
+        "pitch",
+        "chain",
+        "coachTasks",
+        "coachMe",
+        "reports",
+        "orgMatch",
+        "explore",
+        "messages",
+        "market",
+        "role",
+        "settings"
+      ]
     },
     "player": {
       "legacyRouteCount": 16,
-      "requiredRoutes": ["feed", "records", "cabinet", "health", "wallet", "calendar", "pitch", "explore", "opps", "publicView", "messages", "market", "viewLog", "privacy", "role", "settings"]
+      "requiredRoutes": [
+        "feed",
+        "records",
+        "cabinet",
+        "health",
+        "wallet",
+        "calendar",
+        "pitch",
+        "explore",
+        "opps",
+        "publicView",
+        "messages",
+        "market",
+        "viewLog",
+        "privacy",
+        "role",
+        "settings"
+      ]
     }
   },
   "qualityGates": {
@@ -24,6 +109,8 @@
     "organizationIdentityIndependent": true,
     "eventIdentityIndependent": true,
     "sharedAchievementSingleRecord": true,
-    "responsibilityQueuesSeparated": true
+    "responsibilityQueuesSeparated": true,
+    "compatibilityAliases": true,
+    "approvedGeometrySvg": true
   }
 }

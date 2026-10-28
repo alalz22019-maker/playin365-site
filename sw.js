@@ -1,4 +1,4 @@
-const CACHE='playin365-shell-20261028-three-pillars-v1';
+const CACHE='playin365-shell-20261028-three-pillars-v2';
 const CORE=['/','/index.html','/config.js','/app-core.js','/app-academy-ops.js','/app-academy-growth.js','/app-academy-assistant.js','/app-pillars.js','/pillars.css','/three-pillars-contract.json','/manifest.webmanifest','/release.json','/assets/playin-icon.svg'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
