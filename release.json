@@ -1,9 +1,19 @@
 {
   "version": "2026.10.28-golden-training-day-rc1",
-  "stamp_utc": "2026-10-28T20:43:19.805148Z",
-  "status": "preview_candidate",
+  "stamp_utc": "2026-10-28T20:54:00Z",
+  "status": "preview_verified",
   "source_branch": "feat/golden-training-day-20261028",
+  "source_commit": "a08ebe8e97aee1e1a5d5fcc9baed32d2d5c4cf12",
   "base_production_commit": "4159ae355237c152434e726614e3933df8ebec47",
+  "preview": {
+    "deployment_id": "dpl_7WD1kK9h8MXAnfH5i22h4thm9JUp",
+    "url": "https://playin365-g7lybey5o-alalz22019-makers-projects.vercel.app",
+    "state": "READY",
+    "route_checks": "94/94",
+    "runtime_errors": 0,
+    "missing_routes": 0,
+    "unavailable_routes": 0
+  },
   "architecture": {
     "pillars": [
       "individuals",
@@ -64,13 +74,17 @@
     "route_contract": "pass_94_of_94",
     "cross_role_e2e": "pass",
     "mobile_visual": "pass",
-    "preview_runtime": "pending",
+    "preview_runtime": "pass",
+    "preview_build": "pass",
     "production_runtime": "not_started",
     "interactive_sheets": "pass",
     "touch_targets": "pass",
     "horizontal_overflow": "pass",
     "privacy_peer_leak": "pass_false",
     "qa_cleanup": "pass"
+  },
+  "observations": {
+    "non_blocking_warning": "Node DEP0169 was emitted by the football fixtures function while the endpoint remained functional."
   },
   "external_activation": {
     "status": "experimental",
