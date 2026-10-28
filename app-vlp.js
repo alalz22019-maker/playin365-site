@@ -45,7 +45,7 @@ T.venuePage = async () => {
   return `<main style="flex:1;padding:0 0 118px;display:flex;flex-direction:column;gap:14px;background:${VP.IV}">
 
     <div style="position:relative;min-height:330px;display:flex;align-items:flex-end;background:${VP.K};overflow:hidden">
-      <img src="assets/cv-day-grass.png" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.5">
+      <img src="assets/cv-day-grass.svg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.5">
       <div style="position:absolute;inset-inline:0;bottom:0;height:75%;background:linear-gradient(to top,rgba(21,26,46,.96) 22%,rgba(21,26,46,.4) 65%,transparent);pointer-events:none"></div>
       <div style="position:relative;padding:18px;width:100%">
         <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px">

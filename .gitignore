@@ -1,0 +1,6 @@
+node_modules/
+.vercel/
+audit/
+err
+*.log
+.DS_Store

@@ -29,7 +29,7 @@ T.acadHome = async () => {
   const chip = (t,gold) => `<span style="display:inline-flex;align-items:center;gap:5px;background:${gold?"rgba(245,197,24,.16)":"rgba(255,255,255,.1)"};border:1px solid ${gold?"rgba(245,197,24,.5)":"rgba(255,255,255,.22)"};color:${gold?"#f5c518":"#faf8f3"};border-radius:999px;padding:5px 10px;font-size:9.5px;font-weight:900">${t}</span>`;
 
   return `<div style="position:relative;background:#151a2e;overflow:hidden;border-radius:0 0 36px 36px">
-    <img src="assets/cv-day-grass.png" alt="" style="position:absolute;inset:0;width:100%;height:230px;object-fit:cover;object-position:center 42%">
+    <img src="assets/cv-day-grass.svg" alt="" style="position:absolute;inset:0;width:100%;height:230px;object-fit:cover;object-position:center 42%">
     <div style="position:absolute;inset:0;width:100%;height:230px;background:linear-gradient(180deg,rgba(21,26,46,.55) 0%,rgba(21,26,46,.12) 30%,rgba(21,26,46,.82) 74%,#151a2e 100%)"></div>
     <div style="position:absolute;inset-inline-start:60%;top:34%;width:80%;height:120%;background:#f5c518;border-radius:50%;opacity:.12"></div>
     <div style="position:relative;padding:18px 18px 22px;color:#faf8f3">
@@ -99,7 +99,7 @@ T.acadHome = async () => {
         <button onclick="clapPlayer('${ACD.esn(n)}')" style="background:#efedff;color:#4636e3;border:0;border-radius:10px;padding:8px 10px;font:900 11px Cairo;cursor:pointer;flex:none">👏</button></div>`).join("")}`):""}
 
     ${seasonTop?`<div style="position:relative;border-radius:26px;overflow:hidden;background:#151a2e;min-height:200px;display:flex;align-items:flex-end">
-      <img src="assets/cv-night-strike.png" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.8">
+      <img src="assets/cv-night-strike.svg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.8">
       <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(21,26,46,0) 20%,rgba(21,26,46,.96) 100%)"></div>
       <div style="position:relative;padding:18px;color:#faf8f3;width:100%">
         <div style="display:flex;justify-content:space-between;align-items:center">${chip("★ إنجاز الموسم",true)}<button onclick="go('acadPride','${ACD.esn(org)}')" style="background:none;border:0;color:#f5c518;font:900 10.5px Cairo;cursor:pointer">كل الفخر ←</button></div>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="ملعب كرة قدم نهاري">
+<defs><linearGradient id="sky" x2="0" y2="1"><stop stop-color="#8ed6ff"/><stop offset="1" stop-color="#dff5ff"/></linearGradient><linearGradient id="grass" x2="0" y2="1"><stop stop-color="#2ca66f"/><stop offset="1" stop-color="#0f6e4c"/></linearGradient><radialGradient id="sun"><stop stop-color="#fff7b1"/><stop offset="1" stop-color="#ffd767" stop-opacity="0"/></radialGradient></defs>
+<rect width="1600" height="420" fill="url(#sky)"/><circle cx="1280" cy="120" r="170" fill="url(#sun)"/><path d="M0 390Q320 330 650 390T1280 380T1600 390V470H0Z" fill="#294f58" opacity=".35"/><rect y="410" width="1600" height="490" fill="url(#grass)"/>
+<g opacity=".16" fill="#fff"><path d="M0 410h180l160 490H90z"/><path d="M390 410h180l90 490H430z"/><path d="M780 410h180l10 490H790z"/><path d="M1170 410h180l-70 490h-230z"/></g>
+<g fill="none" stroke="#fff" stroke-width="8" opacity=".72"><path d="M800 410v490"/><circle cx="800" cy="655" r="112"/><path d="M0 515h260v285H0M1600 515h-260v285h260"/></g>
+<g transform="translate(715 575)"><circle cx="85" cy="85" r="58" fill="#fff"/><path d="M85 52l25 18-10 30H70L60 70zM44 82l16-12 10 30-22 17zM126 82l-16-12-10 30 22 17zM65 126l5-26h30l5 26-20 15z" fill="#18263d" opacity=".8"/></g>
+</svg>

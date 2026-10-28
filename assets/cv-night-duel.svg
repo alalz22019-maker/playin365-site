@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" role="img" aria-label="مواجهة لاعبين ليلية">
+<defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#0a1020"/><stop offset=".5" stop-color="#241950"/><stop offset="1" stop-color="#091827"/></linearGradient><radialGradient id="spot"><stop stop-color="#8d79ea" stop-opacity=".55"/><stop offset="1" stop-color="#8d79ea" stop-opacity="0"/></radialGradient></defs>
+<rect width="1600" height="1000" fill="url(#bg)"/><ellipse cx="800" cy="450" rx="720" ry="500" fill="url(#spot)"/><path d="M0 700Q360 630 800 680T1600 660V1000H0Z" fill="#0c6048"/><g opacity=".25" stroke="#fff" stroke-width="9" fill="none"><path d="M800 680v320"/><circle cx="800" cy="830" r="125"/></g>
+<g fill="#030711"><circle cx="540" cy="340" r="54"/><path d="M500 395l100-30 80 180-85 36-50-105-72 145-86-29z"/><path d="M475 594l-92 220-72-30 78-237z"/><path d="M590 575l168 86-31 65-185-91z"/></g>
+<g fill="#080b19"><circle cx="1060" cy="330" r="54"/><path d="M1015 385l105-12 68 177-82 32-44-103-76 146-87-31z"/><path d="M990 600l-105 211-70-35 91-232z"/><path d="M1092 571l177 68-26 68-190-75z"/></g>
+<circle cx="800" cy="735" r="58" fill="#fff"/><path d="M800 701l27 19-10 32h-34l-10-32zM759 733l14-13 10 32-22 18zM841 733l-14-13-10 32 22 18z" fill="#172039"/>
+</svg>
