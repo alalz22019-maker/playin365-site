@@ -1,6 +1,6 @@
 {
-  "version": "2026.10.28-three-pillars-v1",
-  "principle": "No capability is removed; legacy routes remain reachable through the service hub while the new home, identity and event entry points are added.",
+  "version": "2026.10.28-golden-training-day-v1",
+  "principle": "No capability is removed. The shared Training Day event is added across academy, coach, and player while legacy services remain directly reachable.",
   "pillars": [
     "individuals",
     "organizations",
@@ -13,7 +13,8 @@
     "eventHub",
     "hub",
     "myHome",
-    "myIdentity"
+    "myIdentity",
+    "trainingDay"
   ],
   "roles": {
     "academy": {
@@ -112,5 +113,26 @@
     "responsibilityQueuesSeparated": true,
     "compatibilityAliases": true,
     "approvedGeometrySvg": true
+  },
+  "goldenJourneys": {
+    "trainingDay": {
+      "route": "trainingDay",
+      "roles": [
+        "academy",
+        "coach",
+        "player"
+      ],
+      "sourceOfTruth": [
+        "training_sessions",
+        "training_session_plans",
+        "training_session_responses",
+        "athlete_readiness_checkins",
+        "training_session_attendance",
+        "coach_evaluations",
+        "player_assessments",
+        "performance_metrics",
+        "entity_activity_events"
+      ]
+    }
   }
 }

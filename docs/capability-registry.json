@@ -7,8 +7,8 @@
     "coach": 20,
     "player": 16
   },
-  "new_core_routes": 2,
-  "total_entries": 72,
+  "new_core_routes": 3,
+  "total_entries": 73,
   "items": [
     {
       "capability_id": "ACA-001",
@@ -1513,6 +1513,28 @@
       "acceptance_required": [
         "functional",
         "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "CORE-003",
+      "role": "shared",
+      "route": "trainingDay",
+      "label_ar": "يوم التدريب المشترك",
+      "current_status": "implemented_on_feature_branch",
+      "disposition": "new_golden_journey",
+      "target_area": "events_training",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "cross_role",
         "mobile",
         "visual",
         "production"
