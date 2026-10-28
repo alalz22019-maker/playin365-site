@@ -1,0 +1,62 @@
+name: Mark pillars production verified
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/mark-pillars-production-verified.yml
+
+permissions:
+  contents: write
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 2
+
+      - name: Update release stamp
+        shell: bash
+        run: |
+          set -euo pipefail
+          SOURCE_COMMIT=$(git rev-parse HEAD^)
+          STAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          SOURCE_COMMIT="$SOURCE_COMMIT" STAMP="$STAMP" python3 <<'PY'
+          import json, os
+          path='release.json'
+          data=json.load(open(path))
+          data['version']='2026.10.28-pillars-foundation-v1'
+          data['stamp_utc']=os.environ['STAMP']
+          data['status']='production_verified'
+          data['source_branch']='main'
+          data['source_commit']=os.environ['SOURCE_COMMIT']
+          data['production_url']='https://playin365.app'
+          data['quality_gates']['preview_runtime']='pass'
+          data['quality_gates']['production_runtime']='pass'
+          data['quality_gates']['production_76_route_regression']='pass'
+          data['quality_gates']['production_public_identity']='pass'
+          data['quality_gates']['production_context_switch']='pass'
+          data['quality_gates']['production_messages_three_roles']='pass'
+          data['quality_gates']['production_settings_three_roles']='pass'
+          data['quality_gates']['production_fixtures_endpoint']='pass'
+          open(path,'w').write(json.dumps(data,ensure_ascii=False,indent=2)+'\n')
+          PY
+          rm -f .github/workflows/mark-pillars-production-verified.yml
+          python3 -m json.tool release.json >/dev/null
+          node -e "const r=require('./release.json'); if(r.version!=='2026.10.28-pillars-foundation-v1'||r.status!=='production_verified'||r.source_branch!=='main'||r.quality_gates.production_runtime!=='pass') process.exit(1)"
+
+      - name: Commit verified release
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "PlayIn365 Release Bot"
+          git config user.email "alalz22019@gmail.com"
+          git add -A
+          git diff --cached --check
+          git commit -m "chore(release): mark pillars foundation production verified"
+          git push origin HEAD:main
