@@ -21,7 +21,7 @@ jobs:
       - name: Download and verify release
         run: |
           curl --fail --silent --show-error --location \
-            https://sb-2ttyibxb2nb0.vercel.run/gtd-release-4b8c519f.tar.gz \
+            https://qmpwekibhdzmpmdbuvxz.supabase.co/storage/v1/object/public/gtd-release-c1cddda1/golden-training-day.tar.gz \
             --output /tmp/golden-training-day.tar.gz
           echo '4b8c519f7e0c2baf9564e7ccd002b7e67265c14f4f1ad9ea18bbeb175f32ccca  /tmp/golden-training-day.tar.gz' | sha256sum --check --strict
           tar -xzf /tmp/golden-training-day.tar.gz -C .
