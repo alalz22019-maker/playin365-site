@@ -1,6 +1,6 @@
 {
-  "version": "2026.10.28-golden-training-day-v1",
-  "principle": "No capability is removed. The shared Training Day event is added across academy, coach, and player while legacy services remain directly reachable.",
+  "version": "2026.10.29-golden-match-day-v1",
+  "principle": "No capability is removed. Training Day and Match Day are shared event journeys across academy, coach, and player while every legacy service remains directly reachable.",
   "pillars": [
     "individuals",
     "organizations",
@@ -14,7 +14,8 @@
     "hub",
     "myHome",
     "myIdentity",
-    "trainingDay"
+    "trainingDay",
+    "matchDay"
   ],
   "roles": {
     "academy": {
@@ -112,7 +113,8 @@
     "sharedAchievementSingleRecord": true,
     "responsibilityQueuesSeparated": true,
     "compatibilityAliases": true,
-    "approvedGeometrySvg": true
+    "approvedGeometrySvg": true,
+    "goldenMatchDay": true
   },
   "goldenJourneys": {
     "trainingDay": {
@@ -132,6 +134,27 @@
         "player_assessments",
         "performance_metrics",
         "entity_activity_events"
+      ]
+    },
+    "matchDay": {
+      "route": "matchDay",
+      "roles": [
+        "academy",
+        "coach",
+        "player"
+      ],
+      "sourceOfTruth": [
+        "matches",
+        "sports_events",
+        "match_plans",
+        "match_plan_players",
+        "team_participant_responses",
+        "match_readiness_checkins",
+        "team_match_events",
+        "match_appearances",
+        "performance_metrics",
+        "entity_activity_events",
+        "data_provenance"
       ]
     }
   }

@@ -1,14 +1,14 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-28",
+  "generated_at": "2026-10-29T00:00:00+03:00",
   "principle": "No existing route or capability may be removed without explicit owner approval. Integration, relocation and visual redesign do not count as deletion.",
   "baseline_counts": {
     "academy": 34,
     "coach": 20,
     "player": 16
   },
-  "new_core_routes": 3,
-  "total_entries": 73,
+  "new_core_routes": 4,
+  "total_entries": 74,
   "items": [
     {
       "capability_id": "ACA-001",
@@ -1526,6 +1526,28 @@
       "current_status": "implemented_on_feature_branch",
       "disposition": "new_golden_journey",
       "target_area": "events_training",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "cross_role",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "CORE-004",
+      "role": "shared",
+      "route": "matchDay",
+      "label_ar": "يوم المباراة المشترك",
+      "current_status": "implemented_on_feature_branch",
+      "disposition": "new_golden_journey",
+      "target_area": "events_match",
       "new_entry_points": [
         "myHome",
         "hub",
