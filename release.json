@@ -1,16 +1,32 @@
 {
-  "version": "2026.10.29-golden-match-day-rc1",
-  "stamp_utc": "2026-10-28T21:45:00Z",
-  "status": "preview_verified",
-  "source_branch": "feat/golden-match-day-20261029",
-  "source_commit": "9d4c1d889efd8a6ef76291f0e62edb92b132f3c0",
-  "base_production_commit": "32da417b3769ac74da5997855f3cf4e4df254595",
+  "version": "2026.10.29-golden-match-day-v1",
+  "stamp_utc": "2026-10-28T21:50:00Z",
+  "status": "production_verified",
+  "source_branch": "main",
+  "source_commit": "cf04d97d68ae6a2026bf7b1740cbc3b314aa01f8",
+  "previous_production_commit": "32da417b3769ac74da5997855f3cf4e4df254595",
   "preview": {
     "deployment_id": "dpl_Ae3avL4BAXAhCrMNFRAn9wSvacDQ",
+    "functional_commit": "9d4c1d889efd8a6ef76291f0e62edb92b132f3c0",
     "url": "https://playin365-ifzfcpdye-alalz22019-makers-projects.vercel.app",
     "state": "READY",
     "route_checks": "97/97",
     "runtime_errors": 0,
+    "missing_routes": 0,
+    "unavailable_routes": 0
+  },
+  "production": {
+    "deployment_id": "dpl_ADgYAZCChGkASWPedbEEnvXUPmP4",
+    "commit": "cf04d97d68ae6a2026bf7b1740cbc3b314aa01f8",
+    "url": "https://playin365.app",
+    "aliases": [
+      "playin365.app",
+      "www.playin365.app"
+    ],
+    "state": "READY",
+    "route_checks": "97/97",
+    "runtime_errors": 0,
+    "runtime_warnings": 1,
     "missing_routes": 0,
     "unavailable_routes": 0
   },
@@ -50,6 +66,7 @@
     "route": "trainingDay"
   },
   "match_day": {
+    "status": "production_verified",
     "route": "matchDay",
     "roles": [
       "academy",
@@ -89,7 +106,8 @@
     "mobile_visual": "pass",
     "preview_runtime": "pass",
     "preview_build": "pass",
-    "production_runtime": "not_started",
+    "production_runtime": "pass",
+    "production_build": "pass",
     "privacy_peer_leak": "pass_false",
     "legacy_capabilities": "preserved",
     "security_advisors": "pass_no_new_match_day_findings",
@@ -100,7 +118,7 @@
     "horizontal_overflow": "pass"
   },
   "observations": {
-    "non_blocking_warning": "Node DEP0169 was emitted by the football fixtures function while the endpoint remained functional and Match Day acceptance remained clean."
+    "production_non_blocking_warning": "Node DEP0169 was emitted only by the football fixtures function; its request remained functional and Match Day production acceptance remained clean."
   },
   "external_activation": {
     "status": "experimental",
