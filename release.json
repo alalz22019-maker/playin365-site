@@ -1,9 +1,19 @@
 {
   "version": "2026.10.29-golden-match-day-rc1",
-  "stamp_utc": "2026-10-28T21:38:29.843560Z",
-  "status": "preview_candidate",
+  "stamp_utc": "2026-10-28T21:45:00Z",
+  "status": "preview_verified",
   "source_branch": "feat/golden-match-day-20261029",
+  "source_commit": "9d4c1d889efd8a6ef76291f0e62edb92b132f3c0",
   "base_production_commit": "32da417b3769ac74da5997855f3cf4e4df254595",
+  "preview": {
+    "deployment_id": "dpl_Ae3avL4BAXAhCrMNFRAn9wSvacDQ",
+    "url": "https://playin365-ifzfcpdye-alalz22019-makers-projects.vercel.app",
+    "state": "READY",
+    "route_checks": "97/97",
+    "runtime_errors": 0,
+    "missing_routes": 0,
+    "unavailable_routes": 0
+  },
   "architecture": {
     "pillars": [
       "individuals",
@@ -77,7 +87,8 @@
     "route_contract": "pass_97_of_97",
     "cross_role_data_e2e": "pass",
     "mobile_visual": "pass",
-    "preview_runtime": "pending",
+    "preview_runtime": "pass",
+    "preview_build": "pass",
     "production_runtime": "not_started",
     "privacy_peer_leak": "pass_false",
     "legacy_capabilities": "preserved",
@@ -87,6 +98,9 @@
     "interactive_sheets": "pass",
     "touch_targets": "pass",
     "horizontal_overflow": "pass"
+  },
+  "observations": {
+    "non_blocking_warning": "Node DEP0169 was emitted by the football fixtures function while the endpoint remained functional and Match Day acceptance remained clean."
   },
   "external_activation": {
     "status": "experimental",
