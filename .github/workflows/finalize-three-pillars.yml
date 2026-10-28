@@ -1,0 +1,113 @@
+name: Finalize Three Pillars Release
+
+on:
+  push:
+    branches:
+      - ops/three-pillars-finalize-20261028
+    paths:
+      - .github/workflows/finalize-three-pillars.yml
+
+permissions:
+  contents: write
+  pull-requests: write
+  statuses: read
+  checks: read
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    env:
+      TARGET_BRANCH: feat/three-pillars-unified-20261028
+      BASE_BRANCH: main
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Wait for imported unified branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git init /tmp/playin
+          cd /tmp/playin
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          ready=0
+          for attempt in $(seq 1 60); do
+            git fetch --depth=5 origin "${TARGET_BRANCH}:refs/remotes/origin/${TARGET_BRANCH}" || true
+            if git show "refs/remotes/origin/${TARGET_BRANCH}:release.json" 2>/dev/null | grep -q '2026.10.28-three-pillars-foundation-rc3'; then
+              ready=1
+              break
+            fi
+            sleep 10
+          done
+          test "$ready" -eq 1
+          git checkout -B "${TARGET_BRANCH}" "refs/remotes/origin/${TARGET_BRANCH}"
+
+      - name: Validate unified branch contract
+        working-directory: /tmp/playin
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check app-pillars.js
+          node --check sw.js
+          python3 - <<'PY'
+          import json,glob
+          release=json.load(open('release.json'))
+          contract=json.load(open('three-pillars-contract.json'))
+          registry=json.load(open('docs/capability-registry.json'))
+          assert release['version']=='2026.10.28-three-pillars-foundation-rc3'
+          assert release['coverage']['total_role_route_checks']==91
+          assert release['geometry']['source']=='approved_archived_svg_path'
+          assert release['geometry']['redrawn'] is False
+          assert release['geometry']['droplet_substitute'] is False
+          assert registry['total_entries']==72
+          assert sum(v['legacyRouteCount']+len(contract['foundationRoutes']) for v in contract['roles'].values())==91
+          assert set(['smartHome','identityHub','organizationIdentity','eventHub','hub','myHome','myIdentity'])==set(contract['foundationRoutes'])
+          assert len(glob.glob('supabase/migrations/20261028140*.sql'))==5
+          PY
+          grep -q 'P.APPROVED_SHAPE_PATH' app-pillars.js
+          grep -q "BR:''" app-pillars.js
+          grep -q "BL:'translate(1000 0) scale(-1 1)'" app-pillars.js
+          grep -q "TR:'translate(0 1000) scale(1 -1)'" app-pillars.js
+          grep -q "TL:'translate(1000 1000) scale(-1 -1)'" app-pillars.js
+          if grep -q '<div class="p3-geometry' app-pillars.js; then exit 1; fi
+          test -f docs/PILLARS-FOUNDATION-2026-10-28.md
+          test -f docs/capability-registry.json
+          test -f supabase/migrations/20261028140000_pillars_identity_context_events.sql
+          test -f supabase/migrations/20261028140400_pillars_achievement_security.sql
+          git diff --check
+
+      - name: Find or create pull request
+        id: pr
+        working-directory: /tmp/playin
+        shell: bash
+        run: |
+          set -euo pipefail
+          number=$(gh pr list --repo "$GITHUB_REPOSITORY" --head "$TARGET_BRANCH" --base "$BASE_BRANCH" --state open --json number --jq '.[0].number // empty')
+          if [ -z "$number" ]; then
+            url=$(gh pr create --repo "$GITHUB_REPOSITORY" --head "$TARGET_BRANCH" --base "$BASE_BRANCH" \
+              --title "Three pillars: unified individuals, organizations, and events foundation" \
+              --body "Unified, verified implementation of individuals, organizations, and events. Preserves 70 legacy routes, adds 7 foundation routes, includes 72-capability registry, governance/security migrations, responsibility-aware homes, independent identities, event identity, shared achievements, approved SVG geometry, and experimental integration status.")
+            number=${url##*/}
+          fi
+          echo "number=$number" >> "$GITHUB_OUTPUT"
+
+      - name: Wait for Vercel status on exact head
+        working-directory: /tmp/playin
+        shell: bash
+        run: |
+          set -euo pipefail
+          sha=$(git rev-parse HEAD)
+          success=0
+          for attempt in $(seq 1 90); do
+            state=$(gh api "repos/${GITHUB_REPOSITORY}/commits/${sha}/status" --jq '[.statuses[] | select(.context=="Vercel")][0].state // "pending"')
+            echo "Vercel state: $state"
+            if [ "$state" = "success" ]; then success=1; break; fi
+            if [ "$state" = "failure" ] || [ "$state" = "error" ]; then exit 1; fi
+            sleep 10
+          done
+          test "$success" -eq 1
+
+      - name: Merge verified pull request
+        shell: bash
+        run: |
+          set -euo pipefail
+          number='${{ steps.pr.outputs.number }}'
+          gh pr merge "$number" --repo "$GITHUB_REPOSITORY" --merge --admin
