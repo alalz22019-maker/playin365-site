@@ -1,14 +1,14 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-29T00:00:00+03:00",
-  "principle": "No existing route or capability may be removed without explicit owner approval. Integration, relocation and visual redesign do not count as deletion.",
+  "generated_at": "2026-10-29T01:35:00+03:00",
+  "principle": "No capability is removed. Golden Subscription & Payment adds a governed cross-role financial journey while legacy subscription, cashier, finance, guardian-pay, and player-wallet services remain reachable.",
   "baseline_counts": {
     "academy": 34,
     "coach": 20,
     "player": 16
   },
-  "new_core_routes": 4,
-  "total_entries": 74,
+  "new_core_routes": 5,
+  "total_entries": 75,
   "items": [
     {
       "capability_id": "ACA-001",
@@ -1557,6 +1557,30 @@
         "functional",
         "permission",
         "cross_role",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "CORE-005",
+      "role": "shared",
+      "route": "subscriptionPayment",
+      "label_ar": "الاشتراك والدفع المشترك",
+      "current_status": "implemented_on_feature_branch",
+      "disposition": "new_golden_journey",
+      "target_area": "finance_subscription_payment",
+      "new_entry_points": [
+        "smartHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "cross_role",
+        "financial_integrity",
+        "privacy",
         "mobile",
         "visual",
         "production"

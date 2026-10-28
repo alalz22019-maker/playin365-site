@@ -1,32 +1,18 @@
 {
-  "version": "2026.10.29-golden-match-day-v1",
-  "stamp_utc": "2026-10-28T21:50:00Z",
-  "status": "production_verified",
-  "source_branch": "main",
-  "source_commit": "cf04d97d68ae6a2026bf7b1740cbc3b314aa01f8",
-  "previous_production_commit": "32da417b3769ac74da5997855f3cf4e4df254595",
+  "version": "2026.10.29-golden-subscription-payment-rc1",
+  "stamp_utc": "2026-10-28T22:50:00Z",
+  "status": "preview_verified",
+  "source_branch": "feat/golden-subscription-payment-20261029",
+  "source_commit": "b1928833db487fae63bbc406c25d276f81e2b77b",
+  "base_production_commit": "426bd25e9d87b6bc7445843fbcd4eff191152fe7",
   "preview": {
-    "deployment_id": "dpl_Ae3avL4BAXAhCrMNFRAn9wSvacDQ",
-    "functional_commit": "9d4c1d889efd8a6ef76291f0e62edb92b132f3c0",
-    "url": "https://playin365-ifzfcpdye-alalz22019-makers-projects.vercel.app",
+    "deployment_id": "dpl_2jPBQfwpDFDAaTzZHXSLRWFhFo9C",
+    "url": "https://playin365-hva12mmi1-alalz22019-makers-projects.vercel.app",
     "state": "READY",
-    "route_checks": "97/97",
+    "baseline_route_checks": "97/97",
+    "role_specific_finance_checks": "3/3",
+    "total_checks": "100/100",
     "runtime_errors": 0,
-    "missing_routes": 0,
-    "unavailable_routes": 0
-  },
-  "production": {
-    "deployment_id": "dpl_ADgYAZCChGkASWPedbEEnvXUPmP4",
-    "commit": "cf04d97d68ae6a2026bf7b1740cbc3b314aa01f8",
-    "url": "https://playin365.app",
-    "aliases": [
-      "playin365.app",
-      "www.playin365.app"
-    ],
-    "state": "READY",
-    "route_checks": "97/97",
-    "runtime_errors": 0,
-    "runtime_warnings": 1,
     "missing_routes": 0,
     "unavailable_routes": 0
   },
@@ -38,18 +24,21 @@
     ],
     "golden_journeys": [
       "training_day",
-      "match_day"
+      "match_day",
+      "subscription_payment"
     ],
-    "shared_event_sources": [
+    "shared_sources": [
       "training_sessions",
-      "matches"
+      "matches",
+      "organization_subscriptions",
+      "invoices"
     ]
   },
   "geometry": {
     "source": "approved_archived_svg_path",
     "orientations": {
       "academy": "TL",
-      "coach": "BL",
+      "guardian": "TR",
       "player": "BR"
     },
     "redrawn": false,
@@ -58,8 +47,10 @@
   "coverage": {
     "foundation_routes": 9,
     "legacy_routes_preserved": 70,
-    "total_role_route_checks": 97,
-    "capability_registry_entries": 74
+    "baseline_role_route_checks": 97,
+    "role_specific_finance_checks": 3,
+    "total_role_route_checks": 100,
+    "capability_registry_entries": 75
   },
   "training_day": {
     "status": "production_verified",
@@ -67,61 +58,75 @@
   },
   "match_day": {
     "status": "production_verified",
-    "route": "matchDay",
+    "route": "matchDay"
+  },
+  "subscription_payment": {
+    "route": "subscriptionPayment",
     "roles": [
       "academy",
-      "coach",
+      "guardian",
       "player"
     ],
     "journey_steps": [
-      "create",
-      "lineup",
-      "publish",
-      "availability",
-      "readiness",
-      "start",
-      "live_events",
-      "result",
-      "close",
-      "identity_update"
+      "plan",
+      "assign_subscription",
+      "issue_invoice",
+      "payer_submission",
+      "finance_review",
+      "payment",
+      "receipt",
+      "ledger",
+      "entitlement"
     ],
-    "privacy": "player_private_readiness_detail_team_summary_only",
-    "result_authority": "team_staff_close_then_authorized_organization_finalizes"
+    "payment_authority": "payer_submits_finance_verifies",
+    "player_privacy": "no_guardian_reference_note_or_provider_details",
+    "gateway_status": "experimental_not_connected",
+    "demo_cycles": [
+      "2026-10_paid",
+      "2026-11_open"
+    ]
   },
   "database": {
-    "schema_foundation": "applied",
-    "shared_center": "applied",
-    "actions_core": "applied",
-    "closure_and_propagation": "applied",
-    "migration_bundle": "supabase/migrations/20261029010000_golden_match_day_complete.sql",
-    "migration_bundle_status": "aligned_with_production",
-    "targeted_indexes": "applied_14"
+    "schema": "applied",
+    "governed_settlement": "applied",
+    "role_center": "applied",
+    "ledger_rls_repair": "applied",
+    "migration_bundle": "supabase/migrations/20261029020000_golden_subscription_payment_complete.sql",
+    "migration_bundle_status": "aligned_with_applied_behavior"
   },
   "integration_mode": "experimental",
   "quality_gates": {
+    "postgres_parse": "pass_111_statements",
     "javascript_syntax": "pass",
-    "json_integrity": "pass",
-    "route_contract": "pass_97_of_97",
-    "cross_role_data_e2e": "pass",
-    "mobile_visual": "pass",
-    "preview_runtime": "pass",
-    "preview_build": "pass",
-    "production_runtime": "pass",
-    "production_build": "pass",
-    "privacy_peer_leak": "pass_false",
-    "legacy_capabilities": "preserved",
-    "security_advisors": "pass_no_new_match_day_findings",
-    "performance_advisors": "pass_match_day_indexes_applied_existing_project_debt_not_blocking",
-    "temporary_resource_cleanup": "pass_zero",
+    "css_integrity": "pass",
+    "database_e2e": "pass",
+    "activation_before_payment": "blocked",
+    "player_payment_attempt": "blocked",
+    "gateway_without_credentials": "blocked",
+    "receipt_generation": "pass",
+    "entitlement_activation": "pass",
+    "ledger_balance": "pass_115_debit_115_credit",
+    "payer_player_privacy": "pass_no_reference_or_note_leak",
+    "local_mobile_visual": "pass",
     "interactive_sheets": "pass",
     "touch_targets": "pass",
-    "horizontal_overflow": "pass"
+    "horizontal_overflow": "pass",
+    "legacy_capabilities": "preserved",
+    "preview_runtime": "pass",
+    "preview_build": "pass",
+    "production_runtime": "not_started",
+    "security_advisors": "pass_no_new_subscription_payment_findings_existing_project_debt_not_blocking",
+    "performance_advisors": "pass_zero_unindexed_feature_foreign_keys",
+    "new_public_security_definers": "pass_zero",
+    "new_tables_rls": "pass_3_of_3",
+    "direct_new_table_access": "pass_revoked",
+    "qa_cleanup": "pass_zero_qa_plans"
   },
   "observations": {
-    "production_non_blocking_warning": "Node DEP0169 was emitted only by the football fixtures function; its request remained functional and Match Day production acceptance remained clean."
+    "non_blocking_warning": "Node DEP0169 was emitted by the football fixtures function; the endpoint remained functional and Subscription & Payment acceptance remained clean."
   },
   "external_activation": {
     "status": "experimental",
-    "note": "No external provider is marked connected without live credentials and verified webhook tests."
+    "note": "No payment provider is marked connected without live credentials and verified webhook tests."
   }
 }

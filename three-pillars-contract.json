@@ -1,6 +1,6 @@
 {
-  "version": "2026.10.29-golden-match-day-v1",
-  "principle": "No capability is removed. Training Day and Match Day are shared event journeys across academy, coach, and player while every legacy service remains directly reachable.",
+  "version": "2026.10.29-golden-subscription-payment-v1",
+  "principle": "No capability is removed. Training Day, Match Day, and Subscription & Payment are governed shared journeys while every legacy service remains directly reachable.",
   "pillars": [
     "individuals",
     "organizations",
@@ -114,7 +114,13 @@
     "responsibilityQueuesSeparated": true,
     "compatibilityAliases": true,
     "approvedGeometrySvg": true,
-    "goldenMatchDay": true
+    "goldenMatchDay": true,
+    "goldenSubscriptionPayment": true,
+    "paymentStateGoverned": true,
+    "payerPlayerPrivacy": true,
+    "verifiedReceipt": true,
+    "balancedLedger": true,
+    "externalGatewayRequiresVerifiedConnection": true
   },
   "goldenJourneys": {
     "trainingDay": {
@@ -156,6 +162,44 @@
         "entity_activity_events",
         "data_provenance"
       ]
+    },
+    "subscriptionPayment": {
+      "route": "subscriptionPayment",
+      "roles": [
+        "academy",
+        "guardian",
+        "player"
+      ],
+      "sourceOfTruth": [
+        "organization_fee_plans",
+        "organization_subscriptions",
+        "invoices",
+        "invoice_items",
+        "subscription_payment_submissions",
+        "payments",
+        "subscription_payment_receipts",
+        "financial_accounts",
+        "ledger_entries",
+        "financial_events",
+        "subscription_access_entitlements"
+      ],
+      "authority": {
+        "payer": "submits_payment_evidence",
+        "academy_finance": "approves_or_records_collection",
+        "player": "reads_membership_outcome_without_private_payment_reference"
+      },
+      "gatewayRule": "disabled_until_connected_and_credentials_configured"
     }
+  },
+  "roleSpecificCoreRoutes": {
+    "academy": [
+      "subscriptionPayment"
+    ],
+    "guardian": [
+      "subscriptionPayment"
+    ],
+    "player": [
+      "subscriptionPayment"
+    ]
   }
 }
