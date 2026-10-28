@@ -79,7 +79,7 @@ async function saveRole(){
 /* حسابات الزائر السريع لا تظهر كلاعبين في قوائم أحد */
 const GUEST_NAME="زائر";
 async function q(name,builder){ const run=()=>typeof builder==="function"?builder():builder; let {data,error}=await run();
-  if(error&&error.code==="PGRST303"&&typeof builder==="function"){ try{ await sb.auth.refreshSession(); ({data,error}=await run()); }catch(e){} }
+  if(error&&(error.code==="PGRST303"||/JWT issued at future/i.test(error.message||""))){ try{ await sb.auth.refreshSession(); ({data,error}=await run()); }catch(e){} }
   if(error){ console.error(name,error); toast("خطأ قراءة "+name,1); return []; }
   let rows=data||[];
   if(Array.isArray(rows)&&rows.length&&rows[0]&&"name" in rows[0]) rows=rows.filter(r=>r.name!==GUEST_NAME);
