@@ -1,9 +1,21 @@
 {
   "version": "2026.10.29-golden-subscription-payment-rc1",
-  "stamp_utc": "2026-10-28T22:41:40.989151Z",
-  "status": "preview_candidate",
+  "stamp_utc": "2026-10-28T22:50:00Z",
+  "status": "preview_verified",
   "source_branch": "feat/golden-subscription-payment-20261029",
+  "source_commit": "b1928833db487fae63bbc406c25d276f81e2b77b",
   "base_production_commit": "426bd25e9d87b6bc7445843fbcd4eff191152fe7",
+  "preview": {
+    "deployment_id": "dpl_2jPBQfwpDFDAaTzZHXSLRWFhFo9C",
+    "url": "https://playin365-hva12mmi1-alalz22019-makers-projects.vercel.app",
+    "state": "READY",
+    "baseline_route_checks": "97/97",
+    "role_specific_finance_checks": "3/3",
+    "total_checks": "100/100",
+    "runtime_errors": 0,
+    "missing_routes": 0,
+    "unavailable_routes": 0
+  },
   "architecture": {
     "pillars": [
       "individuals",
@@ -100,7 +112,8 @@
     "touch_targets": "pass",
     "horizontal_overflow": "pass",
     "legacy_capabilities": "preserved",
-    "preview_runtime": "pending",
+    "preview_runtime": "pass",
+    "preview_build": "pass",
     "production_runtime": "not_started",
     "security_advisors": "pass_no_new_subscription_payment_findings_existing_project_debt_not_blocking",
     "performance_advisors": "pass_zero_unindexed_feature_foreign_keys",
@@ -108,6 +121,9 @@
     "new_tables_rls": "pass_3_of_3",
     "direct_new_table_access": "pass_revoked",
     "qa_cleanup": "pass_zero_qa_plans"
+  },
+  "observations": {
+    "non_blocking_warning": "Node DEP0169 was emitted by the football fixtures function; the endpoint remained functional and Subscription & Payment acceptance remained clean."
   },
   "external_activation": {
     "status": "experimental",
