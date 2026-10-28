@@ -431,7 +431,7 @@ T.acadNext = async () => {
     HUB.ROLE_OK.academy.push(...ACD.OWN);
     Object.keys(HUB.ROLE_OK).forEach(k=>{ if(HUB.ROLE_OK[k].indexOf("acadHome")<0) HUB.ROLE_OK[k].push("acadHome"); });
   }
-  if(typeof homeFor==="function"){ const _h=homeFor; window.homeFor=function(){ return ME && ME.role==="academy" ? "acadHome" : _h(); }; }
+  if(typeof homeFor==="function"){ const _h=homeFor; window.homeFor=function(){ return ME && ME.role==="academy" ? "myHome" : _h(); }; }
   /* رأس الشاشة: شاشات الأكاديمية تحمل رأسها معها · وشريطها بزوايا 12px (جهة لا فرد) */
   ACD.ERPV = v => /^(erp|erpOps|erpPeople|erpField|approvals|accredit|club|tournament)$/.test(v||"");
   ACD.nav = () => { const A = ACD.ERPV(VIEW) ? "#243244" : "#4636e3"; return `<nav style="position:fixed;bottom:12px;inset-inline:12px;max-width:496px;margin:0 auto;background:#fff;border:1px solid #e9e4d8;border-radius:999px;display:flex;justify-content:space-around;align-items:center;padding:8px 10px;box-shadow:0 10px 26px rgba(21,26,46,.07);z-index:50">

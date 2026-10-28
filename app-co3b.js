@@ -427,7 +427,7 @@ T.coachMe = async () => {
   /* الشريط السفلي موحّد بصريًا مع حساب اللاعب */
   if(typeof NAV !== "undefined")
     NAV.coach = [["home","الرئيسية","coachHome"],["community","فريقي","squad"],["services","الخدمات","hub"],["match","التشكيلة","tactics"],["profile","ملفي","coachMe"]];
-  if(typeof homeFor === "function"){ const _h = homeFor; window.homeFor = function(){ return ME && ME.role === "coach" ? "coachHome" : _h(); }; }
+  if(typeof homeFor === "function"){ const _h = homeFor; window.homeFor = function(){ return ME && ME.role === "coach" ? "myHome" : _h(); }; }
   /* عنوان الشاشة: عمود المدرب يتقدّم على العناوين العامة */
   if(typeof PL3 !== "undefined") Object.assign(PL3.TITLE, CO.TITLE);
 

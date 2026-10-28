@@ -395,5 +395,5 @@ window.chFix=async(id,who)=>{
       <div class="lrow" onclick="go('settings')" style="cursor:pointer"><span class="ic">⚙</span><div style="flex:1"><b style="font-size:12px">الإعدادات</b></div><span style="color:#4636e3;font-weight:900">←</span></div></div>`;
     return body.replace("</main>",rows+"</main>");
   };
-  if(typeof homeFor==="function"){ const _h=homeFor; window.homeFor=function(){ return ME&&ME.role==="coach"?"squad":_h(); }; }
+  if(typeof homeFor==="function"){ const _h=homeFor; window.homeFor=function(){ return ME&&ME.role==="coach"?"myHome":_h(); }; }
 })();

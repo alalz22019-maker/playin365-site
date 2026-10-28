@@ -1,28 +1,51 @@
 {
-  "version": "2026.10.28-academy-rekaz-parity-v1",
-  "stamp_utc": "2026-10-28T10:08:40.477Z",
-  "status": "production_verified",
-  "source_branch": "main",
-  "source_commit": "db52605a1f969339d41a7540ae054af4e6413f82",
-  "production_deployment": "dpl_B2sZKvXB6AN437EzAtrFh8kcD9sQ",
-  "production_url": "https://playin365.app",
-  "integration_mode": "experimental",
-  "academy_routes_verified": 31,
-  "integration_providers_registered": 42,
-  "database_migrations_applied": 14,
+  "version": "2026.10.28-pillars-foundation-rc1",
+  "stamp_utc": "2026-10-28T15:02:29Z",
+  "status": "preview_candidate",
+  "source_branch": "feat/pillars-identity-context-events-20261028",
+  "source_commit": "resolved_by_vercel_deployment_metadata",
+  "pillars": [
+    "individuals",
+    "organizations",
+    "events"
+  ],
+  "design_system": "PlayIn Live Canvas",
+  "approved_geometry": {
+    "player": "BR",
+    "coach": "BL",
+    "organization": "TL",
+    "other_individuals": "TR",
+    "geometry_rule": "one_exact_path_transforms_only"
+  },
+  "capability_preservation": {
+    "academy_routes": 34,
+    "coach_routes": 20,
+    "player_routes": 16,
+    "legacy_routes_preserved": 70,
+    "new_core_routes": 2,
+    "total_regression_routes": 76
+  },
+  "database": {
+    "pillars_migrations_applied": 13,
+    "responsibility_types": 12,
+    "work_types": 18,
+    "identity_pages_seeded": 37,
+    "qa_work_items_remaining": 0,
+    "qa_achievements_remaining": 0
+  },
   "quality_gates": {
     "javascript_syntax": "pass",
-    "static_references": "pass",
-    "secret_scan": "pass",
-    "preview_runtime": "pass",
-    "production_runtime": "pass",
-    "empty_academy_routes": 0,
-    "runtime_errors": 0,
-    "webhook_unit": "pass",
-    "ai_queue_lifecycle": "pass"
+    "postgres_sql_parse": "pass",
+    "context_switch": "pass",
+    "smart_home_three_roles": "pass",
+    "independent_identity_three_roles": "pass",
+    "shared_decision_lifecycle": "pass",
+    "shared_achievement_projection": "pass",
+    "security_rejection_tests": "pass",
+    "public_identity": "pass",
+    "exact_geometry": "pass",
+    "capability_registry": "pass",
+    "local_76_route_regression": "pass"
   },
-  "external_activation": {
-    "status": "not_started",
-    "note": "Integrations remain experimental until live credentials and provider webhooks pass verification."
-  }
+  "next_wave": "golden_training_day"
 }

@@ -34,7 +34,7 @@ async function loadMe(uid,email){
   }catch(e){}
   ME=data?{...data,role:demoRole||data.role,isSyntheticDemo:!!demoRole,roleSet:!!demoRole||picked||DEMO_HINT===data.id||(data.role&&data.role!=="player")||(data.org&&data.pos)}:null;
 }
-function homeFor(){ return ({player:"feed",coach:"coachHome",organizer:"orgMatch",referee:"refDuty",academy:"acad",venue:"venue",guardian:"guardian",scout:"scout",admin:"owner",medical:"medical",agent:"deals"})[ME.role]||"home"; }
+function homeFor(){ return ({player:"myHome",coach:"myHome",organizer:"orgMatch",referee:"refDuty",academy:"myHome",venue:"venue",guardian:"guardian",scout:"scout",admin:"owner",medical:"medical",agent:"deals"})[ME.role]||"home"; }
 async function doSignup(){
   const name=$("#su_name").value.trim(), em=$("#su_em").value.trim(), pw=$("#su_pw").value;
   if(!name||!em||pw.length<8) return toast("أكمل الاسم والبريد وكلمة مرور ٨+ أحرف",1);
