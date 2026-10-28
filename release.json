@@ -1,9 +1,9 @@
 {
-  "version": "2026.10.28-academy-rekaz-parity-v1",
-  "stamp_utc": "2026-10-28T10:08:40.477Z",
+  "version": "2026.10.28-pillars-foundation-v1",
+  "stamp_utc": "2026-10-28T15:33:40Z",
   "status": "production_verified",
   "source_branch": "main",
-  "source_commit": "db52605a1f969339d41a7540ae054af4e6413f82",
+  "source_commit": "d23258a86915ef71ac693f0f9a76e0a0804b5bb5",
   "production_deployment": "dpl_B2sZKvXB6AN437EzAtrFh8kcD9sQ",
   "production_url": "https://playin365.app",
   "integration_mode": "experimental",
@@ -19,7 +19,13 @@
     "empty_academy_routes": 0,
     "runtime_errors": 0,
     "webhook_unit": "pass",
-    "ai_queue_lifecycle": "pass"
+    "ai_queue_lifecycle": "pass",
+    "production_76_route_regression": "pass",
+    "production_public_identity": "pass",
+    "production_context_switch": "pass",
+    "production_messages_three_roles": "pass",
+    "production_settings_three_roles": "pass",
+    "production_fixtures_endpoint": "pass"
   },
   "external_activation": {
     "status": "not_started",
