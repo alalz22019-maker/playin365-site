@@ -1,0 +1,73 @@
+name: Import Golden Subscription Payment
+
+on:
+  push:
+    branches:
+      - feat/golden-subscription-payment-20261029
+    paths:
+      - .github/workflows/import-golden-subscription-payment.yml
+
+permissions:
+  contents: write
+
+jobs:
+  import-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: feat/golden-subscription-payment-20261029
+          fetch-depth: 0
+
+      - name: Download verified release bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 --retry-delay 2 \
+            'https://qmpwekibhdzmpmdbuvxz.supabase.co/storage/v1/object/public/gsp-release-20261029-bbe78c1/golden-subscription-payment.tar.gz' \
+            -o /tmp/golden-subscription-payment.tar.gz
+          echo 'fc8e7aed6fa672f621a6a895ff5a0ec5933c6028b2f089721eb3163c08bf34b4  /tmp/golden-subscription-payment.tar.gz' | sha256sum -c -
+
+      - name: Import release files
+        shell: bash
+        run: |
+          set -euo pipefail
+          tar -xzf /tmp/golden-subscription-payment.tar.gz
+
+      - name: Validate imported release
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check app-subscription-payment.js
+          python3 - <<'PY'
+          import json
+          for path in ['release.json', 'three-pillars-contract.json', 'docs/capability-registry.json']:
+              with open(path, encoding='utf-8') as fh:
+                  json.load(fh)
+          release = json.load(open('release.json', encoding='utf-8'))
+          registry = json.load(open('docs/capability-registry.json', encoding='utf-8'))
+          assert release['coverage']['total_role_route_checks'] == 100
+          assert registry['total_entries'] == 75
+          assert release['quality_gates']['postgres_parse'] == 'pass_111_statements'
+          print('Release validation passed')
+          PY
+          test -s subscription-payment.css
+          test -s supabase/migrations/20261029020000_golden_subscription_payment_complete.sql
+          grep -q 'subscriptionPayment' three-pillars-contract.json
+          grep -q 'app-subscription-payment.js' index.html
+
+      - name: Commit imported release
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/import-golden-subscription-payment.yml
+          git config user.name 'alalz22019-maker'
+          git config user.email 'alalz22019@gmail.com'
+          git add -A
+          if git diff --cached --quiet; then
+            echo 'No release changes were imported' >&2
+            exit 1
+          fi
+          git commit -m 'feat(finance): deliver Golden Subscription and Payment journey'
+          git push origin HEAD:feat/golden-subscription-payment-20261029
