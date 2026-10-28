@@ -1,34 +1,51 @@
 {
-  "version": "2026.10.28-pillars-foundation-v1",
-  "stamp_utc": "2026-10-28T15:33:40Z",
-  "status": "production_verified",
-  "source_branch": "main",
-  "source_commit": "d23258a86915ef71ac693f0f9a76e0a0804b5bb5",
-  "production_deployment": "dpl_B2sZKvXB6AN437EzAtrFh8kcD9sQ",
-  "production_url": "https://playin365.app",
+  "version": "2026.10.28-three-pillars-foundation-rc2",
+  "stamp_utc": "2026-10-28T15:41:14.729292Z",
+  "status": "preview_verified",
+  "source_branch": "feat/three-pillars-mainline-20261028",
+  "reconciled_main_commit": "e09116c7aa19f692312215e4535d933f14fe17a7",
+  "implementation_commit": "f3c54c8967888fa91da341571e3ec71955f606c3",
+  "preview_deployment": "dpl_qSWjvwCZjXhpUF5p1tG3iCdofsem",
+  "preview_url": "https://playin365-4i2sfecqf-alalz22019-makers-projects.vercel.app",
+  "architecture": {
+    "pillars": ["individuals", "organizations", "events"],
+    "account_model": "one_account_many_contexts",
+    "identity_model": "personal_organization_event_independent",
+    "work_routing": "responsibility_aware"
+  },
+  "coverage": {
+    "foundation_routes": 5,
+    "legacy_routes_preserved": 70,
+    "total_role_route_checks": 85,
+    "academy_responsibilities": 11,
+    "shared_achievement_entities": 5,
+    "public_identity_pages_verified": 5
+  },
+  "database": {
+    "three_pillars_migrations": 3,
+    "migrations_applied_on_2026_10_28": 32,
+    "context_home_rpc": "my_three_pillars_home"
+  },
   "integration_mode": "experimental",
-  "academy_routes_verified": 31,
   "integration_providers_registered": 42,
-  "database_migrations_applied": 14,
   "quality_gates": {
     "javascript_syntax": "pass",
     "static_references": "pass",
     "secret_scan": "pass",
+    "legacy_capability_contract": "pass",
+    "missing_routes": 0,
+    "unavailable_routes": 0,
+    "responsibility_queue_separation": "pass",
+    "personal_organization_identity_separation": "pass",
+    "shared_achievement_single_record": "pass",
+    "event_identity": "pass",
+    "public_identity_runtime": "pass",
+    "fixtures_fallback": "pass",
     "preview_runtime": "pass",
-    "production_runtime": "pass",
-    "empty_academy_routes": 0,
-    "runtime_errors": 0,
-    "webhook_unit": "pass",
-    "ai_queue_lifecycle": "pass",
-    "production_76_route_regression": "pass",
-    "production_public_identity": "pass",
-    "production_context_switch": "pass",
-    "production_messages_three_roles": "pass",
-    "production_settings_three_roles": "pass",
-    "production_fixtures_endpoint": "pass"
+    "production_runtime": "not_started"
   },
   "external_activation": {
     "status": "not_started",
-    "note": "Integrations remain experimental until live credentials and provider webhooks pass verification."
+    "note": "External integrations remain experimental until live credentials and provider webhooks pass verification."
   }
 }
