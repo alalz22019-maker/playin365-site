@@ -20,28 +20,47 @@ jobs:
           ref: feat/three-pillars-foundation-20261028
           fetch-depth: 0
 
-      - name: Download validated files and verify hashes
+      - name: Download validated archive chunks
         shell: bash
         run: |
           set -euo pipefail
-          BASE="https://sb-6kuhdn76aqm1.vercel.run"
-          cat > /tmp/three-pillars.sha256 <<'SUMS'
-          f0f19a2f912b8c23c51dfe34c5746d45bed1c81151fc5ce9bcc05026a3d43a7b  app-pillars.js
-          8da10702ac972d0e3357119624689efdce33a4c54bcc749009d8d73549656a97  pillars.css
-          58c07529907ae48b2ba3a09b31136197e85c670e8bbeba274f945f3deae5cae3  index.html
-          aede161f9e1a25c4de73f57f758bc55386eb66e488fe70431ae8a464958bda9a  release.json
-          d6f41e149b75be8c2cc4bdfa92bffa5f7eb22afe734561296c4e297e75bf9a87  sw.js
-          0e67a4b8a1dfd5ed349e2db71867a0b4c98579dbc32538275d037c9de8438f1f  three-pillars-contract.json
-          81831d17906c8c7ce2d2e89a7182e3e16ac7178cba8a738269f0b162e0b4f91f  docs/THREE-PILLARS-FOUNDATION-2026-10-28.md
-          e1acd97829b75dce6742f429ef02df755e199a4216c05d41de825118108bea51  supabase/migrations/20261028150000_three_pillars_foundation.sql
-          6355330587b5c873f85100cab775c645f39d534501985270e93b8c20e850621b  supabase/migrations/20261028150500_three_pillars_home_filter.sql
-          9961b62deaf2e2e9567d8843849e0bf13107164db1c608a2a908ec4d821a9cef  supabase/migrations/20261028151000_three_pillars_demo_completion.sql
-          SUMS
-          while read -r hash file; do
-            mkdir -p "$(dirname "$file")"
-            curl -fsSL --retry 10 --retry-connrefused --retry-delay 2 "$BASE/$file" -o "$file"
-          done < /tmp/three-pillars.sha256
-          sha256sum -c /tmp/three-pillars.sha256
+          python3 - <<'PY' > /tmp/supabase.env
+          import re
+          text=open('config.js',encoding='utf-8').read()
+          url=re.search(r'SUPABASE_URL:\s*["\x27]([^"\x27]+)',text).group(1)
+          key=re.search(r'SUPABASE_ANON_KEY:\s*["\x27]([^"\x27]+)',text).group(1)
+          print('SUPABASE_URL='+url)
+          print('SUPABASE_ANON_KEY='+key)
+          PY
+          source /tmp/supabase.env
+          curl -fsS --retry 5 --retry-delay 2 \
+            -X POST "$SUPABASE_URL/rest/v1/rpc/get_release_transfer_chunks" \
+            -H "apikey: $SUPABASE_ANON_KEY" \
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
+            -H "Content-Type: application/json" \
+            --data '{"p_transfer_id":"0091dc09-ba42-46c6-93c1-3359e0033bd6","p_token":"0091dc09-ba42-46c6-93c1-3359e0033bd6"}' \
+            -o /tmp/three-pillars-chunks.json
+          python3 - <<'PY'
+          import base64,hashlib,json
+          rows=json.load(open('/tmp/three-pillars-chunks.json'))
+          rows=sorted(rows,key=lambda x:x['seq'])
+          assert len(rows)==6, f'expected 6 chunks, got {len(rows)}'
+          assert [r['seq'] for r in rows]==list(range(6)), 'chunk sequence is incomplete'
+          archive=b''
+          for row in rows:
+              part=base64.b64decode(row['payload_base64'])
+              actual=hashlib.sha256(part).hexdigest()
+              assert actual==row['chunk_sha256'], f"chunk {row['seq']} hash mismatch"
+              archive+=part
+          expected=rows[0]['archive_sha256']
+          actual=hashlib.sha256(archive).hexdigest()
+          assert actual==expected=='7d5d556a7a283a0666620f74d8479b3b9e83b950af1dcefe1b882b2d98abb1d9', 'archive hash mismatch'
+          open('/tmp/three-pillars.tar.gz','wb').write(archive)
+          print('archive verified',len(archive),actual)
+          PY
+          tar -tzf /tmp/three-pillars.tar.gz | grep -Ev '(^/|\.\./)' >/tmp/archive-paths.txt
+          test "$(wc -l </tmp/archive-paths.txt)" -eq 10
+          tar -xzf /tmp/three-pillars.tar.gz -C .
 
       - name: Validate imported foundation
         shell: bash
@@ -51,11 +70,17 @@ jobs:
           node --check sw.js
           python3 - <<'PY'
           import json
-          json.load(open('release.json'))
-          json.load(open('three-pillars-contract.json'))
+          release=json.load(open('release.json'))
+          contract=json.load(open('three-pillars-contract.json'))
+          assert release['version']=='2026.10.28-three-pillars-foundation-rc1'
+          assert contract['qualityGates']['legacyRoutesPreserved'] is True
           PY
           grep -q 'app-pillars.js' index.html
           grep -q 'pillars.css' index.html
+          grep -q 'my_three_pillars_home' app-pillars.js
+          test -f supabase/migrations/20261028150000_three_pillars_foundation.sql
+          test -f supabase/migrations/20261028150500_three_pillars_home_filter.sql
+          test -f supabase/migrations/20261028151000_three_pillars_demo_completion.sql
           git diff --check
 
       - name: Commit imported release candidate
