@@ -1,0 +1,16 @@
+{
+  "name": "PlayIn365",
+  "short_name": "PlayIn365",
+  "description": "منظومة التشغيل والهوية الرياضية",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#08101e",
+  "theme_color": "#105350",
+  "categories": ["sports", "business", "productivity"],
+  "icons": [
+    {"src":"/assets/playin-icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
+  ]
+}

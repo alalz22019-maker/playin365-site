@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" role="img" aria-label="تجربة أداء كرة قدم">
+<defs><linearGradient id="bg" x2="0" y2="1"><stop stop-color="#11152b"/><stop offset=".58" stop-color="#2f235f"/><stop offset="1" stop-color="#0b4d3d"/></linearGradient><radialGradient id="halo"><stop stop-color="#f5c518" stop-opacity=".35"/><stop offset="1" stop-color="#f5c518" stop-opacity="0"/></radialGradient></defs>
+<rect width="1600" height="1000" fill="url(#bg)"/><circle cx="800" cy="360" r="380" fill="url(#halo)"/><path d="M0 700h1600v300H0z" fill="#0e664d"/><g opacity=".25" stroke="#fff" stroke-width="8"><path d="M200 760h1200M800 700v300"/><circle cx="800" cy="840" r="118" fill="none"/></g>
+<g fill="#050913"><circle cx="800" cy="270" r="65"/><path d="M735 340q65-45 130 0l72 215-88 24-49-128-49 128-88-24z"/><path d="M742 548l-120 254-79-36 106-268z"/><path d="M858 548l132 248-77 40-146-260z"/><path d="M705 370l-150 95-41-69 164-105zM895 370l150 95 41-69-164-105z"/></g>
+<g fill="#f5c518" opacity=".9"><circle cx="520" cy="720" r="20"/><circle cx="1080" cy="720" r="20"/><circle cx="420" cy="820" r="20"/><circle cx="1180" cy="820" r="20"/></g><circle cx="800" cy="775" r="58" fill="#fff"/><path d="M800 741l27 19-10 32h-34l-10-32zM759 773l14-13 10 32-22 18zM841 773l-14-13-10 32 22 18z" fill="#18243e"/>
+</svg>

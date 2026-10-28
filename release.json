@@ -1,0 +1,18 @@
+{
+  "version": "2026.10.28-academy-rekaz-parity-rc1",
+  "stamp_utc": "2026-10-28T09:55:33Z",
+  "status": "preview_candidate",
+  "source_branch": "feat/academy-rekaz-parity-20261028",
+  "integration_mode": "experimental",
+  "academy_routes_verified": 31,
+  "integration_providers_registered": 42,
+  "database_migrations_applied": 14,
+  "quality_gates": {
+    "javascript_syntax": "pass",
+    "academy_runtime": "pass",
+    "empty_academy_routes": 0,
+    "runtime_errors": 0,
+    "webhook_unit": "pass",
+    "ai_queue_lifecycle": "pass"
+  }
+}

@@ -278,7 +278,7 @@ T.vnProfile = async () => {
   return VN.head(esc(D.v),"ملف الملعب وجرد التغطية") + VN.tabs("vnProfile") +
   `<main style="flex:1;padding:14px 18px 118px;display:flex;flex-direction:column;gap:12px">
     <div style="position:relative;overflow:hidden;background:#151a2e;border-radius:22px;padding:18px;color:#faf8f3">
-      <img src="assets/cv-day-grass.png" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.3">
+      <img src="assets/cv-day-grass.svg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.3">
       <div style="position:relative">
         <b style="display:block;font-size:19px;font-weight:900">${esc(D.v)}</b>
         <span style="display:block;font-size:10.5px;font-weight:700;color:#c6cade;margin-top:5px">${D.sp.length?`<span class="ltr">${D.sp.length}</span> مساحات · `:""}<span class="ltr">${D.paid.length}</span> حجزًا مؤكَّدًا</span>

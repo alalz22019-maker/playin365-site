@@ -178,7 +178,7 @@ T.vndProfile = async () => {
     <div style="flex:1 1 420px;min-width:0;padding:18px;display:flex;flex-direction:column;gap:14px">
 
       <div style="position:relative;border-radius:12px;overflow:hidden;min-height:200px;display:flex;align-items:flex-end;background:${VD.INK}">
-        <img src="assets/cv-day-grass.png" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.42">
+        <img src="assets/cv-day-grass.svg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.42">
         <div style="position:relative;padding:18px;display:flex;justify-content:space-between;align-items:flex-end;gap:16px;width:100%;flex-wrap:wrap">
           <div style="min-width:0">
             <b style="display:block;font-size:20px;font-weight:900;color:#fff">${esc(D.v)}</b>

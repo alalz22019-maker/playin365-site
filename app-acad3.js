@@ -51,7 +51,7 @@ ACD.load = async org => {
     q("md", sb.from("pi_media").select("*").order("created_at",{ascending:false}).limit(60)),
     q("mm", sb.from("memberships").select("*").eq("org",org).limit(500)),
     q("m", sb.from("matches").select("*").order("created_at",{ascending:false}).limit(60)),
-    q("f", sb.from("follows").select("id").eq("target_name",org).limit(5000)),
+    q("f", ()=>sb.from("follows").select("id").eq("target_name",org).limit(5000)),
     q("v", sb.from("pi_views").select("viewer,viewer_role,subject,created_at").order("created_at",{ascending:false}).limit(300)),
     q("om", sb.from("pi_org_meta").select("*").eq("org",org).limit(40))
   ]);
@@ -154,7 +154,7 @@ T.acadPride = async () => {
   return ACD.head("الفخر","وش حقّقتم؟ — الإنجازات والخرّيجون") + `<main style="flex:1;padding:14px 18px 118px;display:flex;flex-direction:column;gap:12px">
     ${ACD.tabs("acadPride")}
     <div style="position:relative;border-radius:26px;overflow:hidden;background:#151a2e;min-height:230px;display:flex;align-items:flex-end">
-      <img src="assets/cv-night-strike.png" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.8">
+      <img src="assets/cv-night-strike.svg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.8">
       <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(21,26,46,0) 20%,rgba(21,26,46,.96) 100%)"></div>
       <div style="position:relative;padding:18px;color:#faf8f3">
         ${seasonTop?`<span style="display:inline-flex;align-items:center;gap:5px;background:rgba(245,197,24,.18);border:1px solid rgba(245,197,24,.5);color:#f5c518;border-radius:999px;padding:4px 10px;font-size:9.5px;font-weight:900">★ إنجاز الموسم</span>
@@ -359,7 +359,7 @@ T.acadMedia = async () => {
         <span style="display:inline-flex;align-items:center;gap:5px;background:${hero.m.event_id?"#4636e3":"rgba(255,255,255,.18)"};border-radius:999px;padding:4px 10px;font-size:9.5px;font-weight:900">${hero.tag}${hero.m.minute?` · <span class="ltr">${hero.m.minute}′</span>`:""}</span>
         <b style="display:block;font-size:14px;font-weight:900;margin-top:6px">${esc(hero.m.label||"لقطة")} — ${esc(hero.m.subject)}${hero.m.match_title?` · ${esc(hero.m.match_title)}`:""}</b>
         <span style="display:block;font-size:9.5px;color:#c6cade;font-weight:700;margin-top:2px">${esc(String(hero.m.created_at||"").slice(0,10))} · رفعها ${esc(hero.m.uploaded_by||"صاحبها")}</span></div></div>`
-    :`<div style="position:relative;border-radius:26px;overflow:hidden;background:#151a2e;aspect-ratio:16/10"><img src="assets/cv-night-duel.png" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.55"><div style="position:absolute;inset:0;display:grid;place-items:center;padding:20px;text-align:center;color:#faf8f3"><span style="font-size:12px;font-weight:800;line-height:1.8">لا لقطات منشورة بعد — يرفعها اللاعبون من بطاقاتهم، والمربوطة بحدث تحمل «موثّقة»</span></div></div>`}
+    :`<div style="position:relative;border-radius:26px;overflow:hidden;background:#151a2e;aspect-ratio:16/10"><img src="assets/cv-night-duel.svg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.55"><div style="position:absolute;inset:0;display:grid;place-items:center;padding:20px;text-align:center;color:#faf8f3"><span style="font-size:12px;font-weight:800;line-height:1.8">لا لقطات منشورة بعد — يرفعها اللاعبون من بطاقاتهم، والمربوطة بحدث تحمل «موثّقة»</span></div></div>`}
     <div style="display:flex;gap:6px">
       ${[["all","الكل"],["goal","أهداف"],["train","التدريب"],["event","الفعاليات"]].map(([k,lb])=>`<button onclick="acMf('${k}')" style="flex:1;text-align:center;background:${f===k?"#151a2e":"#fff"};color:${f===k?"#faf8f3":"#5b6078"};border:1px solid ${f===k?"#151a2e":"#e9e4d8"};border-radius:999px;padding:8px;font:900 10.5px Cairo;cursor:pointer">${lb}</button>`).join("")}</div>
     ${shown.length>1?`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
@@ -388,8 +388,8 @@ T.acadNext = async () => {
   const ups = D.allM.filter(m=>(m.status==="open"||m.status==="today") && String(m.title||"").indexOf(short)>=0).slice(0,2);
   const tryo = D.tryouts.find(t=>t.status==="open");
   const events = [
-    ...(tryo?[{img:"assets/cv-night-duel2.png",when:"تجربة أداء · مجانية",wi:"#b9b0f5",t:`تجربة أداء ${esc(tryo.group_name||"")}`,s:`${esc(tryo.note||"مقر الأكاديمية")} · التسجيل من وليّ الأمر`,cta:"سجّل ابنك",cb:"#f5c518",ci:"#151a2e",fn:`acApply('${ACD.esn(org)}','${ACD.esn(tryo.group_name||"")}')`}]:[]),
-    ...ups.map(m=>({img:"assets/cv-night-kick.png",when:`${esc(m.match_date||"قريبًا")} · ${esc(m.match_time||"")} · ${esc(m.comp||"ودية")}`,wi:"#f5c518",t:esc(m.title),s:`${esc(m.venue||"")} · التوقّع يُغلق عند الصافرة`,cta:"احضر · توقّع",cb:"#fff",ci:"#151a2e",fn:`go('acadHub','${ACD.esn(org)}')`}))
+    ...(tryo?[{img:"assets/cv-night-duel2.svg",when:"تجربة أداء · مجانية",wi:"#b9b0f5",t:`تجربة أداء ${esc(tryo.group_name||"")}`,s:`${esc(tryo.note||"مقر الأكاديمية")} · التسجيل من وليّ الأمر`,cta:"سجّل ابنك",cb:"#f5c518",ci:"#151a2e",fn:`acApply('${ACD.esn(org)}','${ACD.esn(tryo.group_name||"")}')`}]:[]),
+    ...ups.map(m=>({img:"assets/cv-night-kick.svg",when:`${esc(m.match_date||"قريبًا")} · ${esc(m.match_time||"")} · ${esc(m.comp||"ودية")}`,wi:"#f5c518",t:esc(m.title),s:`${esc(m.venue||"")} · التوقّع يُغلق عند الصافرة`,cta:"احضر · توقّع",cb:"#fff",ci:"#151a2e",fn:`go('acadHub','${ACD.esn(org)}')`}))
   ];
   const active = D.mem.filter(m=>m.active), tier = active[0], price = tier?tier.price:null;
   const items = D.tr.filter(t=>/متجر|قميص|مزاد/.test(t.action||"")&&String(t.action).indexOf(short)>=0).slice(0,2);

@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="PlayIn365">
+<defs><linearGradient id="g" x2="1" y2="1"><stop stop-color="#105350"/><stop offset="1" stop-color="#26374D"/></linearGradient></defs>
+<rect width="512" height="512" rx="112" fill="url(#g)"/><circle cx="256" cy="256" r="156" fill="none" stroke="#D5B642" stroke-width="24" opacity=".95"/><path d="M210 164v184l146-92z" fill="#fff"/><circle cx="150" cy="150" r="28" fill="#00A6D6"/><circle cx="372" cy="362" r="22" fill="#25A173"/>
+</svg>
