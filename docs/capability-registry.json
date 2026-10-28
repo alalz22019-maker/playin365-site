@@ -1,0 +1,1522 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-10-28",
+  "principle": "No existing route or capability may be removed without explicit owner approval. Integration, relocation and visual redesign do not count as deletion.",
+  "baseline_counts": {
+    "academy": 34,
+    "coach": 20,
+    "player": 16
+  },
+  "new_core_routes": 2,
+  "total_entries": 72,
+  "items": [
+    {
+      "capability_id": "ACA-001",
+      "role": "academy",
+      "route": "opsHome",
+      "label_ar": "مركز التشغيل",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "command_intelligence",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "ACA-002",
+      "role": "academy",
+      "route": "opsCustomers",
+      "label_ar": "العملاء واللاعبون",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "people_identity",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "ACA-003",
+      "role": "academy",
+      "route": "opsSubscriptions",
+      "label_ar": "الاشتراكات والفواتير",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "business",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "ACA-004",
+      "role": "academy",
+      "route": "opsCashier",
+      "label_ar": "الكاشير ونقطة البيع",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "business",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "ACA-005",
+      "role": "academy",
+      "route": "opsOrders",
+      "label_ar": "المتجر والطلبات",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "business",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "ACA-006",
+      "role": "academy",
+      "route": "opsReservations",
+      "label_ar": "الحجوزات",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "sport_operations",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "ACA-007",
+      "role": "academy",
+      "route": "opsAttendance",
+      "label_ar": "الحضور والبوابة",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "sport_operations",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "ACA-008",
+      "role": "academy",
+      "route": "opsReports",
+      "label_ar": "التقارير",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "command_intelligence",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "ACA-009",
+      "role": "academy",
+      "route": "opsIntegrations",
+      "label_ar": "التكاملات",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "configuration",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "ACA-010",
+      "role": "academy",
+      "route": "messages",
+      "label_ar": "الرسائل",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "communication",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "ACA-011",
+      "role": "academy",
+      "route": "settings",
+      "label_ar": "الإعدادات",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "configuration",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "ACA-012",
+      "role": "academy",
+      "route": "acadProfile",
+      "label_ar": "ملف الأكاديمية",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "people_identity",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "ACA-013",
+      "role": "academy",
+      "route": "acad",
+      "label_ar": "الأكاديمية",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "command_intelligence",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "ACA-014",
+      "role": "academy",
+      "route": "acadSquads",
+      "label_ar": "الفئات والفرق",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "sport_operations",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "ACA-015",
+      "role": "academy",
+      "route": "acadMatches",
+      "label_ar": "مباريات الأكاديمية",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "sport_operations",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "ACA-016",
+      "role": "academy",
+      "route": "acadTryouts",
+      "label_ar": "اختبارات القبول",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "sport_operations",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "ACA-017",
+      "role": "academy",
+      "route": "acadRosterImport",
+      "label_ar": "استيراد القوائم",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "sport_operations",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "ACA-018",
+      "role": "academy",
+      "route": "opsOffers",
+      "label_ar": "العروض والهدايا والولاء",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "growth_discovery",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "ACA-019",
+      "role": "academy",
+      "route": "opsEngagement",
+      "label_ar": "التواصل والتأكيدات",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "communication",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "ACA-020",
+      "role": "academy",
+      "route": "opsBranches",
+      "label_ar": "الفروع والإعدادات",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "configuration",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "ACA-021",
+      "role": "academy",
+      "route": "opsForms",
+      "label_ar": "النماذج العامة",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "growth_discovery",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "ACA-022",
+      "role": "academy",
+      "route": "opsMobile",
+      "label_ar": "الجوال والمحفظة",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "configuration",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "ACA-023",
+      "role": "academy",
+      "route": "opsAssistant",
+      "label_ar": "المساعد الذكي",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "command_intelligence",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "ACA-024",
+      "role": "academy",
+      "route": "opsInbox",
+      "label_ar": "صندوق الوارد الموحد",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "communication",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "ACA-025",
+      "role": "academy",
+      "route": "pitch",
+      "label_ar": "المجتمع الرياضي",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "sport_operations",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "ACA-026",
+      "role": "academy",
+      "route": "market",
+      "label_ar": "السوق",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "business",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "ACA-027",
+      "role": "academy",
+      "route": "acadPerformance",
+      "label_ar": "أداء الأكاديمية",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "growth_discovery",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "ACA-028",
+      "role": "academy",
+      "route": "deals",
+      "label_ar": "الصفقات",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "business",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "ACA-029",
+      "role": "academy",
+      "route": "role",
+      "label_ar": "اختيار الدور",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "configuration",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "ACA-030",
+      "role": "academy",
+      "route": "opsStaff",
+      "label_ar": "الموظفون والصلاحيات",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "people_identity",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "ACA-031",
+      "role": "academy",
+      "route": "opsFinance",
+      "label_ar": "المالية والمصروفات",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "business",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "ACA-032",
+      "role": "academy",
+      "route": "opsMarketing",
+      "label_ar": "التسويق",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "growth_discovery",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "ACA-033",
+      "role": "academy",
+      "route": "opsWebsite",
+      "label_ar": "الموقع العام",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "growth_discovery",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "ACA-034",
+      "role": "academy",
+      "route": "opsDocuments",
+      "label_ar": "المستندات",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "command_intelligence",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "COA-001",
+      "role": "coach",
+      "route": "coachHome",
+      "label_ar": "مساحة المدرب",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "command_intelligence",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "COA-002",
+      "role": "coach",
+      "route": "squad",
+      "label_ar": "فريقي",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "sport_operations",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "COA-003",
+      "role": "coach",
+      "route": "session",
+      "label_ar": "حصة اليوم",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "sport_operations",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "COA-004",
+      "role": "coach",
+      "route": "sessions",
+      "label_ar": "الحصص ومخططها",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "sport_operations",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "COA-005",
+      "role": "coach",
+      "route": "drills",
+      "label_ar": "بنك التمارين",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "sport_operations",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "COA-006",
+      "role": "coach",
+      "route": "brief",
+      "label_ar": "تعليمات الحصة",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "sport_operations",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "COA-007",
+      "role": "coach",
+      "route": "rate",
+      "label_ar": "تقييم اللاعب",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "sport_operations",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "COA-008",
+      "role": "coach",
+      "route": "tactics",
+      "label_ar": "التشكيلة والاحتياط",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "sport_operations",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "COA-009",
+      "role": "coach",
+      "route": "boards",
+      "label_ar": "اللوحات التكتيكية",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "sport_operations",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "COA-010",
+      "role": "coach",
+      "route": "pitch",
+      "label_ar": "المجتمع الرياضي",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "sport_operations",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "COA-011",
+      "role": "coach",
+      "route": "chain",
+      "label_ar": "سلسلة الثقة",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "other",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "COA-012",
+      "role": "coach",
+      "route": "coachTasks",
+      "label_ar": "مهام المدرب",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "sport_operations",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "COA-013",
+      "role": "coach",
+      "route": "coachMe",
+      "label_ar": "الملف المهني",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "people_identity",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "COA-014",
+      "role": "coach",
+      "route": "reports",
+      "label_ar": "تقارير المدرب",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "sport_operations",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "COA-015",
+      "role": "coach",
+      "route": "orgMatch",
+      "label_ar": "المباريات والتسجيل",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "sport_operations",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "COA-016",
+      "role": "coach",
+      "route": "explore",
+      "label_ar": "الاستكشاف",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "growth_discovery",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "COA-017",
+      "role": "coach",
+      "route": "messages",
+      "label_ar": "الرسائل",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "communication",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "COA-018",
+      "role": "coach",
+      "route": "market",
+      "label_ar": "السوق",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "business",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "COA-019",
+      "role": "coach",
+      "route": "role",
+      "label_ar": "اختيار الدور",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "configuration",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "COA-020",
+      "role": "coach",
+      "route": "settings",
+      "label_ar": "الإعدادات",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "configuration",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "PLA-001",
+      "role": "player",
+      "route": "feed",
+      "label_ar": "لوحة اللاعب",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "growth_discovery",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "PLA-002",
+      "role": "player",
+      "route": "records",
+      "label_ar": "السجل والأداء",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "sport_operations",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "PLA-003",
+      "role": "player",
+      "route": "cabinet",
+      "label_ar": "خزانة الإنجازات",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "sport_operations",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "PLA-004",
+      "role": "player",
+      "route": "health",
+      "label_ar": "الصحة والجاهزية",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "sport_operations",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "PLA-005",
+      "role": "player",
+      "route": "wallet",
+      "label_ar": "المحفظة والجدول",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "business",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "PLA-006",
+      "role": "player",
+      "route": "calendar",
+      "label_ar": "التقويم",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "sport_operations",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "PLA-007",
+      "role": "player",
+      "route": "pitch",
+      "label_ar": "المجتمع الرياضي",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "sport_operations",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "PLA-008",
+      "role": "player",
+      "route": "explore",
+      "label_ar": "الاستكشاف",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "growth_discovery",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "PLA-009",
+      "role": "player",
+      "route": "opps",
+      "label_ar": "الفرص والدعوات",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "growth_discovery",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "PLA-010",
+      "role": "player",
+      "route": "publicView",
+      "label_ar": "الملف العام",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "people_identity",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "PLA-011",
+      "role": "player",
+      "route": "messages",
+      "label_ar": "الرسائل",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "communication",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "PLA-012",
+      "role": "player",
+      "route": "market",
+      "label_ar": "السوق",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "business",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "PLA-013",
+      "role": "player",
+      "route": "viewLog",
+      "label_ar": "سجل الاطلاع",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "people_identity",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "PLA-014",
+      "role": "player",
+      "route": "privacy",
+      "label_ar": "الخصوصية",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "people_identity",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "PLA-015",
+      "role": "player",
+      "route": "role",
+      "label_ar": "اختيار الدور",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "configuration",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "PLA-016",
+      "role": "player",
+      "route": "settings",
+      "label_ar": "الإعدادات",
+      "current_status": "retained",
+      "disposition": "retained_as_detail_or_integrated_entry",
+      "target_area": "configuration",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "CORE-001",
+      "role": "shared",
+      "route": "myHome",
+      "label_ar": "مساحتي اليوم",
+      "current_status": "implemented_on_feature_branch",
+      "disposition": "new_core_layer",
+      "target_area": "core",
+      "new_entry_points": [
+        "myHome"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "CORE-002",
+      "role": "shared",
+      "route": "myIdentity",
+      "label_ar": "الهوية المستقلة",
+      "current_status": "implemented_on_feature_branch",
+      "disposition": "new_core_layer",
+      "target_area": "core",
+      "new_entry_points": [
+        "myIdentity"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    }
+  ]
+}
