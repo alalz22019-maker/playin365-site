@@ -1,6 +1,6 @@
 {
-  "version": "2026.10.28-pillars-foundation-rc1",
-  "stamp_utc": "2026-10-28T15:02:29Z",
+  "version": "2026.10.28-pillars-foundation-rc2",
+  "stamp_utc": "2026-10-28T15:35:00Z",
   "status": "preview_candidate",
   "source_branch": "feat/pillars-identity-context-events-20261028",
   "source_commit": "resolved_by_vercel_deployment_metadata",
@@ -45,7 +45,9 @@
     "public_identity": "pass",
     "exact_geometry": "pass",
     "capability_registry": "pass",
-    "local_76_route_regression": "pass"
+    "local_76_route_regression": "pass",
+    "personal_settings_multi_role": "pass",
+    "fixtures_graceful_fallback": "pass"
   },
   "next_wave": "golden_training_day"
 }

@@ -70,3 +70,8 @@
 `training_sessions → training_session_attendance → readiness → coach_evaluations → player_assessments → performance_metrics → entity_activity_events`
 
 مع إبقاء طبقة توافق للصفحات القديمة إلى أن تنتهي الهجرة وتُختبر بالكامل.
+
+## إصلاحات Preview RC2
+
+- إعدادات شخصية مستقلة للمدرب واللاعب مع بقاء إعدادات الجهة للأكاديمية.
+- خدمة مباريات اليوم تستخدم المصدر الحي عند تفعيله، وتعود بعقد صالح وواجهة فارغة صريحة بدل خطأ 503 عند غياب أو تعطل المزود.
