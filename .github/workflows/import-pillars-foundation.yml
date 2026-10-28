@@ -25,7 +25,9 @@ jobs:
         run: |
           set -euo pipefail
           curl --fail --silent --show-error --location \
-            "https://sb-6btc3y7gbqna.vercel.run/pillars-foundation-8245d1a.tar.gz" \
+            --retry 15 --retry-delay 2 --retry-all-errors \
+            --connect-timeout 15 --max-time 300 \
+            "https://sb-6btc3y7gbqna.vercel.run/pillars-foundation-8245d1a.tar.gz?run=2" \
             --output /tmp/pillars-foundation.tar.gz
           echo "b4360cb916a004beadf4986a00dfa050f0a0f4379b217ce2deaf2d5f5eb648ab  /tmp/pillars-foundation.tar.gz" | sha256sum --check --strict
           tar -tzf /tmp/pillars-foundation.tar.gz
@@ -44,6 +46,7 @@ jobs:
           python3 -m json.tool docs/capability-registry.json >/dev/null
           grep -F "M500 0 A500 500 0 0 1 1000 500 L1000 750 A250 250 0 0 1 750 1000 L500 1000 A500 500 0 0 1 500 0 Z" app-pillars.js >/dev/null
           test "$(find supabase/migrations -maxdepth 1 -name '2026102814*.sql' | wc -l)" -eq 5
+          test "$(node -e "const r=require('./docs/capability-registry.json');process.stdout.write(String(r.items.filter(x=>x.current_status==='retained').length))")" -eq 70
 
       - name: Commit imported release candidate
         shell: bash
