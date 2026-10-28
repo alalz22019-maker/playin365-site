@@ -1,0 +1,70 @@
+name: Import Three Pillars Foundation
+
+on:
+  push:
+    branches:
+      - feat/three-pillars-foundation-20261028
+    paths:
+      - .github/workflows/import-three-pillars-foundation.yml
+
+permissions:
+  contents: write
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout target branch
+        uses: actions/checkout@v4
+        with:
+          ref: feat/three-pillars-foundation-20261028
+          fetch-depth: 0
+
+      - name: Download validated files and verify hashes
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE="https://sb-6kuhdn76aqm1.vercel.run"
+          cat > /tmp/three-pillars.sha256 <<'SUMS'
+          f0f19a2f912b8c23c51dfe34c5746d45bed1c81151fc5ce9bcc05026a3d43a7b  app-pillars.js
+          8da10702ac972d0e3357119624689efdce33a4c54bcc749009d8d73549656a97  pillars.css
+          58c07529907ae48b2ba3a09b31136197e85c670e8bbeba274f945f3deae5cae3  index.html
+          aede161f9e1a25c4de73f57f758bc55386eb66e488fe70431ae8a464958bda9a  release.json
+          d6f41e149b75be8c2cc4bdfa92bffa5f7eb22afe734561296c4e297e75bf9a87  sw.js
+          0e67a4b8a1dfd5ed349e2db71867a0b4c98579dbc32538275d037c9de8438f1f  three-pillars-contract.json
+          81831d17906c8c7ce2d2e89a7182e3e16ac7178cba8a738269f0b162e0b4f91f  docs/THREE-PILLARS-FOUNDATION-2026-10-28.md
+          e1acd97829b75dce6742f429ef02df755e199a4216c05d41de825118108bea51  supabase/migrations/20261028150000_three_pillars_foundation.sql
+          6355330587b5c873f85100cab775c645f39d534501985270e93b8c20e850621b  supabase/migrations/20261028150500_three_pillars_home_filter.sql
+          9961b62deaf2e2e9567d8843849e0bf13107164db1c608a2a908ec4d821a9cef  supabase/migrations/20261028151000_three_pillars_demo_completion.sql
+          SUMS
+          while read -r hash file; do
+            mkdir -p "$(dirname "$file")"
+            curl -fsSL --retry 10 --retry-connrefused --retry-delay 2 "$BASE/$file" -o "$file"
+          done < /tmp/three-pillars.sha256
+          sha256sum -c /tmp/three-pillars.sha256
+
+      - name: Validate imported foundation
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check app-pillars.js
+          node --check sw.js
+          python3 - <<'PY'
+          import json
+          json.load(open('release.json'))
+          json.load(open('three-pillars-contract.json'))
+          PY
+          grep -q 'app-pillars.js' index.html
+          grep -q 'pillars.css' index.html
+          git diff --check
+
+      - name: Commit imported release candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/import-three-pillars-foundation.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "feat(platform): establish individuals organizations events foundation"
+          git push origin HEAD:feat/three-pillars-foundation-20261028
