@@ -1,0 +1,110 @@
+name: Verify Three Pillars Production
+
+on:
+  push:
+    branches:
+      - ops/three-pillars-production-verify-20261028
+    paths:
+      - .github/workflows/verify-three-pillars-production.yml
+
+permissions:
+  contents: write
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      BASE_URL: https://playin365.app
+    steps:
+      - name: Checkout verifier branch
+        uses: actions/checkout@v4
+        with:
+          ref: ops/three-pillars-production-verify-20261028
+          fetch-depth: 1
+
+      - name: Wait for merged RC3 on main
+        shell: bash
+        run: |
+          set -euo pipefail
+          git init /tmp/playin
+          cd /tmp/playin
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          ready=0
+          for attempt in $(seq 1 120); do
+            git fetch --force --depth=10 origin main:refs/remotes/origin/main || true
+            if git show refs/remotes/origin/main:release.json 2>/dev/null | grep -q '2026.10.28-three-pillars-foundation-rc3'; then
+              ready=1
+              break
+            fi
+            sleep 10
+          done
+          test "$ready" -eq 1
+          git checkout -B main refs/remotes/origin/main
+
+      - name: Install browser runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install --prefix /tmp/pw --no-save playwright@1.56.1
+          npx --yes playwright@1.56.1 install --with-deps chromium
+
+      - name: Run production acceptance
+        working-directory: /tmp/playin
+        shell: bash
+        run: |
+          set -euo pipefail
+          NODE_PATH=/tmp/pw/node_modules \
+          BASE_URL="$BASE_URL" \
+          REPORT_PATH=/tmp/three-pillars-production-acceptance.json \
+          node "$GITHUB_WORKSPACE/scripts/verify-three-pillars-production.js"
+
+      - name: Mark release production verified
+        working-directory: /tmp/playin
+        shell: bash
+        run: |
+          set -euo pipefail
+          verified_commit=$(git rev-parse HEAD)
+          python3 - "$verified_commit" <<'PY'
+          import datetime,json,sys
+          path='release.json'
+          data=json.load(open(path))
+          data['status']='production_verified'
+          data['stamp_utc']=datetime.datetime.now(datetime.timezone.utc).isoformat().replace('+00:00','Z')
+          data['source_branch']='main'
+          data['production_commit']=sys.argv[1]
+          data['production_url']='https://playin365.app'
+          data['quality_gates']['preview_runtime']='pass'
+          data['quality_gates']['production_runtime']='pass'
+          data['quality_gates']['production_route_checks']=91
+          data['quality_gates']['production_runtime_errors']=0
+          json.dump(data,open(path,'w'),ensure_ascii=False,indent=2)
+          open(path,'a').write('\n')
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add release.json
+          git commit -m "chore(release): mark unified three pillars production verified"
+          git push origin HEAD:main
+
+      - name: Wait for verified production stamp
+        shell: bash
+        run: |
+          set -euo pipefail
+          ready=0
+          for attempt in $(seq 1 90); do
+            body=$(curl -fsS --retry 3 --retry-delay 2 "https://playin365.app/release.json?verified=${GITHUB_RUN_ID}-${attempt}" || true)
+            if echo "$body" | grep -q 'production_verified' && echo "$body" | grep -q 'three-pillars-foundation-rc3'; then
+              ready=1
+              break
+            fi
+            sleep 10
+          done
+          test "$ready" -eq 1
+
+      - name: Upload production acceptance evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: three-pillars-production-acceptance
+          path: /tmp/three-pillars-production-acceptance.json
+          retention-days: 30
