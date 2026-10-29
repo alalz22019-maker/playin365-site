@@ -1,24 +1,35 @@
 {
   "version": "2026.10.29-golden-tryouts-opportunities-rc1",
-  "stamp_utc": "2026-10-29T00:27:09.753Z",
-  "status": "preview_candidate",
+  "stamp_utc": "2026-10-29T00:46:35.528Z",
+  "status": "preview_verified",
   "source_branch": "feat/golden-tryouts-opportunities-20261029",
-  "source_commit": null,
+  "source_commit": "72bf1692ce50af5bbe5efa90d59456cbcc518d85",
   "previous_production_commit": "6071262f1dddb3c04511082a924172d1a20ceedd",
   "preview": {
-    "deployment_id": null,
-    "commit": null,
-    "url": null,
-    "state": "PENDING_REMOTE_COMMIT",
+    "deployment_id": "dpl_Cru9J9s9Gh1rpsgmLAxH6kSf7jaL",
+    "functional_commit": "72bf1692ce50af5bbe5efa90d59456cbcc518d85",
+    "release_commit": null,
+    "url": "https://playin365-qzgyvnull-alalz22019-makers-projects.vercel.app",
+    "alias": "https://playin365-git-feat-golden-try-a7338b-alalz22019-makers-projects.vercel.app",
+    "state": "READY",
     "baseline_route_checks": "97/97",
     "role_specific_finance_checks": "3/3",
     "role_specific_tryout_checks": "4/4",
-    "total_checks": "104/104 local acceptance; preview pending",
-    "runtime_errors": null,
+    "total_checks": "104/104",
+    "assets": "PASS 3/3",
+    "role_ui": "PASS 4/4",
+    "privacy": "PASS staff note visible only to academy and coach",
+    "mobile": "PASS iPhone 13 viewport 390px",
+    "horizontal_overflow": 0,
+    "touch_targets_under_44px": 0,
+    "console_errors": 0,
+    "page_errors": 0,
+    "application_request_failures": 0,
+    "protection_handshake_aborts": 8,
+    "runtime_errors": 0,
+    "runtime_warnings": 0,
     "missing_routes": 0,
-    "unavailable_routes": 0,
-    "functional_commit": null,
-    "release_commit": null
+    "unavailable_routes": 0
   },
   "production": {
     "deployment_id": "dpl_6LfFoFwwH3vrF2XJRfbhswhhygNc",
@@ -192,7 +203,7 @@
     "sheet_audit": "PASS 14/14",
     "privacy_guards": "PASS",
     "direct_write_guards": "PASS",
-    "preview": "PENDING",
+    "preview": "PASS",
     "production": "PENDING",
     "local_role_ui": "PASS 4/4",
     "mobile_viewport": "PASS 390x844",
@@ -201,7 +212,11 @@
     "console_errors": 0,
     "page_errors": 0,
     "request_failures": 0,
-    "database_gate": "PASS"
+    "database_gate": "PASS",
+    "preview_role_ui": "PASS 4/4",
+    "preview_assets": "PASS 3/3",
+    "preview_privacy": "PASS",
+    "preview_runtime": "PASS"
   },
   "service_worker": {
     "cache": "playin365-shell-20261029-golden-tryouts-opportunities-v1",
@@ -215,8 +230,9 @@
     "production_dependency": false
   },
   "notes": [
-    "This metadata describes a release candidate until preview and production verification finish.",
+    "Preview verified against the GitHub deployment for all four roles.",
+    "Vercel protection handshake aborts were isolated from application requests; application request failures were zero.",
     "Legacy routes remain directly reachable.",
-    "Database deployment preceded source recovery; Git now restores the exact applied migration bundle."
+    "Database migrations are aligned to production history."
   ]
 }

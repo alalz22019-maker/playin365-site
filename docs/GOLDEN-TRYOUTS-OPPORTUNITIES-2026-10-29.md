@@ -3,7 +3,7 @@
 **Date:** 29 October 2026
 **Route:** `tryoutOpportunity`
 **Roles:** Academy, Coach, Guardian, Player
-**Status:** Preview candidate
+**Status:** Preview verified
 
 ## Purpose
 
@@ -91,4 +91,4 @@ The role views are implemented as Opportunity Flow Canvas surfaces:
 - Visible touch targets below 44px: 0
 - Unavailable route findings: 0
 
-Preview and production states remain pending until Git/Vercel verification completes.
+Preview verification completed on deployment `dpl_Cru9J9s9Gh1rpsgmLAxH6kSf7jaL` for commit `72bf1692ce50af5bbe5efa90d59456cbcc518d85`. All four role views, privacy boundaries, mobile layout, assets, and runtime checks passed. Production verification remains pending until merge and deployment.
