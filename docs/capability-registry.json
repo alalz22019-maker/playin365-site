@@ -1,14 +1,14 @@
 {
-  "schema_version": "1.0",
-  "generated_at": "2026-10-29T00:27:09.753Z",
-  "principle": "No capability is removed. Golden Tryouts & Opportunities adds a governed cross-role recruitment journey while legacy tryout, opportunity, evaluation, offer, membership, and finance services remain directly reachable.",
+  "schema_version": "1.4",
+  "generated_at": "2026-10-29T01:15:00Z",
+  "principle": "No capability is removed. Experience Consolidation adds a role-aware command home, journey map and activity timeline while all specialist and legacy routes remain directly reachable.",
   "baseline_counts": {
     "academy": 34,
     "coach": 20,
     "player": 16
   },
-  "new_core_routes": 6,
-  "total_entries": 76,
+  "new_core_routes": 8,
+  "total_entries": 79,
   "items": [
     {
       "capability_id": "ACA-001",
@@ -1607,6 +1607,70 @@
         "privacy",
         "mobile",
         "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "CORE-007",
+      "role": "shared",
+      "route": "journeyCenter",
+      "label_ar": "خريطة الرحلات الموحدة",
+      "current_status": "new",
+      "disposition": "new_consolidated_entry",
+      "target_area": "experience_command",
+      "new_entry_points": [
+        "smartHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "CORE-008",
+      "role": "shared",
+      "route": "activityTimeline",
+      "label_ar": "الخط الزمني الموحد",
+      "current_status": "new",
+      "disposition": "new_consolidated_entry",
+      "target_area": "experience_timeline",
+      "new_entry_points": [
+        "smartHome",
+        "journeyCenter",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "CORE-009",
+      "role": "shared",
+      "route": "smartHome",
+      "label_ar": "مركز القرار والرحلات",
+      "current_status": "enhanced",
+      "disposition": "enhanced_without_removal",
+      "target_area": "experience_command",
+      "new_entry_points": [
+        "home",
+        "context_switcher",
+        "command_palette"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "performance",
         "production"
       ]
     }
