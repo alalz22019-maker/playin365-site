@@ -1,14 +1,14 @@
 {
-  "schema_version": "1.4",
-  "generated_at": "2026-10-29T01:15:00Z",
-  "principle": "No capability is removed. Experience Consolidation adds a role-aware command home, journey map and activity timeline while all specialist and legacy routes remain directly reachable.",
+  "schema_version": "1.5",
+  "generated_at": "2026-10-29T09:08:00Z",
+  "principle": "No capability is removed. Governed broadcasts, dynamic audiences, recipient inboxes and periodic reports augment direct conversations and all existing operational pages.",
   "baseline_counts": {
     "academy": 34,
     "coach": 20,
     "player": 16
   },
-  "new_core_routes": 8,
-  "total_entries": 79,
+  "new_core_routes": 11,
+  "total_entries": 83,
   "items": [
     {
       "capability_id": "ACA-001",
@@ -1671,6 +1671,92 @@
         "mobile",
         "visual",
         "performance",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "COM-001",
+      "role": "academy_coach",
+      "route": "communicationCenter",
+      "label_ar": "مركز التواصل المؤسسي",
+      "current_status": "new",
+      "disposition": "new_governed_entry",
+      "target_area": "communication_command",
+      "new_entry_points": [
+        "smartHome",
+        "hub",
+        "command_search",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "COM-002",
+      "role": "shared",
+      "route": "communicationInbox",
+      "label_ar": "صندوق تنبيهات الجهة",
+      "current_status": "new",
+      "disposition": "new_governed_entry",
+      "target_area": "communication_inbox",
+      "new_entry_points": [
+        "smartHome",
+        "hub",
+        "notification_deep_link",
+        "command_search"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "COM-003",
+      "role": "academy_coach",
+      "route": "communicationReports",
+      "label_ar": "التقارير الدورية",
+      "current_status": "new",
+      "disposition": "new_governed_entry",
+      "target_area": "periodic_reporting",
+      "new_entry_points": [
+        "communicationCenter",
+        "hub",
+        "command_search"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "COM-004",
+      "role": "shared",
+      "route": "messages",
+      "label_ar": "المحادثات الفردية الموثقة",
+      "current_status": "retained",
+      "disposition": "retained_beside_group_communications",
+      "target_area": "direct_communication",
+      "new_entry_points": [
+        "communicationCenter",
+        "communicationInbox",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "mobile",
         "production"
       ]
     }
