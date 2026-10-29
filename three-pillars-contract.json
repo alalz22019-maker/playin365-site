@@ -1,5 +1,5 @@
 {
-  "version": "2026.10.29-experience-consolidation-v1",
+  "version": "2026.10.29-communications-reports-v1",
   "principle": "No capability is removed. Training Day, Match Day, Subscription & Payment, and Tryouts & Opportunities are governed shared journeys while every legacy service remains directly reachable.",
   "pillars": [
     "individuals",
@@ -18,7 +18,10 @@
     "matchDay",
     "tryoutOpportunity",
     "journeyCenter",
-    "activityTimeline"
+    "activityTimeline",
+    "communicationCenter",
+    "communicationInbox",
+    "communicationReports"
   ],
   "roles": {
     "academy": {
@@ -132,7 +135,15 @@
     "experienceConsolidation": true,
     "unifiedJourneyMap": true,
     "unifiedActivityTimeline": true,
-    "commandPalettePreservesLegacyServices": true
+    "commandPalettePreservesLegacyServices": true,
+    "governedOrganizationCommunications": true,
+    "dynamicCommunicationAudiences": true,
+    "coachManagedTeamScope": true,
+    "verifiedGuardianRecipientsOnly": true,
+    "periodicOrganizationReports": true,
+    "broadcastReadReceipts": true,
+    "externalCommunicationChannelsRequireVerifiedConnection": true,
+    "directMessagesPreserved": true
   },
   "goldenJourneys": {
     "trainingDay": {
@@ -271,18 +282,26 @@
   "roleSpecificCoreRoutes": {
     "academy": [
       "subscriptionPayment",
-      "tryoutOpportunity"
+      "tryoutOpportunity",
+      "communicationCenter",
+      "communicationInbox",
+      "communicationReports"
     ],
     "guardian": [
       "subscriptionPayment",
-      "tryoutOpportunity"
+      "tryoutOpportunity",
+      "communicationInbox"
     ],
     "player": [
       "subscriptionPayment",
-      "tryoutOpportunity"
+      "tryoutOpportunity",
+      "communicationInbox"
     ],
     "coach": [
-      "tryoutOpportunity"
+      "tryoutOpportunity",
+      "communicationCenter",
+      "communicationInbox",
+      "communicationReports"
     ]
   },
   "experienceConsolidation": {
@@ -305,5 +324,76 @@
     "loadStrategy": "parallel_cached_sources",
     "commandPalette": true,
     "mobileFirst": true
+  },
+  "communications": {
+    "routes": {
+      "senderCenter": "communicationCenter",
+      "recipientInbox": "communicationInbox",
+      "periodicReports": "communicationReports",
+      "directMessages": "messages"
+    },
+    "senderRoles": [
+      "academy",
+      "coach"
+    ],
+    "recipientRoles": [
+      "academy",
+      "coach",
+      "guardian",
+      "player"
+    ],
+    "audienceRoles": [
+      "players",
+      "coaches",
+      "guardians",
+      "staff",
+      "management",
+      "all"
+    ],
+    "coachAudienceRoles": [
+      "players",
+      "guardians"
+    ],
+    "teamScope": "live organization teams; coaches limited to managed teams",
+    "guardianScope": "verified guardianships only",
+    "channels": {
+      "in_app": "ready",
+      "push": "experimental",
+      "whatsapp": "experimental",
+      "sms": "experimental",
+      "email": "experimental",
+      "voice": "experimental_backend_only"
+    },
+    "reportTypes": [
+      "weekly_achievement",
+      "weekly_attendance",
+      "weekly_team_summary",
+      "monthly_management",
+      "monthly_financial",
+      "custom"
+    ],
+    "frequencies": [
+      "daily",
+      "weekly",
+      "monthly"
+    ],
+    "worker": {
+      "engine": "pg_cron",
+      "schedule": "*/5 * * * *",
+      "function": "private.process_due_organization_communications(100)"
+    },
+    "sourceOfTruth": [
+      "organization_broadcasts",
+      "organization_broadcast_recipients",
+      "organization_communication_templates",
+      "organization_report_schedules",
+      "organization_report_runs",
+      "notifications",
+      "organization_memberships",
+      "teams",
+      "team_athletes",
+      "guardianships"
+    ],
+    "externalIntegrations": "experimental_until_credentials_connection_webhook_and_delivery_verification"
   }
 }
