@@ -1,41 +1,25 @@
 {
-  "version": "2026.10.29-golden-tryouts-opportunities-v1",
-  "stamp_utc": "2026-10-29T00:50:30Z",
-  "status": "production_verified",
-  "source_branch": "main",
-  "source_commit": "77ddc79df3d99809a1ba7e7277b40935988a1bef",
-  "previous_production_commit": "6071262f1dddb3c04511082a924172d1a20ceedd",
+  "version": "2026.10.29-experience-consolidation-rc1",
+  "stamp_utc": "2026-10-29T01:28:00Z",
+  "status": "preview_candidate",
+  "source_branch": "feat/experience-consolidation-20261029",
+  "source_commit": "58591e637d7f17aeb44d60d6fbdca8afc6a48464",
+  "previous_production_release": {
+    "version": "2026.10.29-golden-tryouts-opportunities-v1",
+    "commit": "219c01de51caa263c2c4ae0d79489d2e85d4d029",
+    "deployment_id": "dpl_DPWqostRpK1HkMC5UKmSqRcZySUz",
+    "status": "production_verified"
+  },
   "preview": {
-    "deployment_id": "dpl_Cru9J9s9Gh1rpsgmLAxH6kSf7jaL",
-    "commit": "72bf1692ce50af5bbe5efa90d59456cbcc518d85",
-    "url": "https://playin365-qzgyvnull-alalz22019-makers-projects.vercel.app",
-    "state": "READY_VERIFIED",
-    "baseline_route_checks": "97/97",
-    "role_specific_finance_checks": "3/3",
-    "role_specific_tryout_checks": "4/4",
-    "total_checks": "104/104",
-    "runtime_errors": 0,
-    "missing_routes": 0,
-    "unavailable_routes": 0,
-    "functional_commit": "72bf1692ce50af5bbe5efa90d59456cbcc518d85"
+    "state": "not_started",
+    "deployment_id": null,
+    "url": null,
+    "functional_commit": "58591e637d7f17aeb44d60d6fbdca8afc6a48464"
   },
   "production": {
-    "deployment_id": "dpl_GkdxtzrwWqumpu1ikoHP7ddRV4pW",
-    "commit": "77ddc79df3d99809a1ba7e7277b40935988a1bef",
-    "url": "https://playin365.app",
-    "aliases": [
-      "playin365.app",
-      "www.playin365.app"
-    ],
-    "state": "READY_VERIFIED",
-    "baseline_route_checks": "97/97",
-    "role_specific_finance_checks": "3/3",
-    "role_specific_tryout_checks": "4/4",
-    "total_checks": "104/104",
-    "runtime_errors": 0,
-    "runtime_warnings": 0,
-    "missing_routes": 0,
-    "unavailable_routes": 0
+    "state": "unchanged",
+    "current_version": "2026.10.29-golden-tryouts-opportunities-v1",
+    "url": "https://playin365.app"
   },
   "architecture": {
     "pillars": [
@@ -49,18 +33,14 @@
       "subscription_payment",
       "tryouts_opportunities"
     ],
-    "shared_sources": [
-      "training_sessions",
-      "matches",
-      "organization_subscriptions",
-      "invoices",
-      "opportunities",
-      "sports_events",
-      "opportunity_candidates",
-      "opportunity_evaluations",
-      "athlete_offers",
-      "opportunity_admissions"
-    ]
+    "experience_routes": [
+      "smartHome",
+      "experienceCenter",
+      "journeyCenter",
+      "activityTimeline"
+    ],
+    "legacy_routes_preserved": true,
+    "duplicate_data_store": false
   },
   "geometry": {
     "source": "approved_archived_svg_path",
@@ -74,173 +54,66 @@
     "droplet_substitute": false
   },
   "coverage": {
-    "foundation_routes": 10,
-    "legacy_routes_preserved": 70,
-    "baseline_role_route_checks": 97,
-    "role_specific_finance_checks": 3,
-    "role_specific_tryout_checks": 4,
-    "total_route_checks": 104,
-    "capability_registry_entries": 76,
-    "opportunity_flow_sheets": 14,
-    "roles": 4
+    "roles": 4,
+    "consolidated_screens": 16,
+    "functional_route_checks": 147,
+    "functional_failures": 0,
+    "capability_registry_entries": 79,
+    "command_entries": {
+      "academy": 43,
+      "coach": 33,
+      "guardian": 19,
+      "player": 26
+    }
   },
-  "training_day": {
-    "status": "production_verified",
-    "route": "trainingDay"
-  },
-  "match_day": {
-    "status": "production_verified",
-    "route": "matchDay"
-  },
-  "subscription_payment": {
-    "status": "production_verified",
-    "route": "subscriptionPayment",
-    "roles": [
-      "academy",
-      "guardian",
-      "player"
-    ],
-    "payment_authority": "payer_submits_finance_verifies",
-    "gateway_status": "experimental_not_connected"
-  },
-  "tryouts_opportunities": {
-    "status": "production_verified",
-    "route": "tryoutOpportunity",
-    "roles": [
-      "academy",
-      "coach",
-      "guardian",
-      "player"
-    ],
-    "journey_steps": [
-      "publish_opportunity",
-      "athlete_apply",
-      "guardian_application_consent",
-      "academy_review",
-      "trial_invitation",
-      "trial_attendance",
-      "coach_evaluation",
-      "academy_offer",
-      "guardian_offer_consent",
-      "athlete_offer_decision",
-      "admission",
-      "membership_activation",
-      "team_assignment",
-      "optional_finance_handoff"
-    ],
-    "authority_model": {
-      "academy": [
-        "publish",
-        "review",
-        "pipeline_decision",
-        "offer",
-        "admission"
-      ],
-      "coach": [
-        "trial_check_in",
-        "technical_evaluation",
-        "recommendation"
-      ],
-      "guardian": [
-        "application_consent",
-        "offer_consent"
-      ],
-      "player": [
-        "apply",
-        "documents",
-        "withdraw",
-        "offer_decision"
-      ]
+  "performance_local_ms": {
+    "academy": {
+      "first": 3551,
+      "center_cached": 30,
+      "timeline_cached": 37
     },
-    "privacy": {
-      "staff_note_visible_to": [
-        "academy",
-        "coach"
-      ],
-      "staff_note_hidden_from": [
-        "guardian",
-        "player"
-      ],
-      "cross_candidate_access": "blocked"
+    "coach": {
+      "first": 2005,
+      "center_cached": 6,
+      "timeline_cached": 5
     },
-    "demo_scenarios": [
-      "open_u18_tryout",
-      "advanced_evaluation_offer_u18"
-    ]
+    "guardian": {
+      "first": 2353,
+      "center_cached": 35,
+      "timeline_cached": 36
+    },
+    "player": {
+      "first": 2654,
+      "center_cached": 31,
+      "timeline_cached": 33
+    },
+    "cached_api_requests": 0
   },
-  "database": {
-    "project_id": "qmpwekibhdzmpmdbuvxz",
-    "migrations": [
-      "20261028232720_golden_tryouts_opportunities_schema",
-      "20261028232810_golden_tryouts_opportunities_create_apply",
-      "20261028232907_golden_tryouts_opportunities_pipeline",
-      "20261028232946_golden_tryouts_opportunities_evaluation_offer",
-      "20261028233026_golden_tryouts_opportunities_admission_finance",
-      "20261028233117_golden_tryouts_opportunities_center",
-      "20261028233134_golden_tryouts_opportunities_grants",
-      "20261028233500_fix_tryout_event_link_statuses",
-      "20261028233605_fix_event_registration_notification_dedup_index",
-      "20261028235940_golden_tryouts_opportunities_index_hardening",
-      "20261029003048_golden_tryouts_opportunities_baseline_rpc_hardening"
-    ],
-    "status": "applied_and_reverified",
-    "new_rls_tables": 5,
-    "anon_rpc_execute_grants": 0,
-    "direct_authenticated_table_writes": 0,
-    "access_model": "authenticated_rpc_only",
-    "migration_history_aligned": true,
-    "baseline_rpc_hardening": "PASS",
-    "gate_status": "PASS",
-    "gate_checked_at": "2026-10-29T00:00:06.445325Z"
-  },
-  "integration_mode": "experimental",
   "quality_gates": {
     "javascript_syntax": "pass",
     "json_integrity": "pass",
     "css_integrity": "pass",
-    "database_e2e": "pass",
+    "secret_scan": "pass",
     "local_role_ui": "pass_4_of_4",
-    "preview_role_ui": "pass_4_of_4",
-    "production_role_ui": "pass_4_of_4",
-    "interactive_sheets": "pass_14_of_14",
+    "local_consolidated_screens": "pass_16_of_16",
+    "functional_regression": "pass_147_of_147",
     "touch_targets": "pass",
-    "horizontal_overflow": "pass",
-    "privacy_guards": "pass",
-    "direct_write_guards": "pass",
+    "horizontal_overflow_new_screens": "pass",
+    "exact_geometry": "pass",
+    "command_search": "pass",
+    "cached_navigation": "pass",
     "legacy_capabilities": "preserved",
-    "preview_runtime": "pass",
-    "preview_build": "pass",
-    "production_runtime": "pass",
-    "production_build": "pass",
-    "database_security_performance_gate": "pass",
-    "qa_cleanup": "pass",
-    "temporary_resource_cleanup": "pass"
+    "preview_runtime": "not_started",
+    "production_runtime": "not_started"
   },
-  "testing": {
-    "mobile_viewport": "390x844",
-    "console_errors": 0,
-    "page_errors": 0,
-    "request_failures": 0,
-    "horizontal_overflow": 0,
-    "visible_touch_targets_under_44px": 0,
-    "staff_note_privacy": "PASS",
-    "cross_candidate_access": "BLOCKED"
+  "database": {
+    "new_migration_required": false,
+    "reason": "UI orchestration over the approved journey RPCs and sources of truth."
   },
-  "service_worker": {
-    "cache": "playin365-shell-20261029-golden-tryouts-opportunities-v1",
-    "assets": [
-      "tryout-opportunity.css",
-      "app-tryout-opportunity.js"
-    ]
-  },
-  "external_integrations": {
-    "mode": "experimental",
-    "production_dependency": false,
-    "note": "No external provider is marked connected without live credentials and verified webhook tests."
-  },
+  "integration_mode": "experimental",
   "notes": [
     "No legacy service or route was removed.",
-    "The four-role opportunity journey is production verified.",
+    "Role-specific home identity is preserved and augmented rather than replaced.",
     "External integrations remain experimental."
   ]
 }

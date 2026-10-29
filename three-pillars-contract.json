@@ -1,5 +1,5 @@
 {
-  "version": "2026.10.29-golden-tryouts-opportunities-rc1",
+  "version": "2026.10.29-experience-consolidation-v1",
   "principle": "No capability is removed. Training Day, Match Day, Subscription & Payment, and Tryouts & Opportunities are governed shared journeys while every legacy service remains directly reachable.",
   "pillars": [
     "individuals",
@@ -16,7 +16,9 @@
     "myIdentity",
     "trainingDay",
     "matchDay",
-    "tryoutOpportunity"
+    "tryoutOpportunity",
+    "journeyCenter",
+    "activityTimeline"
   ],
   "roles": {
     "academy": {
@@ -126,7 +128,11 @@
     "guardianDecisionGate": true,
     "staffNotePrivacy": true,
     "admissionMembershipGoverned": true,
-    "financeHandoffGoverned": true
+    "financeHandoffGoverned": true,
+    "experienceConsolidation": true,
+    "unifiedJourneyMap": true,
+    "unifiedActivityTimeline": true,
+    "commandPalettePreservesLegacyServices": true
   },
   "goldenJourneys": {
     "trainingDay": {
@@ -278,5 +284,26 @@
     "coach": [
       "tryoutOpportunity"
     ]
+  },
+  "experienceConsolidation": {
+    "homeRoute": "smartHome",
+    "journeyRoute": "journeyCenter",
+    "timelineRoute": "activityTimeline",
+    "roles": [
+      "academy",
+      "coach",
+      "guardian",
+      "player"
+    ],
+    "journeys": [
+      "trainingDay",
+      "matchDay",
+      "subscriptionPayment",
+      "tryoutOpportunity"
+    ],
+    "legacyRoutesPreserved": true,
+    "loadStrategy": "parallel_cached_sources",
+    "commandPalette": true,
+    "mobileFirst": true
   }
 }
