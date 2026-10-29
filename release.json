@@ -1,9 +1,10 @@
 {
-  "version": "2026.10.29-academy-spaces-wave1-rc1",
-  "stamp_utc": "2026-10-29T12:00:00Z",
-  "status": "preview_candidate",
+  "version": "2026.10.29-academy-spaces-wave1-rc2",
+  "stamp_utc": "2026-10-29T12:23:00Z",
+  "status": "preview_verified",
   "source_branch": "feat/academy-visual-consolidation-wave1-20261029",
-  "source_commit": "dd9f75ebfcdcbbedf2d7646abd7b7961c879ed04",
+  "source_commit": "39992a0a031eacc6744ea37a139c9ad82aefc315",
+  "functional_commit": "1a21597b4b7c1472d056bdc55cec02197d7b28ce",
   "previous_production_release": {
     "version": "2026.10.29-communications-reports-v1",
     "commit": "ad42cbfe5d37fc25b90de51f0ec0dd6afa6974f7",
@@ -11,9 +12,17 @@
     "status": "production_verified"
   },
   "preview": {
-    "state": "not_started",
-    "deployment_id": null,
-    "url": null
+    "state": "READY_VERIFIED",
+    "deployment_id": "dpl_7DKqiqWriHEkRkFCfL526CRBeh85",
+    "functional_deployment_id": "dpl_FWvzVv4WdFcsN28yMEzh8BNUsLD1",
+    "url": "https://playin365-3xp2h9qqe-alalz22019-makers-projects.vercel.app",
+    "academy_spaces": "pass_5_of_5",
+    "academy_routes": "pass_64_of_64",
+    "mobile_overflow": "pass_0_of_64",
+    "touch_targets": "pass_63_of_63",
+    "runtime_application_errors": 0,
+    "missing_routes": 0,
+    "unavailable_routes": 0
   },
   "production": {
     "state": "unchanged",
@@ -21,28 +30,24 @@
     "url": "https://playin365.app"
   },
   "architecture": {
-    "pillars": [
-      "individuals",
-      "organizations",
-      "events"
-    ],
-    "academy_spaces": [
-      "today",
-      "people",
-      "field",
-      "business",
-      "growth"
-    ],
+    "pillars": ["individuals", "organizations", "events"],
+    "academy_spaces": ["today", "people", "field", "business", "growth"],
+    "academy_routes": {
+      "today": "smartHome",
+      "people": "academyPeople",
+      "field": "academyField",
+      "business": "academyBusiness",
+      "growth": "academyGrowth"
+    },
     "legacy_routes_preserved": true,
-    "database_migration_required": false
+    "old_service_nav_replaced": true,
+    "database_migration_required": false,
+    "duplicate_data_store": false
   },
   "coverage": {
     "capability_registry_entries": 88,
     "academy_space_routes": 5,
     "legacy_academy_routes_targeted": 26,
-    "roles_affected": [
-      "academy"
-    ],
     "academy_routes_checked": 64,
     "academy_route_errors": 0,
     "mobile_overflow_before": 26,
@@ -51,55 +56,59 @@
     "touch_target_failures": 0,
     "all_role_route_checks": 160,
     "new_functional_regressions": 0,
-    "known_unchanged_guardian_placeholders": [
-      "pitch",
-      "identityHub"
-    ]
+    "known_unchanged_guardian_placeholders": ["pitch", "identityHub"]
+  },
+  "geometry": {
+    "source": "approved_archived_svg_path",
+    "academy_orientation": "TL",
+    "redrawn": false,
+    "droplet_substitute": false
+  },
+  "performance_local_ms": {
+    "shell": 214,
+    "academyPeople_first": 2099,
+    "academyField_cached": 26,
+    "academyBusiness_cached": 23,
+    "academyGrowth_cached": 27,
+    "cached_api_requests_max": 1
+  },
+  "performance_preview_ms": {
+    "shell": 268,
+    "academyPeople_first": 1592,
+    "academyField_cached": 24,
+    "academyBusiness_cached": 26,
+    "academyGrowth_cached": 24,
+    "cached_api_requests": 0
   },
   "quality_gates": {
     "javascript_syntax": "pass",
     "json_integrity": "pass",
     "css_integrity": "pass",
     "secret_scan": "pass",
+    "client_storage_source_of_truth": "pass_none",
     "local_academy_spaces": "pass_5_of_5",
+    "preview_academy_spaces": "pass_5_of_5",
     "legacy_academy_routes": "pass_64_of_64",
     "mobile_overflow": "pass_0_of_64",
     "touch_targets": "pass_63_of_63",
-    "preview_runtime": "not_started",
-    "production_runtime": "not_started",
     "all_role_regression": "pass_no_new_failures",
-    "exact_geometry": "pass_TL"
+    "exact_geometry": "pass_TL",
+    "legacy_capabilities": "preserved",
+    "preview_build": "pass",
+    "preview_runtime": "pass_with_non_blocking_existing_football_dependency_warning",
+    "production_runtime": "not_started"
   },
   "integration_mode": "experimental",
+  "runtime_note": {
+    "code": "DEP0169",
+    "scope": "existing Vercel Node dependency for /api/football-fixtures",
+    "academy_spaces_affected": false,
+    "blocking": false
+  },
   "notes": [
-    "No academy capability or specialist route is removed.",
-    "This wave is UI orchestration and responsive remediation only.",
+    "No academy capability or specialist route was removed.",
+    "The old 23-service horizontal navigation is replaced by five academy spaces and a direct all-services entry.",
+    "The two guardian placeholders are unchanged from the previous production baseline and are outside this academy-only wave.",
     "External integrations remain experimental."
-  ],
-  "performance_local_ms": {
-    "at": "2026-10-29T12:18:19.253Z",
-    "shell_ms": 214,
-    "rows": [
-      {
-        "route": "academyPeople",
-        "ms": 2099,
-        "api": 22
-      },
-      {
-        "route": "academyField",
-        "ms": 26,
-        "api": 0
-      },
-      {
-        "route": "academyBusiness",
-        "ms": 23,
-        "api": 1
-      },
-      {
-        "route": "academyGrowth",
-        "ms": 27,
-        "api": 0
-      }
-    ]
-  }
+  ]
 }
