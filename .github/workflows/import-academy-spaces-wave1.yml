@@ -1,0 +1,71 @@
+name: Import Academy Spaces Wave 1
+
+on:
+  push:
+    branches:
+      - feat/academy-visual-consolidation-wave1-20261029
+
+permissions:
+  contents: write
+
+concurrency:
+  group: import-academy-spaces-wave1
+  cancel-in-progress: false
+
+jobs:
+  import:
+    if: ${{ !contains(github.event.head_commit.message, '[academy-spaces-import]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: feat/academy-visual-consolidation-wave1-20261029
+          fetch-depth: 0
+
+      - name: Download verified bundle
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 --retry-delay 2 \
+            'https://sb-2ttyibxb2nb0.vercel.run/transfer/academy-spaces-wave1.tgz' \
+            --output /tmp/academy-spaces-wave1.tgz
+          echo 'e6dae8f74d59db58bedc000947f7e55323059d549fc9ea83dfc017bc475a81d0  /tmp/academy-spaces-wave1.tgz' | sha256sum --check
+
+      - name: Import and verify source
+        run: |
+          set -euo pipefail
+          tar -xzf /tmp/academy-spaces-wave1.tgz -C "$GITHUB_WORKSPACE"
+          node --check app-academy-spaces.js
+          node --check sw.js
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          for path in ['release.json','three-pillars-contract.json','docs/capability-registry.json']:
+              json.loads(Path(path).read_text())
+          css = Path('academy-spaces.css').read_text()
+          assert css.count('{') == css.count('}')
+          assert 'app-academy-spaces.js' in Path('index.html').read_text()
+          assert 'academy-spaces.css' in Path('index.html').read_text()
+          print('academy spaces bundle verification passed')
+          PY
+
+      - name: Commit imported implementation
+        run: |
+          set -euo pipefail
+          git config user.name 'playin365-release-bot'
+          git config user.email 'playin365-release-bot@users.noreply.github.com'
+          git add \
+            app-academy-spaces.js \
+            academy-spaces.css \
+            index.html \
+            sw.js \
+            release.json \
+            three-pillars-contract.json \
+            docs/capability-registry.json \
+            docs/ACADEMY-SPACES-WAVE1-2026-10-29.md
+          if git diff --cached --quiet; then
+            echo 'No import changes detected.'
+            exit 0
+          fi
+          git commit -m 'feat(academy): import verified Academy Spaces Wave 1 [academy-spaces-import]'
+          git push origin HEAD:feat/academy-visual-consolidation-wave1-20261029
