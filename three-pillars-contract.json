@@ -1,5 +1,5 @@
 {
-  "version": "2026.10.29-communications-reports-v1",
+  "version": "2026.10.29-academy-spaces-wave1",
   "principle": "No capability is removed. Training Day, Match Day, Subscription & Payment, and Tryouts & Opportunities are governed shared journeys while every legacy service remains directly reachable.",
   "pillars": [
     "individuals",
@@ -21,7 +21,12 @@
     "activityTimeline",
     "communicationCenter",
     "communicationInbox",
-    "communicationReports"
+    "communicationReports",
+    "academyToday",
+    "academyPeople",
+    "academyField",
+    "academyBusiness",
+    "academyGrowth"
   ],
   "roles": {
     "academy": {
@@ -143,7 +148,10 @@
     "periodicOrganizationReports": true,
     "broadcastReadReceipts": true,
     "externalCommunicationChannelsRequireVerifiedConnection": true,
-    "directMessagesPreserved": true
+    "directMessagesPreserved": true,
+    "academySpacesWave1": true,
+    "academyLegacyRoutesPreserved": true,
+    "academyMobileWidthRemediation": true
   },
   "goldenJourneys": {
     "trainingDay": {
@@ -395,5 +403,26 @@
       "guardianships"
     ],
     "externalIntegrations": "experimental_until_credentials_connection_webhook_and_delivery_verification"
+  },
+  "academySpaces": {
+    "version": "wave1",
+    "spaces": [
+      "today",
+      "people",
+      "field",
+      "business",
+      "growth"
+    ],
+    "routes": {
+      "today": "smartHome",
+      "people": "academyPeople",
+      "field": "academyField",
+      "business": "academyBusiness",
+      "growth": "academyGrowth"
+    },
+    "legacy_routes_preserved": true,
+    "service_nav_replaced_by_space_rail": true,
+    "mobile_overflow_remediation": true,
+    "database_migration_required": false
   }
 }

@@ -1,14 +1,14 @@
 {
-  "schema_version": "1.5",
-  "generated_at": "2026-10-29T09:08:00Z",
-  "principle": "No capability is removed. Governed broadcasts, dynamic audiences, recipient inboxes and periodic reports augment direct conversations and all existing operational pages.",
+  "schema_version": "1.6",
+  "generated_at": "2026-10-29T12:00:00Z",
+  "principle": "No capability is removed. Academy Spaces organizes existing academy capabilities under Today, People, Field, Business, and Growth while every specialist route remains directly reachable.",
   "baseline_counts": {
     "academy": 34,
     "coach": 20,
     "player": 16
   },
   "new_core_routes": 11,
-  "total_entries": 83,
+  "total_entries": 88,
   "items": [
     {
       "capability_id": "ACA-001",
@@ -1757,6 +1757,106 @@
         "functional",
         "permission",
         "mobile",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "ACA-SPACE-001",
+      "role": "academy",
+      "route": "academyToday",
+      "label_ar": "مساحة اليوم",
+      "current_status": "new",
+      "disposition": "new_consolidated_entry",
+      "target_area": "today",
+      "new_entry_points": [
+        "smartHome",
+        "academyToday",
+        "academy_space_rail"
+      ],
+      "acceptance_required": [
+        "functional",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "ACA-SPACE-002",
+      "role": "academy",
+      "route": "academyPeople",
+      "label_ar": "مساحة الأشخاص",
+      "current_status": "new",
+      "disposition": "new_consolidated_entry",
+      "target_area": "people",
+      "new_entry_points": [
+        "academy_space_rail",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "ACA-SPACE-003",
+      "role": "academy",
+      "route": "academyField",
+      "label_ar": "مساحة الملعب",
+      "current_status": "new",
+      "disposition": "new_consolidated_entry",
+      "target_area": "field",
+      "new_entry_points": [
+        "academy_space_rail",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "ACA-SPACE-004",
+      "role": "academy",
+      "route": "academyBusiness",
+      "label_ar": "مساحة الأعمال",
+      "current_status": "new",
+      "disposition": "new_consolidated_entry",
+      "target_area": "business",
+      "new_entry_points": [
+        "academy_space_rail",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "ACA-SPACE-005",
+      "role": "academy",
+      "route": "academyGrowth",
+      "label_ar": "مساحة النمو",
+      "current_status": "new",
+      "disposition": "new_consolidated_entry",
+      "target_area": "growth",
+      "new_entry_points": [
+        "academy_space_rail",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "mobile",
+        "visual",
         "production"
       ]
     }

@@ -1,120 +1,84 @@
 {
-  "version": "2026.10.29-communications-reports-v1",
-  "stamp_utc": "2026-10-29T09:29:00Z",
-  "status": "production_verified",
-  "source_branch": "main",
-  "source_commit": "5c3b8c65eebd7992d4aa1d09c892d48d96e5f704",
-  "functional_commit": "76fc85bcfe826b93061d8899235706b1491cdec5",
+  "version": "2026.10.29-academy-spaces-wave1-rc2",
+  "stamp_utc": "2026-10-29T12:23:00Z",
+  "status": "preview_verified",
+  "source_branch": "feat/academy-visual-consolidation-wave1-20261029",
+  "source_commit": "39992a0a031eacc6744ea37a139c9ad82aefc315",
+  "functional_commit": "1a21597b4b7c1472d056bdc55cec02197d7b28ce",
   "previous_production_release": {
-    "version": "2026.10.29-experience-consolidation-v1",
-    "commit": "bf1f2286a987fb25a19d8f415fe63111e084d30c",
-    "deployment_id": "dpl_3bVQ9P1wwVF2vkeoGZkXPcVPTrvE",
+    "version": "2026.10.29-communications-reports-v1",
+    "commit": "ad42cbfe5d37fc25b90de51f0ec0dd6afa6974f7",
+    "deployment_id": "dpl_GUCQcu68hVJ9gdaZHGaZuutHpvgL",
     "status": "production_verified"
   },
   "preview": {
     "state": "READY_VERIFIED",
-    "deployment_id": "dpl_RiAfivzoAVYJuoEW7pWJm9ZGw1GN",
-    "release_stamp_deployment_id": "dpl_HjvezxSW3yKntw6dXTphLKxeEUgT",
-    "url": "https://playin365-ly4wgbqqk-alalz22019-makers-projects.vercel.app",
-    "commit": "5e3897ff445e9220aaef25532053c4c4f3f74888",
-    "role_ui": "pass_4_of_4",
-    "communication_screens": "pass_12_of_12",
-    "functional_route_checks": "pass_155_of_155",
+    "deployment_id": "dpl_7DKqiqWriHEkRkFCfL526CRBeh85",
+    "functional_deployment_id": "dpl_FWvzVv4WdFcsN28yMEzh8BNUsLD1",
+    "url": "https://playin365-3xp2h9qqe-alalz22019-makers-projects.vercel.app",
+    "academy_spaces": "pass_5_of_5",
+    "academy_routes": "pass_64_of_64",
+    "mobile_overflow": "pass_0_of_64",
+    "touch_targets": "pass_63_of_63",
     "runtime_application_errors": 0,
     "missing_routes": 0,
     "unavailable_routes": 0
   },
   "production": {
-    "state": "READY_VERIFIED",
-    "deployment_id": "dpl_9vu7FK3yAdSAsBSPoiUjR7dHEuTC",
-    "commit": "5c3b8c65eebd7992d4aa1d09c892d48d96e5f704",
-    "url": "https://playin365.app",
-    "aliases": ["playin365.app", "www.playin365.app", "playin365.vercel.app"],
-    "role_ui": "pass_4_of_4",
-    "communication_screens": "pass_12_of_12",
-    "functional_route_checks": "pass_155_of_155",
-    "runtime_application_errors": 0,
-    "missing_routes": 0,
-    "unavailable_routes": 0
+    "state": "unchanged",
+    "current_version": "2026.10.29-communications-reports-v1",
+    "url": "https://playin365.app"
   },
   "architecture": {
     "pillars": ["individuals", "organizations", "events"],
-    "communication_routes": ["communicationCenter", "communicationInbox", "communicationReports"],
-    "direct_messages_preserved": true,
+    "academy_spaces": ["today", "people", "field", "business", "growth"],
+    "academy_routes": {
+      "today": "smartHome",
+      "people": "academyPeople",
+      "field": "academyField",
+      "business": "academyBusiness",
+      "growth": "academyGrowth"
+    },
     "legacy_routes_preserved": true,
-    "duplicate_audience_lists": false,
-    "dynamic_audience_resolution": true,
-    "read_receipts": true,
-    "periodic_report_worker": "pg_cron"
-  },
-  "authority": {
-    "academy": ["players", "coaches", "guardians", "staff", "management", "all"],
-    "coach": ["players", "guardians"],
-    "coach_team_scope": "managed_only",
-    "guardian_link_scope": "verified_only",
-    "recipient_send_authority": false
-  },
-  "delivery_channels": {
-    "in_app": "ready",
-    "push": "experimental",
-    "whatsapp": "experimental",
-    "sms": "experimental",
-    "email": "experimental",
-    "voice": "experimental_backend_only"
-  },
-  "periodic_reports": {
-    "types": ["weekly_achievement", "weekly_attendance", "weekly_team_summary", "monthly_management", "monthly_financial", "custom"],
-    "frequencies": ["daily", "weekly", "monthly"],
-    "cron": "*/5 * * * *",
-    "status": "active"
-  },
-  "database": {
-    "project_id": "qmpwekibhdzmpmdbuvxz",
-    "migration_history_aligned": true,
-    "migrations": [
-      "20261029080050_organization_communications_reports",
-      "20261029080116_organization_communications_cron",
-      "20261029080834_organization_communications_demo_seed",
-      "20261029081022_coach_communications_demo_seed",
-      "20261029091021_organization_communications_index_hardening"
-    ],
-    "new_tables_rls": true,
-    "direct_table_access": "revoked_for_communication_tables",
-    "cron_job": "playin-organization-communications-dispatch",
-    "communication_fk_index_gate": "pass_15_of_15_covered",
-    "anonymous_rpc_execute": 0
+    "old_service_nav_replaced": true,
+    "database_migration_required": false,
+    "duplicate_data_store": false
   },
   "coverage": {
-    "roles": 4,
-    "local_screens": 12,
-    "preview_screens": 12,
-    "production_screens": 12,
-    "data_authority_checks": 15,
-    "data_authority_failures": 0,
-    "functional_route_checks": 155,
-    "functional_route_failures": 0,
-    "capability_registry_entries": 83,
-    "command_entries": {"academy": 45, "coach": 35, "guardian": 20, "player": 27}
+    "capability_registry_entries": 88,
+    "academy_space_routes": 5,
+    "legacy_academy_routes_targeted": 26,
+    "academy_routes_checked": 64,
+    "academy_route_errors": 0,
+    "mobile_overflow_before": 26,
+    "mobile_overflow_after": 0,
+    "touch_routes_checked": 63,
+    "touch_target_failures": 0,
+    "all_role_route_checks": 160,
+    "new_functional_regressions": 0,
+    "known_unchanged_guardian_placeholders": ["pitch", "identityHub"]
   },
   "geometry": {
     "source": "approved_archived_svg_path",
-    "orientations": {"academy": "TL", "coach": "BL", "guardian": "TR", "player": "BR"},
+    "academy_orientation": "TL",
     "redrawn": false,
     "droplet_substitute": false
   },
-  "performance_preview_ms": {
-    "academy": {"first": 1423, "cached": 43, "smart_home": 1532},
-    "coach": {"first": 483, "cached": 7, "smart_home": 1809},
-    "guardian": {"first": 664, "cached": 5, "smart_home": 2688},
-    "player": {"first": 655, "cached": 44, "smart_home": 1770},
-    "cached_api_requests": 0
-  },
-  "performance_production_ms": {
-    "academy": {"first": 1298, "cached": 30, "smart_home": 2729},
-    "coach": {"first": 503, "cached": 5, "smart_home": 1494},
-    "guardian": {"first": 667, "cached": 33, "smart_home": 1602},
-    "player": {"first": 255, "cached": 3, "smart_home": 1866},
+  "performance_local_ms": {
+    "shell": 214,
+    "academyPeople_first": 2099,
+    "academyField_cached": 26,
+    "academyBusiness_cached": 23,
+    "academyGrowth_cached": 27,
     "cached_api_requests_max": 1
+  },
+  "performance_preview_ms": {
+    "shell": 268,
+    "academyPeople_first": 1592,
+    "academyField_cached": 24,
+    "academyBusiness_cached": 26,
+    "academyGrowth_cached": 24,
+    "cached_api_requests": 0
   },
   "quality_gates": {
     "javascript_syntax": "pass",
@@ -122,44 +86,29 @@
     "css_integrity": "pass",
     "secret_scan": "pass",
     "client_storage_source_of_truth": "pass_none",
-    "local_role_ui": "pass_4_of_4",
-    "local_screens": "pass_12_of_12",
-    "preview_role_ui": "pass_4_of_4",
-    "preview_screens": "pass_12_of_12",
-    "production_role_ui": "pass_4_of_4",
-    "production_screens": "pass_12_of_12",
-    "functional_regression": "pass_155_of_155",
-    "data_authority_e2e": "pass_15_of_15",
-    "dynamic_audience_preview": "pass",
-    "scheduled_broadcast_cancel": "pass",
-    "in_app_delivery": "pass",
-    "weekly_report_run_now": "pass",
-    "coach_scope_guards": "pass",
-    "recipient_send_attempts": "blocked",
-    "touch_targets": "pass",
-    "horizontal_overflow_new_screens": "pass",
-    "exact_geometry": "pass",
-    "command_search": "pass",
+    "local_academy_spaces": "pass_5_of_5",
+    "preview_academy_spaces": "pass_5_of_5",
+    "legacy_academy_routes": "pass_64_of_64",
+    "mobile_overflow": "pass_0_of_64",
+    "touch_targets": "pass_63_of_63",
+    "all_role_regression": "pass_no_new_failures",
+    "exact_geometry": "pass_TL",
     "legacy_capabilities": "preserved",
-    "qa_cleanup": "pass_zero",
-    "communication_fk_indexes": "pass_15_of_15",
     "preview_build": "pass",
     "preview_runtime": "pass_with_non_blocking_existing_football_dependency_warning",
-    "production_build": "pass",
-    "production_runtime": "pass_with_non_blocking_existing_football_dependency_warning"
+    "production_runtime": "not_started"
   },
   "integration_mode": "experimental",
   "runtime_note": {
     "code": "DEP0169",
     "scope": "existing Vercel Node dependency for /api/football-fixtures",
-    "communication_feature_affected": false,
-    "application_source_uses_url_parse": false,
+    "academy_spaces_affected": false,
     "blocking": false
   },
   "notes": [
-    "No legacy service or route was removed.",
-    "Direct conversations remain separate from organization broadcasts.",
-    "External delivery channels remain experimental until credentials, connection, webhook and delivery verification pass.",
-    "The communication release is verified on production across academy, coach, guardian and player."
+    "No academy capability or specialist route was removed.",
+    "The old 23-service horizontal navigation is replaced by five academy spaces and a direct all-services entry.",
+    "The two guardian placeholders are unchanged from the previous production baseline and are outside this academy-only wave.",
+    "External integrations remain experimental."
   ]
 }
