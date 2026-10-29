@@ -1,0 +1,56 @@
+name: Import Golden Tryouts bundle
+
+on:
+  push:
+    branches:
+      - feat/golden-tryouts-opportunities-20261029
+    paths:
+      - .github/workflows/import-golden-tryouts.yml
+
+permissions:
+  contents: write
+
+jobs:
+  import-bundle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: feat/golden-tryouts-opportunities-20261029
+          fetch-depth: 0
+
+      - name: Download and verify bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --location \
+            https://sb-2ttyibxb2nb0.vercel.run/golden-tryouts-opportunities.tar.gz \
+            --output /tmp/golden-tryouts-opportunities.tar.gz
+          echo "df6abb1228a698968a59cff394619abb19371eb16b120410614c538e95e60c1a  /tmp/golden-tryouts-opportunities.tar.gz" | sha256sum --check --strict
+          tar -tzf /tmp/golden-tryouts-opportunities.tar.gz | awk '
+            /^\// || /(^|\/)\.\.($|\/)/ { bad=1 }
+            END { exit bad }
+          '
+
+      - name: Import verified source tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          tar -xzf /tmp/golden-tryouts-opportunities.tar.gz -C "$GITHUB_WORKSPACE"
+          rm -f .github/workflows/import-golden-tryouts.yml
+          node --check app-tryout-opportunity.js
+          node -e "for (const f of ['release.json','three-pillars-contract.json','docs/capability-registry.json']) JSON.parse(require('fs').readFileSync(f,'utf8'))"
+          git diff --check
+
+      - name: Commit imported release candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "playin365-release-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          git commit -m "feat(opportunities): deliver Golden Tryouts and Opportunities" \
+            -m "Adds the four-role recruitment journey, Opportunity Flow Canvas, guardian and athlete decision gates, private staff evaluation notes, offer/admission/finance handoff, production-aligned migrations, RPC hardening, demo support, and mobile acceptance."
+          git push origin HEAD:feat/golden-tryouts-opportunities-20261029
