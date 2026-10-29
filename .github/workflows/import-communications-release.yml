@@ -1,0 +1,89 @@
+name: Import Communications Release
+
+on:
+  push:
+    branches:
+      - feat/communications-broadcast-reports-20261029
+
+permissions:
+  contents: write
+
+concurrency:
+  group: import-communications-release
+  cancel-in-progress: false
+
+jobs:
+  import:
+    if: ${{ !contains(github.event.head_commit.message, '[communications-import]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: feat/communications-broadcast-reports-20261029
+          fetch-depth: 0
+
+      - name: Download verified bundle
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 --retry-delay 2 \
+            'https://sb-2ttyibxb2nb0.vercel.run/transfer/communications-release.tgz' \
+            --output /tmp/communications-release.tgz
+          echo 'e2a26df16f184c7072386bd1a86f3eeb5aca2a919369d6636cb9452f5f60b8b1  /tmp/communications-release.tgz' | sha256sum --check
+
+      - name: Import and verify source
+        run: |
+          set -euo pipefail
+          tar -xzf /tmp/communications-release.tgz -C "$GITHUB_WORKSPACE"
+          node --check app-communications.js
+          node --check sw.js
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          for path in [
+              'release.json',
+              'three-pillars-contract.json',
+              'docs/capability-registry.json',
+          ]:
+              json.loads(Path(path).read_text())
+          css = Path('communications.css').read_text()
+          assert css.count('{') == css.count('}')
+          assert 'app-communications.js' in Path('index.html').read_text()
+          assert 'communications.css' in Path('index.html').read_text()
+          required = [
+              'supabase/migrations/20261029080050_organization_communications_reports.sql',
+              'supabase/migrations/20261029080116_organization_communications_cron.sql',
+              'supabase/migrations/20261029080834_organization_communications_demo_seed.sql',
+              'supabase/migrations/20261029081022_coach_communications_demo_seed.sql',
+              'supabase/migrations/20261029091021_organization_communications_index_hardening.sql',
+          ]
+          for path in required:
+              assert Path(path).stat().st_size > 0, path
+          print('communications bundle verification passed')
+          PY
+
+      - name: Commit imported implementation
+        run: |
+          set -euo pipefail
+          git config user.name 'playin365-release-bot'
+          git config user.email 'playin365-release-bot@users.noreply.github.com'
+          git add \
+            app-communications.js \
+            communications.css \
+            index.html \
+            sw.js \
+            release.json \
+            three-pillars-contract.json \
+            docs/capability-registry.json \
+            docs/COMMUNICATIONS-REPORTS-2026-10-29.md \
+            supabase/migrations/20261029080050_organization_communications_reports.sql \
+            supabase/migrations/20261029080116_organization_communications_cron.sql \
+            supabase/migrations/20261029080834_organization_communications_demo_seed.sql \
+            supabase/migrations/20261029081022_coach_communications_demo_seed.sql \
+            supabase/migrations/20261029091021_organization_communications_index_hardening.sql
+          if git diff --cached --quiet; then
+            echo 'No import changes detected.'
+            exit 0
+          fi
+          git commit -m 'feat(communications): import verified broadcasts and reports bundle [communications-import]'
+          git push origin HEAD:feat/communications-broadcast-reports-20261029
