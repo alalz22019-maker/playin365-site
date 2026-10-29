@@ -1,9 +1,10 @@
 {
-  "version": "2026.10.29-communications-reports-rc1",
-  "stamp_utc": "2026-10-29T09:08:00Z",
-  "status": "preview_candidate",
+  "version": "2026.10.29-communications-reports-rc2",
+  "stamp_utc": "2026-10-29T09:23:00Z",
+  "status": "preview_verified",
   "source_branch": "feat/communications-broadcast-reports-20261029",
-  "source_commit": null,
+  "source_commit": "5e3897ff445e9220aaef25532053c4c4f3f74888",
+  "functional_commit": "76fc85bcfe826b93061d8899235706b1491cdec5",
   "previous_production_release": {
     "version": "2026.10.29-experience-consolidation-v1",
     "commit": "bf1f2286a987fb25a19d8f415fe63111e084d30c",
@@ -11,10 +12,16 @@
     "status": "production_verified"
   },
   "preview": {
-    "state": "not_started",
-    "deployment_id": null,
-    "url": null,
-    "functional_commit": null
+    "state": "READY_VERIFIED",
+    "deployment_id": "dpl_RiAfivzoAVYJuoEW7pWJm9ZGw1GN",
+    "url": "https://playin365-ly4wgbqqk-alalz22019-makers-projects.vercel.app",
+    "commit": "5e3897ff445e9220aaef25532053c4c4f3f74888",
+    "role_ui": "pass_4_of_4",
+    "communication_screens": "pass_12_of_12",
+    "functional_route_checks": "pass_155_of_155",
+    "runtime_application_errors": 0,
+    "missing_routes": 0,
+    "unavailable_routes": 0
   },
   "production": {
     "state": "unchanged",
@@ -22,33 +29,18 @@
     "url": "https://playin365.app"
   },
   "architecture": {
-    "pillars": [
-      "individuals",
-      "organizations",
-      "events"
-    ],
-    "communication_routes": [
-      "communicationCenter",
-      "communicationInbox",
-      "communicationReports"
-    ],
+    "pillars": ["individuals", "organizations", "events"],
+    "communication_routes": ["communicationCenter", "communicationInbox", "communicationReports"],
     "direct_messages_preserved": true,
     "legacy_routes_preserved": true,
-    "duplicate_audience_lists": false
+    "duplicate_audience_lists": false,
+    "dynamic_audience_resolution": true,
+    "read_receipts": true,
+    "periodic_report_worker": "pg_cron"
   },
   "authority": {
-    "academy": [
-      "players",
-      "coaches",
-      "guardians",
-      "staff",
-      "management",
-      "all"
-    ],
-    "coach": [
-      "players",
-      "guardians"
-    ],
+    "academy": ["players", "coaches", "guardians", "staff", "management", "all"],
+    "coach": ["players", "guardians"],
     "coach_team_scope": "managed_only",
     "guardian_link_scope": "verified_only",
     "recipient_send_authority": false
@@ -62,19 +54,8 @@
     "voice": "experimental_backend_only"
   },
   "periodic_reports": {
-    "types": [
-      "weekly_achievement",
-      "weekly_attendance",
-      "weekly_team_summary",
-      "monthly_management",
-      "monthly_financial",
-      "custom"
-    ],
-    "frequencies": [
-      "daily",
-      "weekly",
-      "monthly"
-    ],
+    "types": ["weekly_achievement", "weekly_attendance", "weekly_team_summary", "monthly_management", "monthly_financial", "custom"],
+    "frequencies": ["daily", "weekly", "monthly"],
     "cron": "*/5 * * * *",
     "status": "active"
   },
@@ -91,38 +72,44 @@
     "new_tables_rls": true,
     "direct_table_access": "revoked_for_communication_tables",
     "cron_job": "playin-organization-communications-dispatch",
-    "communication_fk_index_gate": "pass_zero_unindexed_communication_foreign_keys"
+    "communication_fk_index_gate": "pass_15_of_15_covered",
+    "anonymous_rpc_execute": 0
   },
   "coverage": {
     "roles": 4,
     "local_screens": 12,
+    "preview_screens": 12,
     "data_authority_checks": 15,
     "data_authority_failures": 0,
+    "functional_route_checks": 155,
+    "functional_route_failures": 0,
     "capability_registry_entries": 83,
-    "command_entries": {
-      "academy": 45,
-      "coach": 35,
-      "guardian": 20,
-      "player": 27
-    }
+    "command_entries": {"academy": 45, "coach": 35, "guardian": 20, "player": 27}
   },
   "geometry": {
     "source": "approved_archived_svg_path",
-    "orientations": {
-      "academy": "TL",
-      "coach": "BL",
-      "guardian": "TR",
-      "player": "BR"
-    },
+    "orientations": {"academy": "TL", "coach": "BL", "guardian": "TR", "player": "BR"},
     "redrawn": false,
     "droplet_substitute": false
+  },
+  "performance_preview_ms": {
+    "academy": {"first": 1423, "cached": 43, "smart_home": 1532},
+    "coach": {"first": 483, "cached": 7, "smart_home": 1809},
+    "guardian": {"first": 664, "cached": 5, "smart_home": 2688},
+    "player": {"first": 655, "cached": 44, "smart_home": 1770},
+    "cached_api_requests": 0
   },
   "quality_gates": {
     "javascript_syntax": "pass",
     "json_integrity": "pass",
     "css_integrity": "pass",
+    "secret_scan": "pass",
+    "client_storage_source_of_truth": "pass_none",
     "local_role_ui": "pass_4_of_4",
     "local_screens": "pass_12_of_12",
+    "preview_role_ui": "pass_4_of_4",
+    "preview_screens": "pass_12_of_12",
+    "functional_regression": "pass_155_of_155",
     "data_authority_e2e": "pass_15_of_15",
     "dynamic_audience_preview": "pass",
     "scheduled_broadcast_cancel": "pass",
@@ -136,14 +123,22 @@
     "command_search": "pass",
     "legacy_capabilities": "preserved",
     "qa_cleanup": "pass_zero",
-    "preview_runtime": "not_started",
-    "production_runtime": "not_started",
-    "communication_fk_indexes": "pass"
+    "communication_fk_indexes": "pass_15_of_15",
+    "preview_build": "pass",
+    "preview_runtime": "pass_with_non_blocking_existing_football_dependency_warning",
+    "production_runtime": "not_started"
   },
   "integration_mode": "experimental",
+  "runtime_note": {
+    "code": "DEP0169",
+    "scope": "existing Vercel Node dependency for /api/football-fixtures",
+    "communication_feature_affected": false,
+    "blocking": false
+  },
   "notes": [
     "No legacy service or route was removed.",
     "Direct conversations remain separate from organization broadcasts.",
-    "External delivery channels remain experimental until fully verified."
+    "External delivery channels remain experimental until credentials, connection, webhook and delivery verification pass.",
+    "The first protected-preview request produced a transient authentication response; stable-session rerun passed with zero application errors."
   ]
 }
