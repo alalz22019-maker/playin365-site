@@ -1,9 +1,9 @@
 {
-  "version": "2026.10.29-communications-reports-rc2",
-  "stamp_utc": "2026-10-29T09:23:00Z",
-  "status": "preview_verified",
-  "source_branch": "feat/communications-broadcast-reports-20261029",
-  "source_commit": "5e3897ff445e9220aaef25532053c4c4f3f74888",
+  "version": "2026.10.29-communications-reports-v1",
+  "stamp_utc": "2026-10-29T09:29:00Z",
+  "status": "production_verified",
+  "source_branch": "main",
+  "source_commit": "5c3b8c65eebd7992d4aa1d09c892d48d96e5f704",
   "functional_commit": "76fc85bcfe826b93061d8899235706b1491cdec5",
   "previous_production_release": {
     "version": "2026.10.29-experience-consolidation-v1",
@@ -14,6 +14,7 @@
   "preview": {
     "state": "READY_VERIFIED",
     "deployment_id": "dpl_RiAfivzoAVYJuoEW7pWJm9ZGw1GN",
+    "release_stamp_deployment_id": "dpl_HjvezxSW3yKntw6dXTphLKxeEUgT",
     "url": "https://playin365-ly4wgbqqk-alalz22019-makers-projects.vercel.app",
     "commit": "5e3897ff445e9220aaef25532053c4c4f3f74888",
     "role_ui": "pass_4_of_4",
@@ -24,9 +25,17 @@
     "unavailable_routes": 0
   },
   "production": {
-    "state": "unchanged",
-    "current_version": "2026.10.29-experience-consolidation-v1",
-    "url": "https://playin365.app"
+    "state": "READY_VERIFIED",
+    "deployment_id": "dpl_9vu7FK3yAdSAsBSPoiUjR7dHEuTC",
+    "commit": "5c3b8c65eebd7992d4aa1d09c892d48d96e5f704",
+    "url": "https://playin365.app",
+    "aliases": ["playin365.app", "www.playin365.app", "playin365.vercel.app"],
+    "role_ui": "pass_4_of_4",
+    "communication_screens": "pass_12_of_12",
+    "functional_route_checks": "pass_155_of_155",
+    "runtime_application_errors": 0,
+    "missing_routes": 0,
+    "unavailable_routes": 0
   },
   "architecture": {
     "pillars": ["individuals", "organizations", "events"],
@@ -79,6 +88,7 @@
     "roles": 4,
     "local_screens": 12,
     "preview_screens": 12,
+    "production_screens": 12,
     "data_authority_checks": 15,
     "data_authority_failures": 0,
     "functional_route_checks": 155,
@@ -99,6 +109,13 @@
     "player": {"first": 655, "cached": 44, "smart_home": 1770},
     "cached_api_requests": 0
   },
+  "performance_production_ms": {
+    "academy": {"first": 1298, "cached": 30, "smart_home": 2729},
+    "coach": {"first": 503, "cached": 5, "smart_home": 1494},
+    "guardian": {"first": 667, "cached": 33, "smart_home": 1602},
+    "player": {"first": 255, "cached": 3, "smart_home": 1866},
+    "cached_api_requests_max": 1
+  },
   "quality_gates": {
     "javascript_syntax": "pass",
     "json_integrity": "pass",
@@ -109,6 +126,8 @@
     "local_screens": "pass_12_of_12",
     "preview_role_ui": "pass_4_of_4",
     "preview_screens": "pass_12_of_12",
+    "production_role_ui": "pass_4_of_4",
+    "production_screens": "pass_12_of_12",
     "functional_regression": "pass_155_of_155",
     "data_authority_e2e": "pass_15_of_15",
     "dynamic_audience_preview": "pass",
@@ -126,19 +145,21 @@
     "communication_fk_indexes": "pass_15_of_15",
     "preview_build": "pass",
     "preview_runtime": "pass_with_non_blocking_existing_football_dependency_warning",
-    "production_runtime": "not_started"
+    "production_build": "pass",
+    "production_runtime": "pass_with_non_blocking_existing_football_dependency_warning"
   },
   "integration_mode": "experimental",
   "runtime_note": {
     "code": "DEP0169",
     "scope": "existing Vercel Node dependency for /api/football-fixtures",
     "communication_feature_affected": false,
+    "application_source_uses_url_parse": false,
     "blocking": false
   },
   "notes": [
     "No legacy service or route was removed.",
     "Direct conversations remain separate from organization broadcasts.",
     "External delivery channels remain experimental until credentials, connection, webhook and delivery verification pass.",
-    "The first protected-preview request produced a transient authentication response; stable-session rerun passed with zero application errors."
+    "The communication release is verified on production across academy, coach, guardian and player."
   ]
 }
