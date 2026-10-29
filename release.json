@@ -1,9 +1,9 @@
 {
-  "version": "2026.10.29-academy-spaces-wave1-rc2",
-  "stamp_utc": "2026-10-29T12:23:00Z",
-  "status": "preview_verified",
-  "source_branch": "feat/academy-visual-consolidation-wave1-20261029",
-  "source_commit": "39992a0a031eacc6744ea37a139c9ad82aefc315",
+  "version": "2026.10.29-academy-spaces-wave1-v1",
+  "stamp_utc": "2026-10-29T12:27:00Z",
+  "status": "production_verified",
+  "source_branch": "main",
+  "source_commit": "3a01d07131571e3f6e4f735fb087732c401f61e2",
   "functional_commit": "1a21597b4b7c1472d056bdc55cec02197d7b28ce",
   "previous_production_release": {
     "version": "2026.10.29-communications-reports-v1",
@@ -25,9 +25,18 @@
     "unavailable_routes": 0
   },
   "production": {
-    "state": "unchanged",
-    "current_version": "2026.10.29-communications-reports-v1",
-    "url": "https://playin365.app"
+    "state": "READY_VERIFIED",
+    "deployment_id": "dpl_AxYcqXLcP2VKJkx5fvrkYiLLemAy",
+    "commit": "3a01d07131571e3f6e4f735fb087732c401f61e2",
+    "url": "https://playin365.app",
+    "aliases": ["playin365.app", "www.playin365.app", "playin365.vercel.app"],
+    "academy_spaces": "pass_5_of_5",
+    "academy_routes": "pass_64_of_64",
+    "mobile_overflow": "pass_0_of_64",
+    "touch_targets": "pass_63_of_63",
+    "runtime_application_errors": 0,
+    "missing_routes": 0,
+    "unavailable_routes": 0
   },
   "architecture": {
     "pillars": ["individuals", "organizations", "events"],
@@ -80,6 +89,14 @@
     "academyGrowth_cached": 24,
     "cached_api_requests": 0
   },
+  "performance_production_ms": {
+    "shell": 261,
+    "academyPeople_first": 1417,
+    "academyField_cached": 28,
+    "academyBusiness_cached": 23,
+    "academyGrowth_cached": 22,
+    "cached_api_requests_max": 1
+  },
   "quality_gates": {
     "javascript_syntax": "pass",
     "json_integrity": "pass",
@@ -88,6 +105,7 @@
     "client_storage_source_of_truth": "pass_none",
     "local_academy_spaces": "pass_5_of_5",
     "preview_academy_spaces": "pass_5_of_5",
+    "production_academy_spaces": "pass_5_of_5",
     "legacy_academy_routes": "pass_64_of_64",
     "mobile_overflow": "pass_0_of_64",
     "touch_targets": "pass_63_of_63",
@@ -96,14 +114,16 @@
     "legacy_capabilities": "preserved",
     "preview_build": "pass",
     "preview_runtime": "pass_with_non_blocking_existing_football_dependency_warning",
-    "production_runtime": "not_started"
+    "production_build": "pass",
+    "production_runtime": "pass"
   },
   "integration_mode": "experimental",
   "runtime_note": {
     "code": "DEP0169",
     "scope": "existing Vercel Node dependency for /api/football-fixtures",
     "academy_spaces_affected": false,
-    "blocking": false
+    "blocking": false,
+    "production_observation": "no logs emitted during final production acceptance"
   },
   "notes": [
     "No academy capability or specialist route was removed.",
