@@ -1,9 +1,9 @@
 {
-  "version": "2026.10.29-experience-consolidation-rc2",
-  "stamp_utc": "2026-10-29T01:42:30Z",
-  "status": "preview_verified",
-  "source_branch": "feat/experience-consolidation-20261029",
-  "source_commit": "12e8f04926a45ac93553a6900f0b0c565bf3525b",
+  "version": "2026.10.29-experience-consolidation-v1",
+  "stamp_utc": "2026-10-29T01:47:00Z",
+  "status": "production_verified",
+  "source_branch": "main",
+  "source_commit": "d2129ff1bcc4de87d5384a67e88cfb6e07048950",
   "previous_production_release": {
     "version": "2026.10.29-golden-tryouts-opportunities-v1",
     "commit": "219c01de51caa263c2c4ae0d79489d2e85d4d029",
@@ -12,9 +12,11 @@
   },
   "preview": {
     "state": "READY_VERIFIED",
-    "deployment_id": "dpl_51856QTboKo3za7mnGWEmDeXXwJ3",
-    "url": "https://playin365-i65f6x5gb-alalz22019-makers-projects.vercel.app",
+    "deployment_id": "dpl_3MhVGA9H4YX68GNMrDXipcgV44KW",
+    "functional_deployment_id": "dpl_51856QTboKo3za7mnGWEmDeXXwJ3",
+    "url": "https://playin365-ejlpw9usq-alalz22019-makers-projects.vercel.app",
     "functional_commit": "12e8f04926a45ac93553a6900f0b0c565bf3525b",
+    "release_commit": "30073d66dcc0aacc6b3eef5a33472950e2ce0ecb",
     "role_ui": "pass_4_of_4",
     "consolidated_screens": "pass_16_of_16",
     "functional_route_checks": "pass_147_of_147",
@@ -23,9 +25,21 @@
     "unavailable_routes": 0
   },
   "production": {
-    "state": "unchanged",
-    "current_version": "2026.10.29-golden-tryouts-opportunities-v1",
-    "url": "https://playin365.app"
+    "state": "READY_VERIFIED",
+    "deployment_id": "dpl_FvToQs9KkXUCkoyNeEYuKt8qvPA7",
+    "commit": "d2129ff1bcc4de87d5384a67e88cfb6e07048950",
+    "url": "https://playin365.app",
+    "aliases": [
+      "playin365.app",
+      "www.playin365.app",
+      "playin365.vercel.app"
+    ],
+    "role_ui": "pass_4_of_4",
+    "consolidated_screens": "pass_16_of_16",
+    "functional_route_checks": "pass_147_of_147",
+    "runtime_errors": 0,
+    "missing_routes": 0,
+    "unavailable_routes": 0
   },
   "architecture": {
     "pillars": [
@@ -46,7 +60,10 @@
       "activityTimeline"
     ],
     "legacy_routes_preserved": true,
-    "duplicate_data_store": false
+    "duplicate_data_store": false,
+    "role_specific_home_preserved": true,
+    "command_search": true,
+    "cached_cross_journey_navigation": true
   },
   "geometry": {
     "source": "approved_archived_svg_path",
@@ -118,6 +135,29 @@
     },
     "cached_api_requests": 0
   },
+  "performance_production_ms": {
+    "academy": {
+      "first": 3311,
+      "center_cached": 46,
+      "timeline_cached": 29
+    },
+    "coach": {
+      "first": 3414,
+      "center_cached": 6,
+      "timeline_cached": 7
+    },
+    "guardian": {
+      "first": 2836,
+      "center_cached": 6,
+      "timeline_cached": 6
+    },
+    "player": {
+      "first": 4206,
+      "center_cached": 7,
+      "timeline_cached": 43
+    },
+    "cached_api_requests": 0
+  },
   "quality_gates": {
     "javascript_syntax": "pass",
     "json_integrity": "pass",
@@ -127,6 +167,8 @@
     "local_consolidated_screens": "pass_16_of_16",
     "preview_role_ui": "pass_4_of_4",
     "preview_consolidated_screens": "pass_16_of_16",
+    "production_role_ui": "pass_4_of_4",
+    "production_consolidated_screens": "pass_16_of_16",
     "functional_regression": "pass_147_of_147",
     "touch_targets": "pass",
     "horizontal_overflow_new_screens": "pass",
@@ -136,16 +178,25 @@
     "legacy_capabilities": "preserved",
     "preview_runtime": "pass",
     "preview_build": "pass",
-    "production_runtime": "not_started"
+    "production_runtime": "pass_with_non_blocking_platform_dependency_warning",
+    "production_build": "pass"
   },
   "database": {
     "new_migration_required": false,
     "reason": "UI orchestration over the approved journey RPCs and sources of truth."
   },
   "integration_mode": "experimental",
+  "runtime_note": {
+    "code": "DEP0169",
+    "scope": "Vercel Node runtime dependency used by /api/football-fixtures",
+    "application_source_uses_url_parse": false,
+    "blocking": false,
+    "service_result": "successful_with_demo_fallback_when_provider_unconfigured"
+  },
   "notes": [
     "No legacy service or route was removed.",
     "Role-specific home identity is preserved and augmented rather than replaced.",
-    "External integrations remain experimental."
+    "External integrations remain experimental.",
+    "The only runtime warning is a non-blocking Node dependency deprecation outside the application source."
   ]
 }
