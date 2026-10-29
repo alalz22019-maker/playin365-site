@@ -1,6 +1,6 @@
 {
-  "version": "2026.10.29-golden-subscription-payment-v1",
-  "principle": "No capability is removed. Training Day, Match Day, and Subscription & Payment are governed shared journeys while every legacy service remains directly reachable.",
+  "version": "2026.10.29-golden-tryouts-opportunities-rc1",
+  "principle": "No capability is removed. Training Day, Match Day, Subscription & Payment, and Tryouts & Opportunities are governed shared journeys while every legacy service remains directly reachable.",
   "pillars": [
     "individuals",
     "organizations",
@@ -15,7 +15,8 @@
     "myHome",
     "myIdentity",
     "trainingDay",
-    "matchDay"
+    "matchDay",
+    "tryoutOpportunity"
   ],
   "roles": {
     "academy": {
@@ -120,7 +121,12 @@
     "payerPlayerPrivacy": true,
     "verifiedReceipt": true,
     "balancedLedger": true,
-    "externalGatewayRequiresVerifiedConnection": true
+    "externalGatewayRequiresVerifiedConnection": true,
+    "goldenTryoutsOpportunities": true,
+    "guardianDecisionGate": true,
+    "staffNotePrivacy": true,
+    "admissionMembershipGoverned": true,
+    "financeHandoffGoverned": true
   },
   "goldenJourneys": {
     "trainingDay": {
@@ -189,17 +195,88 @@
         "player": "reads_membership_outcome_without_private_payment_reference"
       },
       "gatewayRule": "disabled_until_connected_and_credentials_configured"
+    },
+    "tryoutsOpportunities": {
+      "route": "tryoutOpportunity",
+      "roles": [
+        "academy",
+        "coach",
+        "guardian",
+        "player"
+      ],
+      "sourceOfTruth": [
+        "opportunities",
+        "sports_events",
+        "opportunity_candidates",
+        "opportunity_candidate_documents",
+        "opportunity_evaluations",
+        "opportunity_evaluation_dimensions",
+        "athlete_offers",
+        "opportunity_admissions",
+        "organization_memberships",
+        "team_members",
+        "entity_activity_events",
+        "data_provenance"
+      ],
+      "authority": {
+        "academy": [
+          "publish_opportunity",
+          "eligibility_review",
+          "document_review",
+          "candidate_stage",
+          "issue_offer",
+          "admission_finalize"
+        ],
+        "coach": [
+          "trial_check_in",
+          "technical_evaluation",
+          "recommendation"
+        ],
+        "guardian": [
+          "application_consent",
+          "offer_consent"
+        ],
+        "player": [
+          "apply",
+          "submit_documents",
+          "withdraw",
+          "offer_decision"
+        ]
+      },
+      "privacy": {
+        "staff_note": [
+          "academy",
+          "coach"
+        ],
+        "athlete_summary": [
+          "academy",
+          "coach",
+          "guardian",
+          "player"
+        ],
+        "other_candidates": [
+          "academy",
+          "coach"
+        ]
+      },
+      "financeHandoff": "subscriptionPayment"
     }
   },
   "roleSpecificCoreRoutes": {
     "academy": [
-      "subscriptionPayment"
+      "subscriptionPayment",
+      "tryoutOpportunity"
     ],
     "guardian": [
-      "subscriptionPayment"
+      "subscriptionPayment",
+      "tryoutOpportunity"
     ],
     "player": [
-      "subscriptionPayment"
+      "subscriptionPayment",
+      "tryoutOpportunity"
+    ],
+    "coach": [
+      "tryoutOpportunity"
     ]
   }
 }

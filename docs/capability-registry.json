@@ -1,14 +1,14 @@
 {
   "schema_version": "1.0",
-  "generated_at": "2026-10-29T01:35:00+03:00",
-  "principle": "No capability is removed. Golden Subscription & Payment adds a governed cross-role financial journey while legacy subscription, cashier, finance, guardian-pay, and player-wallet services remain reachable.",
+  "generated_at": "2026-10-29T00:27:09.753Z",
+  "principle": "No capability is removed. Golden Tryouts & Opportunities adds a governed cross-role recruitment journey while legacy tryout, opportunity, evaluation, offer, membership, and finance services remain directly reachable.",
   "baseline_counts": {
     "academy": 34,
     "coach": 20,
     "player": 16
   },
-  "new_core_routes": 5,
-  "total_entries": 75,
+  "new_core_routes": 6,
+  "total_entries": 76,
   "items": [
     {
       "capability_id": "ACA-001",
@@ -1580,6 +1580,30 @@
         "permission",
         "cross_role",
         "financial_integrity",
+        "privacy",
+        "mobile",
+        "visual",
+        "production"
+      ]
+    },
+    {
+      "capability_id": "CORE-006",
+      "role": "shared",
+      "route": "tryoutOpportunity",
+      "label_ar": "التجارب والفرص المشتركة",
+      "current_status": "implemented_on_feature_branch",
+      "disposition": "new_golden_journey",
+      "target_area": "recruitment_opportunities",
+      "new_entry_points": [
+        "myHome",
+        "hub",
+        "direct_route"
+      ],
+      "acceptance_required": [
+        "functional",
+        "permission",
+        "cross_role",
+        "guardian_gate",
         "privacy",
         "mobile",
         "visual",
