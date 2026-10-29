@@ -1,39 +1,39 @@
 {
-  "version": "2026.10.29-golden-tryouts-opportunities-rc1",
-  "stamp_utc": "2026-10-29T00:27:09.753Z",
-  "status": "preview_candidate",
-  "source_branch": "feat/golden-tryouts-opportunities-20261029",
-  "source_commit": null,
+  "version": "2026.10.29-golden-tryouts-opportunities-v1",
+  "stamp_utc": "2026-10-29T00:50:30Z",
+  "status": "production_verified",
+  "source_branch": "main",
+  "source_commit": "77ddc79df3d99809a1ba7e7277b40935988a1bef",
   "previous_production_commit": "6071262f1dddb3c04511082a924172d1a20ceedd",
   "preview": {
-    "deployment_id": null,
-    "commit": null,
-    "url": null,
-    "state": "PENDING_REMOTE_COMMIT",
+    "deployment_id": "dpl_Cru9J9s9Gh1rpsgmLAxH6kSf7jaL",
+    "commit": "72bf1692ce50af5bbe5efa90d59456cbcc518d85",
+    "url": "https://playin365-qzgyvnull-alalz22019-makers-projects.vercel.app",
+    "state": "READY_VERIFIED",
     "baseline_route_checks": "97/97",
     "role_specific_finance_checks": "3/3",
     "role_specific_tryout_checks": "4/4",
-    "total_checks": "104/104 local acceptance; preview pending",
-    "runtime_errors": null,
+    "total_checks": "104/104",
+    "runtime_errors": 0,
     "missing_routes": 0,
     "unavailable_routes": 0,
-    "functional_commit": null,
-    "release_commit": null
+    "functional_commit": "72bf1692ce50af5bbe5efa90d59456cbcc518d85"
   },
   "production": {
-    "deployment_id": "dpl_6LfFoFwwH3vrF2XJRfbhswhhygNc",
-    "commit": "6071262f1dddb3c04511082a924172d1a20ceedd",
+    "deployment_id": "dpl_GkdxtzrwWqumpu1ikoHP7ddRV4pW",
+    "commit": "77ddc79df3d99809a1ba7e7277b40935988a1bef",
     "url": "https://playin365.app",
     "aliases": [
       "playin365.app",
       "www.playin365.app"
     ],
-    "state": "READY_CURRENT_BASELINE",
+    "state": "READY_VERIFIED",
     "baseline_route_checks": "97/97",
     "role_specific_finance_checks": "3/3",
-    "total_checks": "100/100 prior production",
+    "role_specific_tryout_checks": "4/4",
+    "total_checks": "104/104",
     "runtime_errors": 0,
-    "runtime_warnings": 1,
+    "runtime_warnings": 0,
     "missing_routes": 0,
     "unavailable_routes": 0
   },
@@ -100,23 +100,72 @@
       "guardian",
       "player"
     ],
-    "journey_steps": [
-      "plan",
-      "assign_subscription",
-      "issue_invoice",
-      "payer_submission",
-      "finance_review",
-      "payment",
-      "receipt",
-      "ledger",
-      "entitlement"
-    ],
     "payment_authority": "payer_submits_finance_verifies",
-    "player_privacy": "no_guardian_reference_note_or_provider_details",
-    "gateway_status": "experimental_not_connected",
-    "demo_cycles": [
-      "2026-10_paid",
-      "2026-11_open"
+    "gateway_status": "experimental_not_connected"
+  },
+  "tryouts_opportunities": {
+    "status": "production_verified",
+    "route": "tryoutOpportunity",
+    "roles": [
+      "academy",
+      "coach",
+      "guardian",
+      "player"
+    ],
+    "journey_steps": [
+      "publish_opportunity",
+      "athlete_apply",
+      "guardian_application_consent",
+      "academy_review",
+      "trial_invitation",
+      "trial_attendance",
+      "coach_evaluation",
+      "academy_offer",
+      "guardian_offer_consent",
+      "athlete_offer_decision",
+      "admission",
+      "membership_activation",
+      "team_assignment",
+      "optional_finance_handoff"
+    ],
+    "authority_model": {
+      "academy": [
+        "publish",
+        "review",
+        "pipeline_decision",
+        "offer",
+        "admission"
+      ],
+      "coach": [
+        "trial_check_in",
+        "technical_evaluation",
+        "recommendation"
+      ],
+      "guardian": [
+        "application_consent",
+        "offer_consent"
+      ],
+      "player": [
+        "apply",
+        "documents",
+        "withdraw",
+        "offer_decision"
+      ]
+    },
+    "privacy": {
+      "staff_note_visible_to": [
+        "academy",
+        "coach"
+      ],
+      "staff_note_hidden_from": [
+        "guardian",
+        "player"
+      ],
+      "cross_candidate_access": "blocked"
+    },
+    "demo_scenarios": [
+      "open_u18_tryout",
+      "advanced_evaluation_offer_u18"
     ]
   },
   "database": {
@@ -136,72 +185,46 @@
     ],
     "status": "applied_and_reverified",
     "new_rls_tables": 5,
-    "public_feature_rpcs": 18,
     "anon_rpc_execute_grants": 0,
     "direct_authenticated_table_writes": 0,
-    "security_definer_search_path": "empty_and_schema_qualified",
     "access_model": "authenticated_rpc_only",
     "migration_history_aligned": true,
     "baseline_rpc_hardening": "PASS",
     "gate_status": "PASS",
-    "gate_checked_at": "2026-10-29T00:37:57.210051Z"
+    "gate_checked_at": "2026-10-29T00:00:06.445325Z"
   },
   "integration_mode": "experimental",
   "quality_gates": {
-    "postgres_parse": "pass_111_statements",
     "javascript_syntax": "pass",
+    "json_integrity": "pass",
     "css_integrity": "pass",
     "database_e2e": "pass",
-    "activation_before_payment": "blocked",
-    "player_payment_attempt": "blocked",
-    "gateway_without_credentials": "blocked",
-    "receipt_generation": "pass",
-    "entitlement_activation": "pass",
-    "ledger_balance": "pass_115_debit_115_credit",
-    "payer_player_privacy": "pass_no_reference_or_note_leak",
-    "local_mobile_visual": "pass",
-    "interactive_sheets": "pass_13_of_13",
+    "local_role_ui": "pass_4_of_4",
+    "preview_role_ui": "pass_4_of_4",
+    "production_role_ui": "pass_4_of_4",
+    "interactive_sheets": "pass_14_of_14",
     "touch_targets": "pass",
     "horizontal_overflow": "pass",
+    "privacy_guards": "pass",
+    "direct_write_guards": "pass",
     "legacy_capabilities": "preserved",
     "preview_runtime": "pass",
     "preview_build": "pass",
     "production_runtime": "pass",
     "production_build": "pass",
-    "security_advisors": "pass_no_new_subscription_payment_findings_existing_project_debt_not_blocking",
-    "performance_advisors": "pass_zero_unindexed_feature_foreign_keys",
-    "new_public_security_definers": "pass_zero",
-    "new_tables_rls": "pass_3_of_3",
-    "direct_new_table_access": "pass_revoked",
-    "qa_cleanup": "pass_zero_active_qa_records_historical_archived_1",
-    "temporary_resource_cleanup": "pass_zero"
-  },
-  "observations": {
-    "production_non_blocking_warning": "Node DEP0169 was emitted only by the football fixtures function; its request remained functional and Subscription & Payment production acceptance remained clean.",
-    "historical_qa_record": "One archived fee plan with one cancelled subscription from an earlier acceptance test remains intentionally retained as an inactive audit record."
-  },
-  "external_activation": {
-    "status": "experimental",
-    "note": "No payment provider is marked connected without live credentials and verified webhook tests."
+    "database_security_performance_gate": "pass",
+    "qa_cleanup": "pass",
+    "temporary_resource_cleanup": "pass"
   },
   "testing": {
-    "javascript_syntax": "PASS",
-    "data_e2e": "PASS",
-    "demo_seed": "PASS",
-    "ui_audit": "PASS",
-    "sheet_audit": "PASS 14/14",
-    "privacy_guards": "PASS",
-    "direct_write_guards": "PASS",
-    "preview": "PENDING",
-    "production": "PENDING",
-    "local_role_ui": "PASS 4/4",
-    "mobile_viewport": "PASS 390x844",
-    "horizontal_overflow": 0,
-    "visible_touch_targets_under_44px": 0,
+    "mobile_viewport": "390x844",
     "console_errors": 0,
     "page_errors": 0,
     "request_failures": 0,
-    "database_gate": "PASS"
+    "horizontal_overflow": 0,
+    "visible_touch_targets_under_44px": 0,
+    "staff_note_privacy": "PASS",
+    "cross_candidate_access": "BLOCKED"
   },
   "service_worker": {
     "cache": "playin365-shell-20261029-golden-tryouts-opportunities-v1",
@@ -212,11 +235,12 @@
   },
   "external_integrations": {
     "mode": "experimental",
-    "production_dependency": false
+    "production_dependency": false,
+    "note": "No external provider is marked connected without live credentials and verified webhook tests."
   },
   "notes": [
-    "This metadata describes a release candidate until preview and production verification finish.",
-    "Legacy routes remain directly reachable.",
-    "Database deployment preceded source recovery; Git now restores the exact applied migration bundle."
+    "No legacy service or route was removed.",
+    "The four-role opportunity journey is production verified.",
+    "External integrations remain experimental."
   ]
 }
