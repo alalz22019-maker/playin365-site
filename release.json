@@ -1,9 +1,9 @@
 {
-  "version": "2026.10.29-experience-consolidation-rc1",
-  "stamp_utc": "2026-10-29T01:28:00Z",
-  "status": "preview_candidate",
+  "version": "2026.10.29-experience-consolidation-rc2",
+  "stamp_utc": "2026-10-29T01:42:30Z",
+  "status": "preview_verified",
   "source_branch": "feat/experience-consolidation-20261029",
-  "source_commit": "58591e637d7f17aeb44d60d6fbdca8afc6a48464",
+  "source_commit": "12e8f04926a45ac93553a6900f0b0c565bf3525b",
   "previous_production_release": {
     "version": "2026.10.29-golden-tryouts-opportunities-v1",
     "commit": "219c01de51caa263c2c4ae0d79489d2e85d4d029",
@@ -11,10 +11,16 @@
     "status": "production_verified"
   },
   "preview": {
-    "state": "not_started",
-    "deployment_id": null,
-    "url": null,
-    "functional_commit": "58591e637d7f17aeb44d60d6fbdca8afc6a48464"
+    "state": "READY_VERIFIED",
+    "deployment_id": "dpl_51856QTboKo3za7mnGWEmDeXXwJ3",
+    "url": "https://playin365-i65f6x5gb-alalz22019-makers-projects.vercel.app",
+    "functional_commit": "12e8f04926a45ac93553a6900f0b0c565bf3525b",
+    "role_ui": "pass_4_of_4",
+    "consolidated_screens": "pass_16_of_16",
+    "functional_route_checks": "pass_147_of_147",
+    "runtime_errors": 0,
+    "missing_routes": 0,
+    "unavailable_routes": 0
   },
   "production": {
     "state": "unchanged",
@@ -89,6 +95,29 @@
     },
     "cached_api_requests": 0
   },
+  "performance_preview_ms": {
+    "academy": {
+      "first": 3773,
+      "center_cached": 54,
+      "timeline_cached": 75
+    },
+    "coach": {
+      "first": 3377,
+      "center_cached": 8,
+      "timeline_cached": 62
+    },
+    "guardian": {
+      "first": 3068,
+      "center_cached": 5,
+      "timeline_cached": 51
+    },
+    "player": {
+      "first": 4218,
+      "center_cached": 52,
+      "timeline_cached": 34
+    },
+    "cached_api_requests": 0
+  },
   "quality_gates": {
     "javascript_syntax": "pass",
     "json_integrity": "pass",
@@ -96,6 +125,8 @@
     "secret_scan": "pass",
     "local_role_ui": "pass_4_of_4",
     "local_consolidated_screens": "pass_16_of_16",
+    "preview_role_ui": "pass_4_of_4",
+    "preview_consolidated_screens": "pass_16_of_16",
     "functional_regression": "pass_147_of_147",
     "touch_targets": "pass",
     "horizontal_overflow_new_screens": "pass",
@@ -103,7 +134,8 @@
     "command_search": "pass",
     "cached_navigation": "pass",
     "legacy_capabilities": "preserved",
-    "preview_runtime": "not_started",
+    "preview_runtime": "pass",
+    "preview_build": "pass",
     "production_runtime": "not_started"
   },
   "database": {
